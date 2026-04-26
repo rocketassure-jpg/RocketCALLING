@@ -7,7 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3 } from "lucide-react";
+import { LogOut, Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox } from "lucide-react";
+import { CallingList } from "@/components/CallingList";
+import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -89,11 +91,21 @@ const ManagerDashboard = () => {
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><IndianRupee className="h-5 w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
-        <Tabs defaultValue="team">
+        <Tabs defaultValue="calling">
           <TabsList>
+            <TabsTrigger value="calling"><Phone className="mr-2 h-4 w-4" />Calling</TabsTrigger>
+            <TabsTrigger value="enquiries"><Inbox className="mr-2 h-4 w-4" />New enquiries</TabsTrigger>
             <TabsTrigger value="team"><BarChart3 className="mr-2 h-4 w-4" />Team performance</TabsTrigger>
             <TabsTrigger value="leads">Team leads</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="calling">
+            <CallingList callerName={me?.full_name || "Rocket Services"} />
+          </TabsContent>
+
+          <TabsContent value="enquiries">
+            <EnquiriesPanel />
+          </TabsContent>
 
           <TabsContent value="team">
             <Card>
