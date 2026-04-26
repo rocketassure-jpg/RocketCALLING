@@ -64,10 +64,40 @@ export type Database = {
           },
         ]
       }
+      dial_logs: {
+        Row: {
+          clicked_at: string
+          id: string
+          lead_id: string
+          telecaller_id: string
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          lead_id: string
+          telecaller_id: string
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          lead_id?: string
+          telecaller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dial_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           area_id: string
           assigned_telecaller: string | null
+          call_date: string
           created_at: string
           customer_name: string
           id: string
@@ -75,12 +105,14 @@ export type Database = {
           notes: string | null
           phone_number: string
           policy_type: Database["public"]["Enums"]["policy_type"]
+          premium_amount: number
           status: Database["public"]["Enums"]["lead_status"]
           updated_at: string
         }
         Insert: {
           area_id: string
           assigned_telecaller?: string | null
+          call_date?: string
           created_at?: string
           customer_name: string
           id?: string
@@ -88,12 +120,14 @@ export type Database = {
           notes?: string | null
           phone_number: string
           policy_type: Database["public"]["Enums"]["policy_type"]
+          premium_amount?: number
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
         }
         Update: {
           area_id?: string
           assigned_telecaller?: string | null
+          call_date?: string
           created_at?: string
           customer_name?: string
           id?: string
@@ -101,6 +135,7 @@ export type Database = {
           notes?: string | null
           phone_number?: string
           policy_type?: Database["public"]["Enums"]["policy_type"]
+          premium_amount?: number
           status?: Database["public"]["Enums"]["lead_status"]
           updated_at?: string
         }
@@ -119,18 +154,29 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          manager_id: string | null
         }
         Insert: {
           created_at?: string
           full_name?: string
           id: string
+          manager_id?: string | null
         }
         Update: {
           created_at?: string
           full_name?: string
           id?: string
+          manager_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_manager_id_fkey"
+            columns: ["manager_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       telecaller_areas: {
         Row: {
@@ -188,19 +234,29 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_manager_of: {
+        Args: { _manager_id: string; _telecaller_id: string }
+        Returns: boolean
+      }
+      manager_can_see_lead: {
+        Args: { _area_id: string; _manager_id: string }
+        Returns: boolean
+      }
       telecaller_has_area: {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      app_role: "admin" | "telecaller"
+      app_role: "admin" | "telecaller" | "manager"
       lead_status:
         | "New"
         | "Interested"
         | "Follow-up"
         | "Not Picked"
         | "Not Interested"
+        | "Unsubscribed"
+        | "Done"
       policy_type: "Life" | "Health" | "Motor"
     }
     CompositeTypes: {
@@ -329,13 +385,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "telecaller"],
+      app_role: ["admin", "telecaller", "manager"],
       lead_status: [
         "New",
         "Interested",
         "Follow-up",
         "Not Picked",
         "Not Interested",
+        "Unsubscribed",
+        "Done",
       ],
       policy_type: ["Life", "Health", "Motor"],
     },

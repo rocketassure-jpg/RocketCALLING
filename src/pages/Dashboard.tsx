@@ -7,6 +7,7 @@ const Dashboard = () => {
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
   if (role === "admin") return <Navigate to="/admin" replace />;
+  if (role === "manager") return <Navigate to="/manager" replace />;
   if (role === "telecaller") return <Navigate to="/telecaller" replace />;
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">

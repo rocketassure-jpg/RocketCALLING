@@ -2,7 +2,10 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "admin" | "telecaller" | null;
+type Role = "admin" | "manager" | "telecaller" | null;
+
+const pickRole = (roles: string[]): Role =>
+  roles.includes("admin") ? "admin" : roles.includes("manager") ? "manager" : roles.includes("telecaller") ? "telecaller" : null;
 
 interface AuthCtx {
   user: User | null;
@@ -27,8 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (s?.user) {
         setTimeout(async () => {
           const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-          const roles = (data ?? []).map((r) => r.role);
-          setRole(roles.includes("admin") ? "admin" : roles.includes("telecaller") ? "telecaller" : null);
+          setRole(pickRole((data ?? []).map((r) => r.role)));
         }, 0);
       } else {
         setRole(null);
@@ -40,8 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(s?.user ?? null);
       if (s?.user) {
         const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-        const roles = (data ?? []).map((r) => r.role);
-        setRole(roles.includes("admin") ? "admin" : roles.includes("telecaller") ? "telecaller" : null);
+        setRole(pickRole((data ?? []).map((r) => r.role)));
       }
       setLoading(false);
     });
