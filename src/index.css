@@ -2,30 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Rocket Insurance — professional blue & white design system */
+/* Rocket Services — bold red & white design system */
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 9%;
 
-    /* Brand: trustworthy royal blue */
-    --primary: 217 91% 45%;
+    /* Brand: bold rocket red */
+    --primary: 0 85% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 213 94% 60%;
+    --primary-glow: 0 90% 62%;
 
-    --secondary: 214 100% 97%;
-    --secondary-foreground: 217 91% 25%;
+    --secondary: 0 100% 97%;
+    --secondary-foreground: 0 75% 30%;
 
-    --muted: 215 28% 96%;
-    --muted-foreground: 215 16% 40%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: 199 89% 48%;
+    --accent: 14 90% 55%;
     --accent-foreground: 0 0% 100%;
 
     --success: 142 71% 42%;
@@ -34,54 +34,54 @@
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 55%;
+    --destructive: 0 0% 25%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 25% 90%;
-    --input: 215 25% 90%;
-    --ring: 217 91% 45%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 85% 50%;
 
     --radius: 0.625rem;
 
-    --gradient-hero: linear-gradient(135deg, hsl(217 91% 30%) 0%, hsl(213 94% 50%) 60%, hsl(199 89% 60%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 85% 38%) 0%, hsl(0 90% 55%) 60%, hsl(14 90% 60%) 100%);
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(214 100% 99%) 0%, hsl(0 0% 100%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(0 100% 99%) 0%, hsl(0 0% 100%) 100%);
 
-    --shadow-soft: 0 2px 12px -4px hsl(217 91% 45% / 0.08);
-    --shadow-elegant: 0 14px 40px -16px hsl(217 91% 35% / 0.25);
-    --shadow-glow: 0 0 32px hsl(213 94% 60% / 0.35);
+    --shadow-soft: 0 2px 12px -4px hsl(0 85% 50% / 0.10);
+    --shadow-elegant: 0 14px 40px -16px hsl(0 85% 40% / 0.30);
+    --shadow-glow: 0 0 32px hsl(0 90% 62% / 0.40);
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 20%;
-    --sidebar-primary: 217 91% 45%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 0 85% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 100% 97%;
-    --sidebar-accent-foreground: 217 91% 25%;
-    --sidebar-border: 215 25% 90%;
-    --sidebar-ring: 217 91% 45%;
+    --sidebar-accent: 0 100% 97%;
+    --sidebar-accent-foreground: 0 75% 30%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 85% 50%;
   }
 
   .dark {
-    --background: 222 47% 8%;
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 11%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 213 94% 60%;
-    --primary-foreground: 222 47% 8%;
-    --primary-glow: 199 89% 60%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 199 89% 48%;
+    --background: 0 0% 8%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 90% 60%;
+    --primary-foreground: 0 0% 8%;
+    --primary-glow: 14 90% 62%;
+    --secondary: 0 0% 17%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 14 90% 55%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 51%;
+    --destructive: 0 0% 30%;
     --destructive-foreground: 0 0% 100%;
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 213 94% 60%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 90% 60%;
   }
 }
 
