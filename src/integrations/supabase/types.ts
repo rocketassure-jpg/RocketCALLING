@@ -93,6 +93,39 @@ export type Database = {
           },
         ]
       }
+      enquiries: {
+        Row: {
+          created_at: string
+          customer_name: string
+          handled: boolean
+          id: string
+          insurance_type: Database["public"]["Enums"]["policy_type"]
+          message: string | null
+          phone_number: string
+          vehicle_number: string | null
+        }
+        Insert: {
+          created_at?: string
+          customer_name: string
+          handled?: boolean
+          id?: string
+          insurance_type?: Database["public"]["Enums"]["policy_type"]
+          message?: string | null
+          phone_number: string
+          vehicle_number?: string | null
+        }
+        Update: {
+          created_at?: string
+          customer_name?: string
+          handled?: boolean
+          id?: string
+          insurance_type?: Database["public"]["Enums"]["policy_type"]
+          message?: string | null
+          phone_number?: string
+          vehicle_number?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           area_id: string
