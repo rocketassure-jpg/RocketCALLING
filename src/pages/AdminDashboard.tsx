@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, Plus, Trash2, Upload, MapPin, Users, FileSpreadsheet, Ban, IndianRupee, RotateCcw } from "lucide-react";
+import { LogOut, Plus, Trash2, Upload, MapPin, Users, FileSpreadsheet, Ban, IndianRupee, RotateCcw, Phone, Inbox } from "lucide-react";
+import { CallingList } from "@/components/CallingList";
+import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -176,14 +178,24 @@ const AdminDashboard = () => {
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Total premium</div><div className="mt-1 flex items-center gap-1 text-2xl font-bold text-primary"><IndianRupee className="h-5 w-5" />{totalPremium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
-        <Tabs defaultValue="leads">
-          <TabsList className="grid w-full max-w-3xl grid-cols-5">
+        <Tabs defaultValue="calling">
+          <TabsList className="grid w-full max-w-4xl grid-cols-7">
+            <TabsTrigger value="calling"><Phone className="mr-2 h-4 w-4" />Calling</TabsTrigger>
+            <TabsTrigger value="enquiries"><Inbox className="mr-2 h-4 w-4" />Enquiries</TabsTrigger>
             <TabsTrigger value="leads"><FileSpreadsheet className="mr-2 h-4 w-4" />Leads</TabsTrigger>
             <TabsTrigger value="areas"><MapPin className="mr-2 h-4 w-4" />Areas</TabsTrigger>
             <TabsTrigger value="team"><Users className="mr-2 h-4 w-4" />Team</TabsTrigger>
             <TabsTrigger value="import"><Upload className="mr-2 h-4 w-4" />Import</TabsTrigger>
             <TabsTrigger value="trash"><Ban className="mr-2 h-4 w-4" />Trash</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="calling">
+            <CallingList callerName="Owner" />
+          </TabsContent>
+
+          <TabsContent value="enquiries">
+            <EnquiriesPanel />
+          </TabsContent>
 
           {/* LEADS */}
           <TabsContent value="leads" className="space-y-6">
