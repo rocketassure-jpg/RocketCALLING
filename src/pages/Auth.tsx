@@ -1,0 +1,119 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Logo } from "@/components/Logo";
+import { toast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+
+const Auth = () => {
+  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    nav("/dashboard");
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`,
+        data: { full_name: fullName },
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: "Account created", description: "You can sign in now. An admin will assign your role & areas." });
+  };
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-soft p-4">
+      <div className="w-full max-w-md space-y-6">
+        <div className="text-center">
+          <div className="flex justify-center"><Logo /></div>
+          <p className="mt-3 text-sm text-muted-foreground">Staff portal — Tele-CRM access</p>
+        </div>
+
+        <Card className="shadow-elegant">
+          <CardHeader>
+            <CardTitle>Welcome back</CardTitle>
+            <CardDescription>Sign in to manage your assigned leads</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="signin">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="signin">Sign in</TabsTrigger>
+                <TabsTrigger value="signup">Sign up</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="signin">
+                <form onSubmit={handleSignIn} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="se">Email</Label>
+                    <Input id="se" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="sp">Password</Label>
+                    <Input id="sp" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
+                  <Button type="submit" variant="hero" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup">
+                <form onSubmit={handleSignUp} className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="n">Full name</Label>
+                    <Input id="n" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ue">Email</Label>
+                    <Input id="ue" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="up">Password</Label>
+                    <Input id="up" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} />
+                  </div>
+                  <Button type="submit" variant="hero" className="w-full" disabled={loading}>
+                    {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
+                  </Button>
+                  <p className="text-center text-xs text-muted-foreground">First user to sign up should be promoted to admin via Cloud → Database.</p>
+                </form>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <div className="text-center">
+          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Back to home</Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Auth;
