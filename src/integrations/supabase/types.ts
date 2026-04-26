@@ -14,16 +14,194 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      areas: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      call_logs: {
+        Row: {
+          called_at: string
+          id: string
+          lead_id: string
+          status: Database["public"]["Enums"]["lead_status"]
+          telecaller_id: string
+        }
+        Insert: {
+          called_at?: string
+          id?: string
+          lead_id: string
+          status: Database["public"]["Enums"]["lead_status"]
+          telecaller_id: string
+        }
+        Update: {
+          called_at?: string
+          id?: string
+          lead_id?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          telecaller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "call_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          area_id: string
+          assigned_telecaller: string | null
+          created_at: string
+          customer_name: string
+          id: string
+          last_called_at: string | null
+          notes: string | null
+          phone_number: string
+          policy_type: Database["public"]["Enums"]["policy_type"]
+          status: Database["public"]["Enums"]["lead_status"]
+          updated_at: string
+        }
+        Insert: {
+          area_id: string
+          assigned_telecaller?: string | null
+          created_at?: string
+          customer_name: string
+          id?: string
+          last_called_at?: string | null
+          notes?: string | null
+          phone_number: string
+          policy_type: Database["public"]["Enums"]["policy_type"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Update: {
+          area_id?: string
+          assigned_telecaller?: string | null
+          created_at?: string
+          customer_name?: string
+          id?: string
+          last_called_at?: string | null
+          notes?: string | null
+          phone_number?: string
+          policy_type?: Database["public"]["Enums"]["policy_type"]
+          status?: Database["public"]["Enums"]["lead_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string
+          id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      telecaller_areas: {
+        Row: {
+          area_id: string
+          id: string
+          telecaller_id: string
+        }
+        Insert: {
+          area_id: string
+          id?: string
+          telecaller_id: string
+        }
+        Update: {
+          area_id?: string
+          id?: string
+          telecaller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telecaller_areas_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      telecaller_has_area: {
+        Args: { _area_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "telecaller"
+      lead_status:
+        | "New"
+        | "Interested"
+        | "Follow-up"
+        | "Not Picked"
+        | "Not Interested"
+      policy_type: "Life" | "Health" | "Motor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +328,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "telecaller"],
+      lead_status: [
+        "New",
+        "Interested",
+        "Follow-up",
+        "Not Picked",
+        "Not Interested",
+      ],
+      policy_type: ["Life", "Health", "Motor"],
+    },
   },
 } as const
