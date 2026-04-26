@@ -7,7 +7,7 @@ export const Logo = ({ light = false }: { light?: boolean }) => (
       <Rocket className={`h-5 w-5 ${light ? "text-white" : "text-primary-foreground"}`} />
     </span>
     <span className={`text-lg ${light ? "text-white" : "text-foreground"}`}>
-      Rocket <span className="text-primary">Insurance</span>
+      Rocket <span className="text-primary">Services</span>
     </span>
   </Link>
 );
