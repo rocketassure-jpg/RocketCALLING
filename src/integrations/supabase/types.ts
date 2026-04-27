@@ -32,6 +32,33 @@ export type Database = {
         }
         Relationships: []
       }
+      break_logs: {
+        Row: {
+          created_at: string
+          ended_at: string | null
+          id: string
+          reason: string
+          started_at: string
+          telecaller_id: string
+        }
+        Insert: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          reason: string
+          started_at?: string
+          telecaller_id: string
+        }
+        Update: {
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          reason?: string
+          started_at?: string
+          telecaller_id?: string
+        }
+        Relationships: []
+      }
       call_logs: {
         Row: {
           called_at: string
@@ -66,19 +93,28 @@ export type Database = {
       }
       dial_logs: {
         Row: {
+          call_type: string
           clicked_at: string
+          connected: boolean
+          duration_seconds: number
           id: string
           lead_id: string
           telecaller_id: string
         }
         Insert: {
+          call_type?: string
           clicked_at?: string
+          connected?: boolean
+          duration_seconds?: number
           id?: string
           lead_id: string
           telecaller_id: string
         }
         Update: {
+          call_type?: string
           clicked_at?: string
+          connected?: boolean
+          duration_seconds?: number
           id?: string
           lead_id?: string
           telecaller_id?: string
