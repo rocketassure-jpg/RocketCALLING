@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, PhoneOff, User, IndianRupee, TrendingUp, Loader2 } from "lucide-react";
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend } from "recharts";
+import { Progress } from "@/components/ui/progress";
+import { Phone, PhoneOff, User, IndianRupee, TrendingUp, Loader2, PhoneIncoming, PhoneOutgoing, Clock, Timer } from "lucide-react";
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar, Legend, Cell } from "recharts";
 
 type Range = "today" | "7d" | "30d";
 
@@ -16,12 +17,21 @@ const rangeStart = (r: Range) => {
   return d.toISOString();
 };
 
+const fmtTime = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}m ${sec}s`;
+};
+
 export const WavelengthDashboard = () => {
   const [range, setRange] = useState<Range>("today");
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({ connected: 0, notConnected: 0, personal: 0, premium: 0, openActions: 0 });
+  const [stats, setStats] = useState({
+    connected: 0, notConnected: 0, personal: 0, premium: 0, openActions: 0,
+    outbound: 0, inbound: 0, totalTalk: 0, avgTalk: 0,
+  });
   const [trend, setTrend] = useState<{ day: string; connected: number; notConnected: number }[]>([]);
-  const [statusBuckets, setStatusBuckets] = useState<{ name: string; value: number }[]>([]);
+  const [funnel, setFunnel] = useState<{ name: string; value: number; color: string }[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -36,25 +46,36 @@ export const WavelengthDashboard = () => {
       const c = calls.data ?? [];
       const l = leads.data ?? [];
 
-      // Buckets
       const personal = d.filter((x: any) => x.call_type === "Personal").length;
-      // Connected = dial logs marked connected OR call_log status in (Interested/Done/Follow-up/Not Interested)
+      const inbound = d.filter((x: any) => x.call_type === "Inbound").length;
+      const outbound = d.filter((x: any) => x.call_type === "Outbound").length;
       const connectedStatuses = new Set(["Interested", "Done", "Follow-up", "Not Interested"]);
       const connected = d.filter((x: any) => x.connected && x.call_type !== "Personal").length
         + c.filter((x: any) => connectedStatuses.has(x.status)).length;
       const notConnected = d.filter((x: any) => !x.connected && x.call_type !== "Personal").length
         + c.filter((x: any) => x.status === "Not Picked").length;
 
+      const totalTalk = d.reduce((s: number, x: any) => s + (x.duration_seconds || 0), 0);
+      const connectedDials = d.filter((x: any) => x.connected);
+      const avgTalk = connectedDials.length ? totalTalk / connectedDials.length : 0;
+
       const premium = l.filter((x: any) => x.status === "Done").reduce((s: number, x: any) => s + Number(x.premium_amount || 0), 0);
       const today = new Date().toISOString().slice(0, 10);
       const openActions = l.filter((x: any) => x.call_date <= today && !["Done", "Unsubscribed", "Not Interested"].includes(x.status)).length;
 
-      setStats({ connected, notConnected, personal, premium, openActions });
+      setStats({ connected, notConnected, personal, premium, openActions, outbound, inbound, totalTalk, avgTalk });
 
-      // Status bucket pie/bar
-      const groups: Record<string, number> = {};
-      l.forEach((x: any) => { groups[x.status] = (groups[x.status] || 0) + 1; });
-      setStatusBuckets(Object.entries(groups).map(([name, value]) => ({ name, value })));
+      // Customer Funnel
+      const start = l.filter((x: any) => x.status === "New").length;
+      const inProgress = l.filter((x: any) => ["Follow-up", "Interested"].includes(x.status)).length;
+      const won = l.filter((x: any) => x.status === "Done").length;
+      const lost = l.filter((x: any) => ["Not Interested", "Unsubscribed"].includes(x.status)).length;
+      setFunnel([
+        { name: "Start", value: start, color: "hsl(217 91% 60%)" },
+        { name: "In Progress", value: inProgress, color: "hsl(45 93% 55%)" },
+        { name: "Closed Won", value: won, color: "hsl(142 71% 45%)" },
+        { name: "Closed Lost", value: lost, color: "hsl(0 84% 60%)" },
+      ]);
 
       // Trend
       const days = range === "today" ? 1 : range === "7d" ? 7 : 30;
@@ -65,10 +86,8 @@ export const WavelengthDashboard = () => {
       }
       d.forEach((x: any) => {
         const k = (x.clicked_at as string).slice(0, 10);
-        if (!buckets[k]) return;
-        if (x.call_type === "Personal") return;
-        if (x.connected) buckets[k].connected++;
-        else buckets[k].notConnected++;
+        if (!buckets[k] || x.call_type === "Personal") return;
+        if (x.connected) buckets[k].connected++; else buckets[k].notConnected++;
       });
       c.forEach((x: any) => {
         const k = (x.called_at as string).slice(0, 10);
@@ -83,11 +102,12 @@ export const WavelengthDashboard = () => {
 
   if (loading) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
 
-  const cards = [
-    { label: "Connected", value: stats.connected, icon: Phone, bg: "from-blue-500 to-blue-600" },
-    { label: "Not Connected", value: stats.notConnected, icon: PhoneOff, bg: "from-pink-500 to-rose-600" },
-    { label: "Personal", value: stats.personal, icon: User, bg: "from-purple-500 to-fuchsia-600" },
-    { label: "Premium ₹", value: stats.premium.toLocaleString("en-IN"), icon: IndianRupee, bg: "from-orange-500 to-red-600" },
+  const callTotal = stats.connected + stats.notConnected + stats.personal || 1;
+  const metricCards = [
+    { label: "Connected", value: stats.connected, icon: Phone, bg: "from-blue-500 to-blue-600", pct: Math.round((stats.connected / callTotal) * 100) },
+    { label: "Not Connected", value: stats.notConnected, icon: PhoneOff, bg: "from-pink-500 to-rose-600", pct: Math.round((stats.notConnected / callTotal) * 100) },
+    { label: "Personal", value: stats.personal, icon: User, bg: "from-purple-500 to-fuchsia-600", pct: Math.round((stats.personal / callTotal) * 100) },
+    { label: "Premium ₹", value: stats.premium.toLocaleString("en-IN"), icon: IndianRupee, bg: "from-orange-500 to-red-600", pct: 100 },
   ];
 
   return (
@@ -106,18 +126,33 @@ export const WavelengthDashboard = () => {
         </div>
       </div>
 
+      {/* Metric cards with progress bars */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        {cards.map((c) => (
+        {metricCards.map((c) => (
           <Card key={c.label} className="overflow-hidden">
             <CardContent className="p-0">
               <div className={`bg-gradient-to-br ${c.bg} p-4 text-white`}>
                 <c.icon className="h-5 w-5 opacity-80" />
                 <div className="mt-3 text-xs opacity-90">{c.label}</div>
                 <div className="mt-1 text-3xl font-bold">{c.value}</div>
+                <div className="mt-3">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/20">
+                    <div className="h-full rounded-full bg-white/90 transition-all" style={{ width: `${c.pct}%` }} />
+                  </div>
+                  <div className="mt-1 text-[10px] opacity-80">{c.pct}%</div>
+                </div>
               </div>
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* Call breakdown row */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="rounded-lg bg-blue-100 p-2 text-blue-600"><PhoneOutgoing className="h-5 w-5" /></div><div><div className="text-xs text-muted-foreground">Overall Outbound</div><div className="text-2xl font-bold">{stats.outbound}</div></div></div></CardContent></Card>
+        <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="rounded-lg bg-green-100 p-2 text-green-600"><PhoneIncoming className="h-5 w-5" /></div><div><div className="text-xs text-muted-foreground">Overall Inbound</div><div className="text-2xl font-bold">{stats.inbound}</div></div></div></CardContent></Card>
+        <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="rounded-lg bg-orange-100 p-2 text-orange-600"><Clock className="h-5 w-5" /></div><div><div className="text-xs text-muted-foreground">Avg Talk Time</div><div className="text-2xl font-bold">{fmtTime(stats.avgTalk)}</div></div></div></CardContent></Card>
+        <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="rounded-lg bg-red-100 p-2 text-red-600"><Timer className="h-5 w-5" /></div><div><div className="text-xs text-muted-foreground">Total Talk Time</div><div className="text-2xl font-bold">{fmtTime(stats.totalTalk)}</div></div></div></CardContent></Card>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
@@ -147,16 +182,19 @@ export const WavelengthDashboard = () => {
         </Card>
       </div>
 
+      {/* Customer Funnel */}
       <Card>
-        <CardHeader><CardTitle>Status Buckets</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Customer Funnel</CardTitle></CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={statusBuckets}>
+          <ResponsiveContainer width="100%" height={280}>
+            <BarChart data={funnel}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
               <Tooltip contentStyle={{ background: "hsl(var(--background))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-              <Bar dataKey="value" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                {funnel.map((f, i) => <Cell key={i} fill={f.color} />)}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
