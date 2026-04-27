@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_settings: {
+        Row: {
+          allow_logout_mobile: boolean
+          allow_logout_web: boolean
+          auto_start_allocation: boolean
+          id: string
+          post_interaction_actions: boolean
+          retry_1_hours: number
+          retry_2_hours: number
+          updated_at: string
+          variable_retry_enabled: boolean
+          whatsapp_business_messaging: boolean
+          whatsapp_notifications: boolean
+        }
+        Insert: {
+          allow_logout_mobile?: boolean
+          allow_logout_web?: boolean
+          auto_start_allocation?: boolean
+          id?: string
+          post_interaction_actions?: boolean
+          retry_1_hours?: number
+          retry_2_hours?: number
+          updated_at?: string
+          variable_retry_enabled?: boolean
+          whatsapp_business_messaging?: boolean
+          whatsapp_notifications?: boolean
+        }
+        Update: {
+          allow_logout_mobile?: boolean
+          allow_logout_web?: boolean
+          auto_start_allocation?: boolean
+          id?: string
+          post_interaction_actions?: boolean
+          retry_1_hours?: number
+          retry_2_hours?: number
+          updated_at?: string
+          variable_retry_enabled?: boolean
+          whatsapp_business_messaging?: boolean
+          whatsapp_notifications?: boolean
+        }
+        Relationships: []
+      }
       areas: {
         Row: {
           created_at: string
@@ -91,6 +133,36 @@ export type Database = {
           },
         ]
       }
+      crm_fields: {
+        Row: {
+          created_at: string
+          field_type: string
+          id: string
+          mandatory: boolean
+          name: string
+          options: string[] | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          field_type?: string
+          id?: string
+          mandatory?: boolean
+          name: string
+          options?: string[] | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          field_type?: string
+          id?: string
+          mandatory?: boolean
+          name?: string
+          options?: string[] | null
+          sort_order?: number
+        }
+        Relationships: []
+      }
       dial_logs: {
         Row: {
           call_type: string
@@ -159,6 +231,33 @@ export type Database = {
           message?: string | null
           phone_number?: string
           vehicle_number?: string | null
+        }
+        Relationships: []
+      }
+      lead_statuses: {
+        Row: {
+          bucket: string
+          color: string
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          bucket?: string
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          bucket?: string
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
         }
         Relationships: []
       }
@@ -246,6 +345,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      role_permissions: {
+        Row: {
+          id: string
+          manage_ivr: boolean
+          mask_phone: boolean
+          recording_request: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          track_personal_calls: boolean
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          manage_ivr?: boolean
+          mask_phone?: boolean
+          recording_request?: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          track_personal_calls?: boolean
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          manage_ivr?: boolean
+          mask_phone?: boolean
+          recording_request?: boolean
+          role?: Database["public"]["Enums"]["app_role"]
+          track_personal_calls?: boolean
+          updated_at?: string
+        }
+        Relationships: []
       }
       telecaller_areas: {
         Row: {
