@@ -15,6 +15,11 @@ import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
 import { CSVImporter } from "@/components/admin/CSVImporter";
+import { GeneralSettings } from "@/components/admin/GeneralSettings";
+import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
+import { CRMFieldsManager } from "@/components/admin/CRMFieldsManager";
+import { StatusConfigurator } from "@/components/admin/StatusConfigurator";
+import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 type Area = { id: string; name: string };
@@ -88,20 +93,13 @@ const AdminDashboard = () => {
       case "calling": return <CallingList callerName="Owner" />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <CSVImporter areas={areas} telecallers={telecallers} onDone={load} />;
+      case "settings": return <GeneralSettings />;
+      case "permissions": return <PermissionsMatrix />;
+      case "fields": return <CRMFieldsManager />;
+      case "statuses": return <StatusConfigurator />;
       case "leads": return (
         <div className="space-y-6">
-          <Card>
-            <CardHeader><CardTitle>Add new lead</CardTitle></CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-7">
-              <Input placeholder="Customer name" value={lead.customer_name} onChange={(e) => setLead({ ...lead, customer_name: e.target.value })} />
-              <Input placeholder="Phone" value={lead.phone_number} onChange={(e) => setLead({ ...lead, phone_number: e.target.value })} />
-              <Select value={lead.area_id} onValueChange={(v) => setLead({ ...lead, area_id: v })}><SelectTrigger><SelectValue placeholder="Area" /></SelectTrigger><SelectContent>{areas.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select>
-              <Select value={lead.policy_type} onValueChange={(v) => setLead({ ...lead, policy_type: v as any })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{POLICIES.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent></Select>
-              <Input type="date" value={lead.call_date} onChange={(e) => setLead({ ...lead, call_date: e.target.value })} />
-              <Input type="number" placeholder="Premium ₹" value={lead.premium_amount} onChange={(e) => setLead({ ...lead, premium_amount: e.target.value })} />
-              <Button variant="hero" onClick={addLead}><Plus className="h-4 w-4" /> Add</Button>
-            </CardContent>
-          </Card>
+          <AddCustomerForm areas={areas} onDone={load} />
           <Card>
             <CardHeader>
               <div className="flex flex-wrap items-center justify-between gap-2">
