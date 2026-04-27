@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Phone, MessageCircle, Inbox, MapPin, Upload, Ban, Shield, Settings } from "lucide-react";
+import { LayoutDashboard, Users, Phone, Inbox, MapPin, Upload, Ban, Shield, Settings, ListChecks, Tags, KeyRound } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const items = [
@@ -10,6 +10,10 @@ const items = [
   { to: "import", label: "CSV Import", icon: Upload },
   { to: "areas", label: "Areas", icon: MapPin },
   { to: "team", label: "Team", icon: Shield },
+  { to: "settings", label: "General", icon: Settings },
+  { to: "permissions", label: "Permissions", icon: KeyRound },
+  { to: "fields", label: "CRM Fields", icon: Tags },
+  { to: "statuses", label: "Statuses", icon: ListChecks },
   { to: "trash", label: "Trash (DNC)", icon: Ban },
 ];
 
