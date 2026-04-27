@@ -34,7 +34,7 @@ const Index = () => {
               <ShieldCheck className="h-3.5 w-3.5" /> Trusted by 10,000+ families
             </span>
             <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl">
-              Insurance solutions that <span className="bg-gradient-primary bg-clip-text text-transparent">protect what matters</span>
+              Insurance solutions that <span className="bg-gradient-primary bg-clip-text bg-primary text-accent">protect what matters</span>
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
@@ -100,7 +100,7 @@ const Index = () => {
             { num: "98%", label: "Claim success rate" },
           ].map((s) => (
             <div key={s.label} className="text-center">
-              <div className="bg-gradient-primary bg-clip-text text-5xl font-bold text-transparent md:text-6xl">{s.num}</div>
+              <div className="bg-gradient-primary bg-clip-text bg-primary text-5xl font-bold text-accent md:text-6xl">{s.num}</div>
               <div className="mt-2 text-muted-foreground">{s.label}</div>
             </div>
           ))}
