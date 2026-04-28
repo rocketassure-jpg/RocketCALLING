@@ -15,6 +15,8 @@ import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
 import { CSVImporter } from "@/components/admin/CSVImporter";
+import { SmartCSVImporter } from "@/components/admin/SmartCSVImporter";
+import { ApiKeysManager } from "@/components/admin/ApiKeysManager";
 import { GeneralSettings } from "@/components/admin/GeneralSettings";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 import { CRMFieldsManager } from "@/components/admin/CRMFieldsManager";
@@ -93,6 +95,8 @@ const AdminDashboard = () => {
       case "calling": return <CallingList callerName="Owner" />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <CSVImporter areas={areas} telecallers={telecallers} onDone={load} />;
+      case "smart-import": return <SmartCSVImporter areas={areas} onDone={load} />;
+      case "api": return <ApiKeysManager />;
       case "settings": return <GeneralSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "fields": return <CRMFieldsManager />;

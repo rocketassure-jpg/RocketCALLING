@@ -19,6 +19,7 @@ type Settings = {
   retry_2_hours: number;
   allow_logout_mobile: boolean;
   allow_logout_web: boolean;
+  master_sheet_url: string | null;
 };
 
 const Row = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
@@ -55,6 +56,7 @@ export const GeneralSettings = () => {
       retry_2_hours: s.retry_2_hours,
       allow_logout_mobile: s.allow_logout_mobile,
       allow_logout_web: s.allow_logout_web,
+      master_sheet_url: s.master_sheet_url,
     }).eq("id", s.id);
     setSaving(false);
     if (error) return toast({ title: "Save failed", description: error.message, variant: "destructive" });
@@ -72,6 +74,19 @@ export const GeneralSettings = () => {
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save
         </Button>
       </div>
+
+      <Card>
+        <CardHeader><CardTitle>Master Google Sheet</CardTitle></CardHeader>
+        <CardContent className="space-y-3 pt-0">
+          <Label>Master Sheet URL</Label>
+          <Input
+            placeholder="https://docs.google.com/spreadsheets/d/..."
+            value={s.master_sheet_url ?? ""}
+            onChange={(e) => update({ master_sheet_url: e.target.value })}
+          />
+          <p className="text-xs text-muted-foreground">Paste your master Google Sheet link. Use the Smart CSV Importer to map columns and import data.</p>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader><CardTitle>Communication</CardTitle></CardHeader>
