@@ -14,12 +14,46 @@ export type Database = {
   }
   public: {
     Tables: {
+      api_keys: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          key_hash: string
+          last_used_at: string | null
+          name: string
+          prefix: string
+          revoked: boolean
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          key_hash: string
+          last_used_at?: string | null
+          name: string
+          prefix: string
+          revoked?: boolean
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          key_hash?: string
+          last_used_at?: string | null
+          name?: string
+          prefix?: string
+          revoked?: boolean
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           allow_logout_mobile: boolean
           allow_logout_web: boolean
           auto_start_allocation: boolean
           id: string
+          master_sheet_url: string | null
           post_interaction_actions: boolean
           retry_1_hours: number
           retry_2_hours: number
@@ -33,6 +67,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           id?: string
+          master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
           retry_2_hours?: number
@@ -46,6 +81,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           id?: string
+          master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
           retry_2_hours?: number
@@ -287,52 +323,148 @@ export type Database = {
       }
       leads: {
         Row: {
+          agent_sm_name: string | null
           area_id: string
           assigned_telecaller: string | null
+          authorised_person: string | null
           call_date: string
+          cash_back: number | null
+          chassis_number: string | null
+          city_village: string | null
           created_at: string
+          current_address: string | null
           customer_name: string
+          delivery_address: string | null
+          engine_number: string | null
+          expiry_date: string | null
+          father_name: string | null
+          fitness_upto: string | null
+          fuel_type: string | null
           id: string
+          insurance_company: string | null
+          issue_date: string | null
           last_called_at: string | null
+          lead_source: string | null
+          maker_name: string | null
+          mobile_2: string | null
+          model_name: string | null
+          net_od: number | null
           notes: string | null
+          payment_mode: string | null
+          payment_status: string | null
+          permanent_address: string | null
           phone_number: string
+          policy_copy_url: string | null
           policy_expiry_date: string | null
+          policy_number: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount: number
+          pucc_upto: string | null
+          reg_date: string | null
+          registration_number: string | null
+          remark: string | null
           status: Database["public"]["Enums"]["lead_status"]
+          total_premium_incl_gst: number | null
+          tp_premium: number | null
           updated_at: string
+          vehicle_type: string | null
+          vendor_name: string | null
         }
         Insert: {
+          agent_sm_name?: string | null
           area_id: string
           assigned_telecaller?: string | null
+          authorised_person?: string | null
           call_date?: string
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
           created_at?: string
+          current_address?: string | null
           customer_name: string
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          fuel_type?: string | null
           id?: string
+          insurance_company?: string | null
+          issue_date?: string | null
           last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
           notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
           phone_number: string
+          policy_copy_url?: string | null
           policy_expiry_date?: string | null
+          policy_number?: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
           updated_at?: string
+          vehicle_type?: string | null
+          vendor_name?: string | null
         }
         Update: {
+          agent_sm_name?: string | null
           area_id?: string
           assigned_telecaller?: string | null
+          authorised_person?: string | null
           call_date?: string
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
           created_at?: string
+          current_address?: string | null
           customer_name?: string
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          fuel_type?: string | null
           id?: string
+          insurance_company?: string | null
+          issue_date?: string | null
           last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
           notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
           phone_number?: string
+          policy_copy_url?: string | null
           policy_expiry_date?: string | null
+          policy_number?: string | null
           policy_type?: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
           updated_at?: string
+          vehicle_type?: string | null
+          vendor_name?: string | null
         }
         Relationships: [
           {
@@ -446,6 +578,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          lead_id: string | null
+          payload: Json
+          processed: boolean
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          payload: Json
+          processed?: boolean
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          payload?: Json
+          processed?: boolean
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
