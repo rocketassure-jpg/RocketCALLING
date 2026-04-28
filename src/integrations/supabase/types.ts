@@ -234,6 +234,30 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_notes: {
+        Row: {
+          author_id: string
+          created_at: string
+          id: string
+          lead_id: string
+          note: string
+        }
+        Insert: {
+          author_id: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          note: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          note?: string
+        }
+        Relationships: []
+      }
       lead_statuses: {
         Row: {
           bucket: string
@@ -272,6 +296,7 @@ export type Database = {
           last_called_at: string | null
           notes: string | null
           phone_number: string
+          policy_expiry_date: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount: number
           status: Database["public"]["Enums"]["lead_status"]
@@ -287,6 +312,7 @@ export type Database = {
           last_called_at?: string | null
           notes?: string | null
           phone_number: string
+          policy_expiry_date?: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
           status?: Database["public"]["Enums"]["lead_status"]
@@ -302,6 +328,7 @@ export type Database = {
           last_called_at?: string | null
           notes?: string | null
           phone_number?: string
+          policy_expiry_date?: string | null
           policy_type?: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
           status?: Database["public"]["Enums"]["lead_status"]
@@ -455,6 +482,7 @@ export type Database = {
         | "Not Interested"
         | "Unsubscribed"
         | "Done"
+        | "Transfer to Senior"
       policy_type: "Life" | "Health" | "Motor"
     }
     CompositeTypes: {
@@ -592,6 +620,7 @@ export const Constants = {
         "Not Interested",
         "Unsubscribed",
         "Done",
+        "Transfer to Senior",
       ],
       policy_type: ["Life", "Health", "Motor"],
     },
