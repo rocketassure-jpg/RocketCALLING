@@ -33,8 +33,8 @@ const Index = () => {
             <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
               <ShieldCheck className="h-3.5 w-3.5" /> Trusted by 10,000+ families
             </span>
-            <h1 className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl">
-              Insurance solutions that <span className="bg-gradient-primary bg-clip-text bg-primary text-accent">protect what matters</span>
+            <h1 className="font-bold leading-tight tracking-tight md:text-6xl shadow-inner rounded-full text-center text-2xl font-serif border-double border-2 bg-warning text-destructive border-destructive opacity-85">
+              insurance expert
             </h1>
             <p className="max-w-xl text-lg text-muted-foreground">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
