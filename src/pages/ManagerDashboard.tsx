@@ -72,19 +72,19 @@ const ManagerDashboard = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 border-b bg-background shadow-soft">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="container flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
             <Logo />
-            <Badge variant="secondary">Manager</Badge>
+            <Badge variant="secondary" className="hidden sm:inline-flex">Manager</Badge>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="hidden text-sm text-muted-foreground sm:inline">{me?.full_name}</span>
             <UserActionMenu label={me?.full_name} onTraining={() => setShowTraining(true)} />
           </div>
         </div>
       </header>
 
-      <main className="container space-y-6 py-6">
+      <main className="container space-y-4 px-3 py-4 sm:space-y-6 sm:px-4 sm:py-6">
         {showTraining && (
           <div className="space-y-3">
             <Button variant="outline" size="sm" onClick={() => setShowTraining(false)}>← Back to dashboard</Button>
@@ -92,7 +92,7 @@ const ManagerDashboard = () => {
           </div>
         )}
         {!showTraining && (<>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><Users className="h-5 w-5" />{totals.teamSize}</div></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold"><PhoneCall className="h-5 w-5" />{totals.totalDials}</div></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dispositions</div><div className="mt-1 text-2xl font-bold">{totals.totalCalls}</div></CardContent></Card>
