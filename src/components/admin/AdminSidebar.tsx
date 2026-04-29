@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, Phone, Inbox, MapPin, Upload, Ban, Shield, Settings, ListChecks, Tags, KeyRound, Webhook } from "lucide-react";
+import { LayoutDashboard, Users, Phone, Inbox, MapPin, Upload, Ban, Shield, Settings, ListChecks, Tags, KeyRound, Webhook, GraduationCap, Lock } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
 const items = [
@@ -9,7 +9,9 @@ const items = [
   { to: "leads", label: "Customers", icon: Users },
   { to: "import", label: "CSV Import", icon: Upload },
   { to: "smart-import", label: "Smart Import", icon: Upload },
+  { to: "training", label: "Training", icon: GraduationCap },
   { to: "api", label: "API & Webhooks", icon: Webhook },
+  { to: "secrets", label: "API Keys", icon: Lock },
   { to: "areas", label: "Areas", icon: MapPin },
   { to: "team", label: "Team", icon: Shield },
   { to: "settings", label: "General", icon: Settings },

@@ -17,6 +17,8 @@ import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
 import { CSVImporter } from "@/components/admin/CSVImporter";
 import { SmartCSVImporter } from "@/components/admin/SmartCSVImporter";
 import { ApiKeysManager } from "@/components/admin/ApiKeysManager";
+import { SecretsManager } from "@/components/admin/SecretsManager";
+import { TrainingModule } from "@/components/TrainingModule";
 import { GeneralSettings } from "@/components/admin/GeneralSettings";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 import { CRMFieldsManager } from "@/components/admin/CRMFieldsManager";
