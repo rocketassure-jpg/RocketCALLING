@@ -91,7 +91,7 @@ const ManagerDashboard = () => {
             <TrainingModule canManage={false} />
           </div>
         )}
-        {!showTraining && <></>}
+        {!showTraining && (<>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><Users className="h-5 w-5" />{totals.teamSize}</div></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold"><PhoneCall className="h-5 w-5" />{totals.totalDials}</div></CardContent></Card>
@@ -175,6 +175,7 @@ const ManagerDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        </>)}
       </main>
     </div>
   );
