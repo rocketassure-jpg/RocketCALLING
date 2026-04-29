@@ -99,6 +99,8 @@ const AdminDashboard = () => {
       case "import": return <CSVImporter areas={areas} telecallers={telecallers} onDone={load} />;
       case "smart-import": return <SmartCSVImporter areas={areas} onDone={load} />;
       case "api": return <ApiKeysManager />;
+      case "secrets": return <SecretsManager />;
+      case "training": return <TrainingModule canManage={true} />;
       case "settings": return <GeneralSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "fields": return <CRMFieldsManager />;
