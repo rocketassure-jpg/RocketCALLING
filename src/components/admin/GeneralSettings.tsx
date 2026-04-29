@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Download } from "lucide-react";
 
 type Settings = {
   id: string;
@@ -35,6 +35,16 @@ const Row = ({ title, desc, children }: { title: string; desc?: string; children
 export const GeneralSettings = () => {
   const [s, setS] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+
+  const syncSheet = async () => {
+    if (!s?.master_sheet_url) return toast({ title: "Add a Sheet URL first", variant: "destructive" });
+    setSyncing(true);
+    const { data, error } = await supabase.functions.invoke("sheets-sync", { body: { sheet_url: s.master_sheet_url } });
+    setSyncing(false);
+    if (error || data?.error) return toast({ title: "Sync failed", description: data?.error || error?.message, variant: "destructive" });
+    toast({ title: "Synced ✅", description: `${data.inserted} imported, ${data.skipped} skipped (of ${data.total})` });
+  };
 
   useEffect(() => {
     supabase.from("app_settings").select("*").limit(1).single().then(({ data }) => setS(data as any));
@@ -84,7 +94,10 @@ export const GeneralSettings = () => {
             value={s.master_sheet_url ?? ""}
             onChange={(e) => update({ master_sheet_url: e.target.value })}
           />
-          <p className="text-xs text-muted-foreground">Paste your master Google Sheet link. Use the Smart CSV Importer to map columns and import data.</p>
+          <p className="text-xs text-muted-foreground">Paste your master Google Sheet link. Make sure it's shared as 'Anyone with link can view'. Click Sync to import new leads.</p>
+          <Button variant="outline" size="sm" onClick={syncSheet} disabled={syncing || !s.master_sheet_url}>
+            {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />} Sync now
+          </Button>
         </CardContent>
       </Card>
 
