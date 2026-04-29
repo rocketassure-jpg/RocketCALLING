@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { GraduationCap, Plus, Trash2, FileText, Video, Image as ImageIcon, ExternalLink, Youtube } from "lucide-react";
+import { GraduationCap, Plus, Trash2, FileText, Video, Image as ImageIcon, ExternalLink } from "lucide-react";
 
 type Material = {
   id: string; title: string; description: string | null;
