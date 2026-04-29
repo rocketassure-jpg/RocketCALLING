@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox } from "lucide-react";
+import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, GraduationCap } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
+import { UserActionMenu } from "@/components/UserActionMenu";
+import { TrainingModule } from "@/components/TrainingModule";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -19,7 +21,8 @@ type DialLog = { telecaller_id: string };
 const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
 const ManagerDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
+  const [showTraining, setShowTraining] = useState(false);
   const [me, setMe] = useState<Profile | null>(null);
   const [team, setTeam] = useState<Profile[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -76,12 +79,19 @@ const ManagerDashboard = () => {
           </div>
           <div className="flex items-center gap-3">
             <span className="hidden text-sm text-muted-foreground sm:inline">{me?.full_name}</span>
-            <Button variant="outline" size="sm" onClick={signOut}><LogOut className="h-4 w-4" /> Sign out</Button>
+            <UserActionMenu label={me?.full_name} onTraining={() => setShowTraining(true)} />
           </div>
         </div>
       </header>
 
       <main className="container space-y-6 py-6">
+        {showTraining && (
+          <div className="space-y-3">
+            <Button variant="outline" size="sm" onClick={() => setShowTraining(false)}>← Back to dashboard</Button>
+            <TrainingModule canManage={false} />
+          </div>
+        )}
+        {!showTraining && <></>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><Users className="h-5 w-5" />{totals.teamSize}</div></CardContent></Card>
           <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold"><PhoneCall className="h-5 w-5" />{totals.totalDials}</div></CardContent></Card>
