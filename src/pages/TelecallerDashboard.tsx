@@ -6,15 +6,27 @@ import { Button } from "@/components/ui/button";
 import { CallingList } from "@/components/CallingList";
 import { BreakToggle } from "@/components/agent/BreakToggle";
 import { MobileBottomNav } from "@/components/agent/MobileBottomNav";
-import { LogOut } from "lucide-react";
+import { UserActionMenu } from "@/components/UserActionMenu";
+import { TrainingModule } from "@/components/TrainingModule";
+import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
+import { Plus } from "lucide-react";
+
+type Area = { id: string; name: string };
 
 const TelecallerDashboard = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [tab, setTab] = useState<"home" | "leads" | "menu">("home");
+  const [view, setView] = useState<"calls" | "training" | "add">("calls");
+  const [areas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
     if (user) supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle().then(({ data }) => setFullName(data?.full_name ?? ""));
+    // Telecaller can only see their assigned areas
+    supabase.from("telecaller_areas").select("areas(id,name)").then(({ data }) => {
+      const a = (data ?? []).map((r: any) => r.areas).filter(Boolean);
+      setAreas(a);
+    });
   }, [user]);
 
   return (
@@ -24,13 +36,16 @@ const TelecallerDashboard = () => {
           <Logo />
           <div className="flex items-center gap-2">
             <span className="hidden text-sm text-muted-foreground sm:inline">Hi, {fullName || "Agent"}</span>
-            <Button variant="outline" size="sm" onClick={signOut}><LogOut className="h-4 w-4" /> <span className="hidden sm:inline">Sign out</span></Button>
+            <Button variant="hero" size="sm" onClick={() => { setView("add"); setTab("home"); }}>
+              <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Lead</span>
+            </Button>
+            <UserActionMenu label={fullName || user?.email} onTraining={() => { setView("training"); setTab("home"); }} />
           </div>
         </div>
       </header>
 
       <main className="container space-y-5 py-5">
-        {tab === "home" && (
+        {tab === "home" && view === "calls" && (
           <>
             <div>
               <h1 className="text-xl font-bold">Today's Calling List</h1>
@@ -38,6 +53,25 @@ const TelecallerDashboard = () => {
             </div>
             <BreakToggle />
             <CallingList callerName={fullName || "Rocket Services"} />
+          </>
+        )}
+        {tab === "home" && view === "training" && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => setView("calls")}>← Back to calls</Button>
+            <TrainingModule canManage={false} />
+          </>
+        )}
+        {tab === "home" && view === "add" && (
+          <>
+            <div className="flex items-center justify-between">
+              <h1 className="text-xl font-bold">Add Walk-in / Reference Lead</h1>
+              <Button variant="outline" size="sm" onClick={() => setView("calls")}>← Back</Button>
+            </div>
+            {areas.length === 0 ? (
+              <p className="rounded-lg border bg-warning/10 p-4 text-sm">Aapko abhi koi area assign nahi hai. Admin se request karein.</p>
+            ) : (
+              <AddCustomerForm areas={areas} onDone={() => setView("calls")} />
+            )}
           </>
         )}
         {tab === "leads" && (
@@ -50,12 +84,13 @@ const TelecallerDashboard = () => {
           <div className="space-y-3">
             <h1 className="text-xl font-bold">Menu</h1>
             <BreakToggle />
-            <Button variant="outline" className="w-full" onClick={signOut}><LogOut className="h-4 w-4" /> Sign out</Button>
+            <Button variant="outline" className="w-full" onClick={() => { setView("training"); setTab("home"); }}>Training Module</Button>
+            <Button variant="hero" className="w-full" onClick={() => { setView("add"); setTab("home"); }}><Plus className="h-4 w-4" /> Add Lead</Button>
           </div>
         )}
       </main>
 
-      <MobileBottomNav active={tab} onChange={setTab} onCallClick={() => setTab("home")} />
+      <MobileBottomNav active={tab} onChange={setTab} onCallClick={() => { setView("calls"); setTab("home"); }} />
     </div>
   );
 };

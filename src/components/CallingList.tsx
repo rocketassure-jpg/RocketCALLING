@@ -84,6 +84,14 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
     if (e1) return toast({ title: "Update failed", description: e1.message, variant: "destructive" });
     if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: newStatus });
     toast({ title: "Saved", description: `${lead.customer_name} → ${newStatus}` });
+
+    // Auto-trigger Thank You message when marked Interested
+    if (newStatus === "Interested") {
+      const msg = `Hi ${lead.customer_name}, thank you for your interest in Rocket Services Insurance! Our team will contact you shortly with the best ${lead.policy_type} policy options. — Rocket Services`;
+      supabase.functions.invoke("send-whatsapp", { body: { lead_id: lead.id, phone_number: lead.phone_number, template: "thank_you", message: msg } }).catch(() => {});
+      supabase.functions.invoke("send-sms", { body: { lead_id: lead.id, phone_number: lead.phone_number, message: msg } }).catch(() => {});
+    }
+
     // Auto-next: pick next visible lead in current filtered view
     const idx = filtered.findIndex((l) => l.id === lead.id);
     const next = filtered[idx + 1] ?? filtered.find((l) => l.id !== lead.id);

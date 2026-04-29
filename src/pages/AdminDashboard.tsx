@@ -17,6 +17,8 @@ import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
 import { CSVImporter } from "@/components/admin/CSVImporter";
 import { SmartCSVImporter } from "@/components/admin/SmartCSVImporter";
 import { ApiKeysManager } from "@/components/admin/ApiKeysManager";
+import { SecretsManager } from "@/components/admin/SecretsManager";
+import { TrainingModule } from "@/components/TrainingModule";
 import { GeneralSettings } from "@/components/admin/GeneralSettings";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 import { CRMFieldsManager } from "@/components/admin/CRMFieldsManager";
@@ -97,6 +99,8 @@ const AdminDashboard = () => {
       case "import": return <CSVImporter areas={areas} telecallers={telecallers} onDone={load} />;
       case "smart-import": return <SmartCSVImporter areas={areas} onDone={load} />;
       case "api": return <ApiKeysManager />;
+      case "secrets": return <SecretsManager />;
+      case "training": return <TrainingModule canManage={true} />;
       case "settings": return <GeneralSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "fields": return <CRMFieldsManager />;

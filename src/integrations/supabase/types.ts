@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_suggestions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          lead_id: string
+          model: string
+          suggestion: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id: string
+          model?: string
+          suggestion: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lead_id?: string
+          model?: string
+          suggestion?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           created_at: string
@@ -535,6 +562,39 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          lead_id: string | null
+          message: string
+          phone_number: string
+          sent_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          message: string
+          phone_number: string
+          sent_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          message?: string
+          phone_number?: string
+          sent_by?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       telecaller_areas: {
         Row: {
           area_id: string
@@ -560,6 +620,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      training_materials: {
+        Row: {
+          body: string | null
+          category: string
+          content_type: string
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          body?: string | null
+          category?: string
+          content_type?: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          body?: string | null
+          category?: string
+          content_type?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -616,6 +718,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      whatsapp_logs: {
+        Row: {
+          created_at: string
+          error: string | null
+          id: string
+          lead_id: string | null
+          message: string | null
+          phone_number: string
+          sent_by: string | null
+          status: string
+          template: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          message?: string | null
+          phone_number: string
+          sent_by?: string | null
+          status?: string
+          template: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          id?: string
+          lead_id?: string | null
+          message?: string | null
+          phone_number?: string
+          sent_by?: string | null
+          status?: string
+          template?: string
+        }
+        Relationships: []
       }
     }
     Views: {
