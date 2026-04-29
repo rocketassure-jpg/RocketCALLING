@@ -72,19 +72,19 @@ const ManagerDashboard = () => {
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 border-b bg-background shadow-soft">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="container flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
             <Logo />
-            <Badge variant="secondary">Manager</Badge>
+            <Badge variant="secondary" className="hidden sm:inline-flex">Manager</Badge>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <span className="hidden text-sm text-muted-foreground sm:inline">{me?.full_name}</span>
             <UserActionMenu label={me?.full_name} onTraining={() => setShowTraining(true)} />
           </div>
         </div>
       </header>
 
-      <main className="container space-y-6 py-6">
+      <main className="container space-y-4 px-3 py-4 sm:space-y-6 sm:px-4 sm:py-6">
         {showTraining && (
           <div className="space-y-3">
             <Button variant="outline" size="sm" onClick={() => setShowTraining(false)}>← Back to dashboard</Button>
@@ -92,22 +92,24 @@ const ManagerDashboard = () => {
           </div>
         )}
         {!showTraining && (<>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><Users className="h-5 w-5" />{totals.teamSize}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold"><PhoneCall className="h-5 w-5" />{totals.totalDials}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dispositions</div><div className="mt-1 text-2xl font-bold">{totals.totalCalls}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Interested</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-success"><ThumbsUp className="h-5 w-5" />{totals.interested}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Unsubscribed</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-destructive"><Ban className="h-5 w-5" />{totals.unsubscribed}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><IndianRupee className="h-5 w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
+        <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><Users className="h-4 w-4 sm:h-5 sm:w-5" />{totals.teamSize}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold"><PhoneCall className="h-4 w-4 sm:h-5 sm:w-5" />{totals.totalDials}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Dispositions</div><div className="mt-1 text-lg sm:text-2xl font-bold">{totals.totalCalls}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Interested</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-success"><ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5" />{totals.interested}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Unsubscribed</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-destructive"><Ban className="h-4 w-4 sm:h-5 sm:w-5" />{totals.unsubscribed}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><IndianRupee className="h-4 w-4 sm:h-5 sm:w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
         <Tabs defaultValue="calling">
-          <TabsList>
-            <TabsTrigger value="calling"><Phone className="mr-2 h-4 w-4" />Calling</TabsTrigger>
-            <TabsTrigger value="enquiries"><Inbox className="mr-2 h-4 w-4" />New enquiries</TabsTrigger>
-            <TabsTrigger value="team"><BarChart3 className="mr-2 h-4 w-4" />Team performance</TabsTrigger>
-            <TabsTrigger value="leads">Team leads</TabsTrigger>
-          </TabsList>
+          <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-max min-w-full sm:w-auto">
+              <TabsTrigger value="calling"><Phone className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Calling</span></TabsTrigger>
+              <TabsTrigger value="enquiries"><Inbox className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Enquiries</span></TabsTrigger>
+              <TabsTrigger value="team"><BarChart3 className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Team</span></TabsTrigger>
+              <TabsTrigger value="leads"><span className="text-xs sm:text-sm">Leads</span></TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="calling">
             <CallingList callerName={me?.full_name || "Rocket Services"} />
