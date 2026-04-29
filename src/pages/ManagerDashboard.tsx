@@ -93,21 +93,23 @@ const ManagerDashboard = () => {
         )}
         {!showTraining && (<>
         <div className="grid grid-cols-2 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><Users className="h-5 w-5" />{totals.teamSize}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold"><PhoneCall className="h-5 w-5" />{totals.totalDials}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Dispositions</div><div className="mt-1 text-2xl font-bold">{totals.totalCalls}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Interested</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-success"><ThumbsUp className="h-5 w-5" />{totals.interested}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Unsubscribed</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-destructive"><Ban className="h-5 w-5" />{totals.unsubscribed}</div></CardContent></Card>
-          <Card><CardContent className="p-4"><div className="text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-2 text-2xl font-bold text-primary"><IndianRupee className="h-5 w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Team</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><Users className="h-4 w-4 sm:h-5 sm:w-5" />{totals.teamSize}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Dials</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold"><PhoneCall className="h-4 w-4 sm:h-5 sm:w-5" />{totals.totalDials}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Dispositions</div><div className="mt-1 text-lg sm:text-2xl font-bold">{totals.totalCalls}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Interested</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-success"><ThumbsUp className="h-4 w-4 sm:h-5 sm:w-5" />{totals.interested}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Unsubscribed</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-destructive"><Ban className="h-4 w-4 sm:h-5 sm:w-5" />{totals.unsubscribed}</div></CardContent></Card>
+          <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><IndianRupee className="h-4 w-4 sm:h-5 sm:w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
         <Tabs defaultValue="calling">
-          <TabsList>
-            <TabsTrigger value="calling"><Phone className="mr-2 h-4 w-4" />Calling</TabsTrigger>
-            <TabsTrigger value="enquiries"><Inbox className="mr-2 h-4 w-4" />New enquiries</TabsTrigger>
-            <TabsTrigger value="team"><BarChart3 className="mr-2 h-4 w-4" />Team performance</TabsTrigger>
-            <TabsTrigger value="leads">Team leads</TabsTrigger>
-          </TabsList>
+          <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex w-max min-w-full sm:w-auto">
+              <TabsTrigger value="calling"><Phone className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Calling</span></TabsTrigger>
+              <TabsTrigger value="enquiries"><Inbox className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Enquiries</span></TabsTrigger>
+              <TabsTrigger value="team"><BarChart3 className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Team</span></TabsTrigger>
+              <TabsTrigger value="leads"><span className="text-xs sm:text-sm">Leads</span></TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="calling">
             <CallingList callerName={me?.full_name || "Rocket Services"} />
