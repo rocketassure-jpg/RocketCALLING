@@ -215,7 +215,7 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                 key={lead.id}
                 className={`overflow-hidden transition-all hover:shadow-elegant ${expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
