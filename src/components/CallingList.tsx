@@ -125,6 +125,13 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
 
   const logDial = async (lead: Lead) => {
     if (user) await supabase.from("dial_logs").insert({ lead_id: lead.id, telecaller_id: user.id });
+    setDialCounts((prev) => ({ ...prev, [lead.id]: (prev[lead.id] ?? 0) + 1 }));
+  };
+
+  const openDialHistory = async (lead: Lead) => {
+    setHistoryLead(lead);
+    const { data } = await supabase.from("dial_logs").select("clicked_at,connected").eq("lead_id", lead.id).order("clicked_at", { ascending: false });
+    setDialHistory((data ?? []) as any);
   };
 
   const waMessage = (name: string) =>
