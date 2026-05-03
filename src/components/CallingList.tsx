@@ -47,18 +47,6 @@ const statusColor = (s: string) => {
   }
 };
 
-const statusColor = (s: string) => {
-  switch (s) {
-    case "Interested": return "bg-success text-success-foreground";
-    case "Done": return "bg-primary text-primary-foreground";
-    case "Follow-up": return "bg-warning text-warning-foreground";
-    case "Transfer to Senior": return "bg-accent text-accent-foreground";
-    case "Not Picked": return "bg-muted text-muted-foreground";
-    case "Not Interested": return "bg-destructive text-destructive-foreground";
-    case "Unsubscribed": return "bg-destructive text-destructive-foreground";
-    default: return "bg-secondary text-secondary-foreground";
-  }
-};
 
 const today = () => new Date().toISOString().slice(0, 10);
 const isOverdue = (d: string) => d < today();
