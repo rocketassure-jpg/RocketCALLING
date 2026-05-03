@@ -85,8 +85,10 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
       .not("status", "in", "(Unsubscribed,Done,Not Interested)")
       .order("call_date", { ascending: true });
     if (error) toast({ title: "Failed to load leads", description: error.message, variant: "destructive" });
-    setLeads((data ?? []) as any);
+    const list = (data ?? []) as any[];
+    setLeads(list as any);
     setLoading(false);
+    loadDialCounts(list.map((l) => l.id));
   };
 
   useEffect(() => { load(); }, []);
