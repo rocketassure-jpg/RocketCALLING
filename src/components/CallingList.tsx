@@ -337,6 +337,32 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
           })}
         </div>
       )}
+
+      <Dialog open={!!historyLead} onOpenChange={(o) => !o && setHistoryLead(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Dial History — {historyLead?.customer_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              Number: <span className="font-mono font-semibold text-foreground">{historyLead?.phone_number}</span>
+            </div>
+            <div className="text-sm">Total dials: <span className="font-bold text-primary">{dialHistory.length}</span></div>
+            <div className="max-h-72 space-y-1 overflow-y-auto rounded border p-2">
+              {dialHistory.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground">Abhi tak koi dial nahi.</p>
+              ) : dialHistory.map((d, i) => (
+                <div key={i} className="flex items-center justify-between rounded bg-muted/50 px-2 py-1.5 text-xs">
+                  <span>{new Date(d.clicked_at).toLocaleString()}</span>
+                  <Badge variant={d.connected ? "default" : "outline"} className="text-[10px]">
+                    {d.connected ? "Connected" : "Dialed"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
