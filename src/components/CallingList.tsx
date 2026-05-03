@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { Phone, MessageCircle, MessageSquare, Search, Loader2, MapPin, Ban, Calendar, IndianRupee, AlarmClock, History, ArrowRight } from "lucide-react";
 import { LeadTimeline } from "./LeadTimeline";
 
-type Status = "New" | "Interested" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done" | "Transfer to Senior";
+type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
 type Lead = {
   id: string;
@@ -28,14 +28,15 @@ type Lead = {
   areas?: { name: string } | null;
 };
 
-const STATUSES: Status[] = ["New", "Interested", "Follow-up", "Not Picked", "Transfer to Senior", "Insurance Done" as any, "Not Interested", "Done"]
-  // "Insurance Done" alias—keeping enum values; UI shows real list:
-  .filter((s) => s !== ("Insurance Done" as any));
-const STATUS_OPTIONS: Status[] = ["New", "Interested", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Done"];
+const STATUS_OPTIONS: Status[] = ["New", "Interested", "Quote Sent", "Premium Quoted", "Negotiation", "Converted", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Done"];
 
 const statusColor = (s: string) => {
   switch (s) {
     case "Interested": return "bg-success text-success-foreground";
+    case "Quote Sent": return "bg-accent text-accent-foreground";
+    case "Premium Quoted": return "bg-warning text-warning-foreground";
+    case "Negotiation": return "bg-warning text-warning-foreground";
+    case "Converted": return "bg-success text-success-foreground";
     case "Done": return "bg-primary text-primary-foreground";
     case "Follow-up": return "bg-warning text-warning-foreground";
     case "Transfer to Senior": return "bg-accent text-accent-foreground";
@@ -45,6 +46,7 @@ const statusColor = (s: string) => {
     default: return "bg-secondary text-secondary-foreground";
   }
 };
+
 
 const today = () => new Date().toISOString().slice(0, 10);
 const isOverdue = (d: string) => d < today();
@@ -63,6 +65,17 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
   const [search, setSearch] = useState("");
   const [bucket, setBucket] = useState<Bucket>("today");
   const [autoNextId, setAutoNextId] = useState<string | null>(null);
+  const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
+  const [historyLead, setHistoryLead] = useState<Lead | null>(null);
+  const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
+
+  const loadDialCounts = async (leadIds: string[]) => {
+    if (leadIds.length === 0) return;
+    const { data } = await supabase.from("dial_logs").select("lead_id").in("lead_id", leadIds);
+    const counts: Record<string, number> = {};
+    (data ?? []).forEach((r: any) => { counts[r.lead_id] = (counts[r.lead_id] ?? 0) + 1; });
+    setDialCounts(counts);
+  };
 
   const load = async () => {
     setLoading(true);
@@ -72,8 +85,10 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
       .not("status", "in", "(Unsubscribed,Done,Not Interested)")
       .order("call_date", { ascending: true });
     if (error) toast({ title: "Failed to load leads", description: error.message, variant: "destructive" });
-    setLeads((data ?? []) as any);
+    const list = (data ?? []) as any[];
+    setLeads(list as any);
     setLoading(false);
+    loadDialCounts(list.map((l) => l.id));
   };
 
   useEffect(() => { load(); }, []);
@@ -110,6 +125,13 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
 
   const logDial = async (lead: Lead) => {
     if (user) await supabase.from("dial_logs").insert({ lead_id: lead.id, telecaller_id: user.id });
+    setDialCounts((prev) => ({ ...prev, [lead.id]: (prev[lead.id] ?? 0) + 1 }));
+  };
+
+  const openDialHistory = async (lead: Lead) => {
+    setHistoryLead(lead);
+    const { data } = await supabase.from("dial_logs").select("clicked_at,connected").eq("lead_id", lead.id).order("clicked_at", { ascending: false });
+    setDialHistory((data ?? []) as any);
   };
 
   const waMessage = (name: string) =>
@@ -193,7 +215,7 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                 key={lead.id}
                 className={`overflow-hidden transition-all hover:shadow-elegant ${expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
               >
-                <CardContent className="p-4">
+                <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
@@ -229,10 +251,22 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:justify-end">
                       {!blocked && (
-                        <Button asChild variant="hero" size="sm" onClick={() => logDial(lead)}>
-                          <a href={`tel:${lead.phone_number}`}><Phone className="h-4 w-4" /> Dial</a>
+                        <Button asChild variant="hero" size="sm" className="relative" onClick={() => logDial(lead)}>
+                          <a href={`tel:${lead.phone_number}`}>
+                            <Phone className="h-4 w-4" /> Dial
+                            {(dialCounts[lead.id] ?? 0) > 0 && (
+                              <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background/90 px-1.5 text-[11px] font-bold text-primary">
+                                {dialCounts[lead.id]}
+                              </span>
+                            )}
+                          </a>
+                        </Button>
+                      )}
+                      {!blocked && (
+                        <Button variant="outline" size="sm" onClick={() => openDialHistory(lead)} title="Dialed numbers history">
+                          <History className="h-4 w-4" /> Dialed ({dialCounts[lead.id] ?? 0})
                         </Button>
                       )}
                       {!blocked && (
@@ -262,14 +296,14 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                         </Button>
                       )}
                       <Select value={lead.status} onValueChange={(v) => updateStatus(lead, v as Status)}>
-                        <SelectTrigger className="h-9 w-[170px]"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="col-span-2 h-9 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm"><History className="h-4 w-4" /> History</Button>
+                          <Button variant="outline" size="sm"><History className="h-4 w-4" /> Timeline</Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-lg">
                           <DialogHeader>
@@ -303,6 +337,32 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
           })}
         </div>
       )}
+
+      <Dialog open={!!historyLead} onOpenChange={(o) => !o && setHistoryLead(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Dial History — {historyLead?.customer_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <div className="text-sm text-muted-foreground">
+              Number: <span className="font-mono font-semibold text-foreground">{historyLead?.phone_number}</span>
+            </div>
+            <div className="text-sm">Total dials: <span className="font-bold text-primary">{dialHistory.length}</span></div>
+            <div className="max-h-72 space-y-1 overflow-y-auto rounded border p-2">
+              {dialHistory.length === 0 ? (
+                <p className="text-center text-sm text-muted-foreground">Abhi tak koi dial nahi.</p>
+              ) : dialHistory.map((d, i) => (
+                <div key={i} className="flex items-center justify-between rounded bg-muted/50 px-2 py-1.5 text-xs">
+                  <span>{new Date(d.clicked_at).toLocaleString()}</span>
+                  <Badge variant={d.connected ? "default" : "outline"} className="text-[10px]">
+                    {d.connected ? "Connected" : "Dialed"}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
