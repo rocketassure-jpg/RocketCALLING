@@ -28,10 +28,24 @@ type Lead = {
   areas?: { name: string } | null;
 };
 
-const STATUSES: Status[] = ["New", "Interested", "Follow-up", "Not Picked", "Transfer to Senior", "Insurance Done" as any, "Not Interested", "Done"]
-  // "Insurance Done" alias—keeping enum values; UI shows real list:
-  .filter((s) => s !== ("Insurance Done" as any));
-const STATUS_OPTIONS: Status[] = ["New", "Interested", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Done"];
+const STATUS_OPTIONS: Status[] = ["New", "Interested", "Quote Sent", "Premium Quoted", "Negotiation", "Converted", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Done"];
+
+const statusColor = (s: string) => {
+  switch (s) {
+    case "Interested": return "bg-success text-success-foreground";
+    case "Quote Sent": return "bg-accent text-accent-foreground";
+    case "Premium Quoted": return "bg-warning text-warning-foreground";
+    case "Negotiation": return "bg-warning text-warning-foreground";
+    case "Converted": return "bg-success text-success-foreground";
+    case "Done": return "bg-primary text-primary-foreground";
+    case "Follow-up": return "bg-warning text-warning-foreground";
+    case "Transfer to Senior": return "bg-accent text-accent-foreground";
+    case "Not Picked": return "bg-muted text-muted-foreground";
+    case "Not Interested": return "bg-destructive text-destructive-foreground";
+    case "Unsubscribed": return "bg-destructive text-destructive-foreground";
+    default: return "bg-secondary text-secondary-foreground";
+  }
+};
 
 const statusColor = (s: string) => {
   switch (s) {
