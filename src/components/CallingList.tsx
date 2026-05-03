@@ -65,6 +65,17 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
   const [search, setSearch] = useState("");
   const [bucket, setBucket] = useState<Bucket>("today");
   const [autoNextId, setAutoNextId] = useState<string | null>(null);
+  const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
+  const [historyLead, setHistoryLead] = useState<Lead | null>(null);
+  const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
+
+  const loadDialCounts = async (leadIds: string[]) => {
+    if (leadIds.length === 0) return;
+    const { data } = await supabase.from("dial_logs").select("lead_id").in("lead_id", leadIds);
+    const counts: Record<string, number> = {};
+    (data ?? []).forEach((r: any) => { counts[r.lead_id] = (counts[r.lead_id] ?? 0) + 1; });
+    setDialCounts(counts);
+  };
 
   const load = async () => {
     setLoading(true);
