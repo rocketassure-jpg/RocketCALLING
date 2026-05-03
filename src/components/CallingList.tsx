@@ -251,10 +251,22 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
+                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:justify-end">
                       {!blocked && (
-                        <Button asChild variant="hero" size="sm" onClick={() => logDial(lead)}>
-                          <a href={`tel:${lead.phone_number}`}><Phone className="h-4 w-4" /> Dial</a>
+                        <Button asChild variant="hero" size="sm" className="relative" onClick={() => logDial(lead)}>
+                          <a href={`tel:${lead.phone_number}`}>
+                            <Phone className="h-4 w-4" /> Dial
+                            {(dialCounts[lead.id] ?? 0) > 0 && (
+                              <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background/90 px-1.5 text-[11px] font-bold text-primary">
+                                {dialCounts[lead.id]}
+                              </span>
+                            )}
+                          </a>
+                        </Button>
+                      )}
+                      {!blocked && (
+                        <Button variant="outline" size="sm" onClick={() => openDialHistory(lead)} title="Dialed numbers history">
+                          <History className="h-4 w-4" /> Dialed ({dialCounts[lead.id] ?? 0})
                         </Button>
                       )}
                       {!blocked && (
@@ -284,14 +296,14 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                         </Button>
                       )}
                       <Select value={lead.status} onValueChange={(v) => updateStatus(lead, v as Status)}>
-                        <SelectTrigger className="h-9 w-[170px]"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="col-span-2 h-9 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="outline" size="sm"><History className="h-4 w-4" /> History</Button>
+                          <Button variant="outline" size="sm"><History className="h-4 w-4" /> Timeline</Button>
                         </DialogTrigger>
                         <DialogContent className="max-w-lg">
                           <DialogHeader>
