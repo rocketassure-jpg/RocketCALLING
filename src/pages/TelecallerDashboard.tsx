@@ -32,10 +32,10 @@ const TelecallerDashboard = () => {
   return (
     <div className="min-h-screen bg-muted/30 pb-24 md:pb-0">
       <header className="sticky top-0 z-30 border-b bg-background shadow-soft">
-        <div className="container flex h-16 items-center justify-between gap-3">
+        <div className="container flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
           <Logo />
-          <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-muted-foreground sm:inline">Hi, {fullName || "Agent"}</span>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <span className="hidden text-sm text-muted-foreground md:inline">Hi, {fullName || "Agent"}</span>
             <Button variant="hero" size="sm" onClick={() => { setView("add"); setTab("home"); }}>
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Lead</span>
             </Button>
@@ -44,7 +44,7 @@ const TelecallerDashboard = () => {
         </div>
       </header>
 
-      <main className="container space-y-5 py-5">
+      <main className="container space-y-4 px-3 py-4 sm:space-y-5 sm:px-4 sm:py-5">
         {tab === "home" && view === "calls" && (
           <>
             <div>
