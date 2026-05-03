@@ -12,7 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import { Phone, MessageCircle, MessageSquare, Search, Loader2, MapPin, Ban, Calendar, IndianRupee, AlarmClock, History, ArrowRight } from "lucide-react";
 import { LeadTimeline } from "./LeadTimeline";
 
-type Status = "New" | "Interested" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done" | "Transfer to Senior";
+type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
 type Lead = {
   id: string;
