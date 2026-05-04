@@ -94,7 +94,12 @@
   .bg-gradient-hero { background: var(--gradient-hero); }
   .bg-gradient-primary { background: var(--gradient-primary); }
   .bg-gradient-soft { background: var(--gradient-soft); }
+  .bg-gradient-canvas { background: radial-gradient(1200px 600px at 100% -10%, hsl(14 100% 96%) 0%, transparent 60%), radial-gradient(900px 500px at -10% 110%, hsl(0 100% 97%) 0%, transparent 55%), hsl(30 25% 98%); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
+  .shadow-card-pop { box-shadow: 0 8px 30px -12px hsl(0 85% 40% / 0.12), 0 0 0 1px hsl(0 0% 0% / 0.03); }
+  .shadow-dial { box-shadow: 0 10px 24px -6px hsl(0 85% 50% / 0.45); }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { scrollbar-width: none; }
 }
