@@ -43,6 +43,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const AdminDashboard = () => {
   const { signOut } = useAuth();
   const [section, setSection] = useState("dashboard");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
