@@ -167,32 +167,47 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
     }
   }), [leads, search, bucket]);
 
-  const buckets: { id: Bucket; label: string; value: number; color: string }[] = [
-    { id: "today", label: "To Call Today", value: stats.today, color: "text-primary" },
-    { id: "overdue", label: "Overdue", value: stats.overdue, color: "text-destructive" },
-    { id: "interested", label: "Interested", value: stats.interested, color: "text-success" },
-    { id: "followup", label: "Follow-up", value: stats.followup, color: "text-warning" },
-    { id: "cold", label: "Cold Leads", value: stats.cold, color: "text-muted-foreground" },
+  const buckets: { id: Bucket; label: string; value: number; tone: string; dot: string }[] = [
+    { id: "today",      label: "To Call",   value: stats.today,      tone: "from-primary to-accent text-primary-foreground", dot: "bg-white/80" },
+    { id: "overdue",    label: "Overdue",   value: stats.overdue,    tone: "bg-card text-foreground border",                  dot: "bg-destructive" },
+    { id: "interested", label: "Interested",value: stats.interested, tone: "bg-card text-foreground border",                  dot: "bg-success" },
+    { id: "followup",   label: "Follow-up", value: stats.followup,   tone: "bg-card text-foreground border",                  dot: "bg-warning" },
+    { id: "cold",       label: "Cold",      value: stats.cold,       tone: "bg-card text-foreground border",                  dot: "bg-muted-foreground" },
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        {buckets.map((b) => (
-          <button key={b.id} onClick={() => setBucket(b.id)} className="text-left">
-            <Card className={`transition-all hover:shadow-elegant ${bucket === b.id ? "ring-2 ring-primary" : ""}`}>
-              <CardContent className="p-4">
-                <div className="text-xs text-muted-foreground">{b.label}</div>
-                <div className={`mt-1 text-2xl font-bold ${b.color}`}>{b.value}</div>
-              </CardContent>
-            </Card>
-          </button>
-        ))}
+    <div className="space-y-5">
+      {/* Stat buckets — horizontal scroll story row */}
+      <div className="-mx-3 flex snap-x gap-2.5 overflow-x-auto px-3 pb-1 scrollbar-hide sm:mx-0 sm:px-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible">
+        {buckets.map((b) => {
+          const active = bucket === b.id;
+          const isHero = b.id === "today";
+          return (
+            <button
+              key={b.id}
+              onClick={() => setBucket(b.id)}
+              className={`relative shrink-0 snap-start overflow-hidden rounded-2xl px-4 py-3 text-left transition-all md:w-auto ${isHero ? `bg-gradient-to-br ${b.tone} shadow-dial` : `${b.tone} shadow-card-pop hover:shadow-elegant`} ${active && !isHero ? "ring-2 ring-primary" : ""} ${isHero ? "min-w-[140px]" : "min-w-[110px]"}`}
+            >
+              {isHero && <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/20 blur-2xl" />}
+              <div className="relative flex items-center gap-1.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${isHero ? "bg-white/80" : b.dot}`} />
+                <span className={`text-[10px] font-bold uppercase tracking-wider ${isHero ? "text-white/90" : "text-muted-foreground"}`}>{b.label}</span>
+              </div>
+              <div className={`relative mt-1 text-3xl font-extrabold tabular-nums tracking-tight ${isHero ? "text-white" : "text-foreground"}`}>{b.value}</div>
+            </button>
+          );
+        })}
       </div>
 
+      {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input className="pl-9" placeholder="Search by name, phone, or last 4 digits…" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          className="h-11 rounded-full border-border/70 bg-card pl-10 pr-4 shadow-card-pop focus-visible:ring-primary/30"
+          placeholder="Search name, phone, last 4 digits…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {loading ? (
