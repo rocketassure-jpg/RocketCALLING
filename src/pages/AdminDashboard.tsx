@@ -43,6 +43,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const AdminDashboard = () => {
   const { signOut } = useAuth();
   const [section, setSection] = useState("dashboard");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -216,9 +217,11 @@ const AdminDashboard = () => {
       <div className="flex flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-4 shadow-soft md:px-6">
           <div className="flex items-center gap-3">
-            <Sheet>
+            <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
               <SheetTrigger asChild><Button variant="ghost" size="icon" className="md:hidden"><Menu className="h-5 w-5" /></Button></SheetTrigger>
-              <SheetContent side="left" className="w-64 p-0"><AdminSidebar active={section} onChange={setSection} /></SheetContent>
+              <SheetContent side="left" className="w-72 p-0">
+                <AdminSidebar variant="mobile" active={section} onChange={(v) => { setSection(v); setMobileNavOpen(false); }} />
+              </SheetContent>
             </Sheet>
             <div className="md:hidden"><Logo /></div>
             <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
