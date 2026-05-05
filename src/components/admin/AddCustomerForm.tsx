@@ -117,6 +117,17 @@ export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Ar
                   </Select>
                 </div>
                 <div className="space-y-2"><Label>Premium amount ₹</Label><Input type="number" value={form.premium_amount} onChange={(e) => setForm({ ...form, premium_amount: e.target.value })} /></div>
+                {telecallers.length > 0 && (
+                  <div className="space-y-2 md:col-span-2"><Label>Assign Telecaller (optional)</Label>
+                    <Select value={form.assigned_telecaller} onValueChange={(v) => setForm({ ...form, assigned_telecaller: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">— Unassigned —</SelectItem>
+                        {telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             </AccordionContent>
           </AccordionItem>
