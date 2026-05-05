@@ -9,7 +9,9 @@ import { MobileBottomNav } from "@/components/agent/MobileBottomNav";
 import { UserActionMenu } from "@/components/UserActionMenu";
 import { TrainingModule } from "@/components/TrainingModule";
 import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
-import { Plus } from "lucide-react";
+import { HamburgerMenu } from "@/components/HamburgerMenu";
+import { InstallPWA } from "@/components/InstallPWA";
+import { Plus, Phone, GraduationCap } from "lucide-react";
 
 type Area = { id: string; name: string };
 
@@ -33,9 +35,20 @@ const TelecallerDashboard = () => {
     <div className="min-h-screen bg-muted/30 pb-24 md:pb-0">
       <header className="sticky top-0 z-30 border-b bg-background shadow-soft">
         <div className="container flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
-          <Logo />
+          <div className="flex items-center gap-2">
+            <HamburgerMenu
+              items={[
+                { id: "calls", label: "Calls", icon: Phone },
+                { id: "add", label: "Add Lead", icon: Plus },
+                { id: "training", label: "Training", icon: GraduationCap },
+              ]}
+              onChange={(id) => { setView(id as any); setTab("home"); }}
+              userName={fullName || user?.email}
+            />
+            <Logo />
+          </div>
           <div className="flex items-center gap-1.5 sm:gap-2">
-            <span className="hidden text-sm text-muted-foreground md:inline">Hi, {fullName || "Agent"}</span>
+            <InstallPWA />
             <Button variant="hero" size="sm" onClick={() => { setView("add"); setTab("home"); }}>
               <Plus className="h-4 w-4" /> <span className="hidden sm:inline">Add Lead</span>
             </Button>
