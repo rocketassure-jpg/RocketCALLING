@@ -119,7 +119,7 @@ const AdminDashboard = () => {
   };
   const bulkMove = async (status: string) => {
     const ids = [...selectedIds]; if (!ids.length) return;
-    const { error } = await supabase.from("leads").update({ status }).in("id", ids);
+    const { error } = await supabase.from("leads").update({ status: status as any }).in("id", ids);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: `Moved to ${status}` }); setSelectedIds(new Set()); load();
   };
