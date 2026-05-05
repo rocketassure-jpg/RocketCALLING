@@ -10,6 +10,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Phone, MessageCircle, MessageSquare, Search, Loader2, MapPin, Ban, Calendar, IndianRupee, AlarmClock, History, ArrowRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { BulkActionBar } from "@/components/BulkActionBar";
 import { LeadTimeline } from "./LeadTimeline";
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
@@ -68,6 +70,17 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
   const [historyLead, setHistoryLead] = useState<Lead | null>(null);
   const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [telecallerList, setTelecallerList] = useState<{ id: string; full_name: string }[]>([]);
+
+  useEffect(() => {
+    supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "telecaller").then(({ data }) => {
+      const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean);
+      setTelecallerList(list);
+    });
+  }, []);
+
+  const toggleSelect = (id: string) => setSelectedIds((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const loadDialCounts = async (leadIds: string[]) => {
     if (leadIds.length === 0) return;
