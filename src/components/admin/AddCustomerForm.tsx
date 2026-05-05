@@ -15,7 +15,7 @@ type CrmField = { id: string; name: string; field_type: string; mandatory: boole
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export const AddCustomerForm = ({ areas, onDone }: { areas: Area[]; onDone?: () => void }) => {
+export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Area[]; telecallers?: { id: string; full_name: string }[]; onDone?: () => void }) => {
   const [fields, setFields] = useState<CrmField[]>([]);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -24,6 +24,7 @@ export const AddCustomerForm = ({ areas, onDone }: { areas: Area[]; onDone?: () 
     call_date: today(), premium_amount: "0",
     priority: "Medium",
     notes: "",
+    assigned_telecaller: "none",
   });
   const [custom, setCustom] = useState<Record<string, string>>({});
 
@@ -43,12 +44,13 @@ export const AddCustomerForm = ({ areas, onDone }: { areas: Area[]; onDone?: () 
       policy_type: form.policy_type,
       call_date: form.call_date,
       premium_amount: Number(form.premium_amount || 0),
+      assigned_telecaller: form.assigned_telecaller !== "none" ? form.assigned_telecaller : null,
       notes: `Priority: ${form.priority}\nEmail: ${form.email || "—"}\n${form.notes}${customNotes}`,
     });
     setSaving(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: "Customer added ✅" });
-    setForm({ customer_name: "", phone_number: "", email: "", area_id: "", policy_type: "Motor", call_date: today(), premium_amount: "0", priority: "Medium", notes: "" });
+    setForm({ customer_name: "", phone_number: "", email: "", area_id: "", policy_type: "Motor", call_date: today(), premium_amount: "0", priority: "Medium", notes: "", assigned_telecaller: "none" });
     setCustom({});
     onDone?.();
   };
