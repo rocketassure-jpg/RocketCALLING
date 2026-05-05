@@ -408,6 +408,31 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
           </div>
         </DialogContent>
       </Dialog>
+
+      <BulkActionBar
+        count={selectedIds.size}
+        telecallers={telecallerList}
+        onClear={() => setSelectedIds(new Set())}
+        onDelete={async () => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").delete().in("id", ids);
+          toast({ title: `${ids.length} deleted` });
+          setSelectedIds(new Set()); load();
+        }}
+        onMove={async (status) => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").update({ status: status as any }).in("id", ids);
+          toast({ title: `Moved to ${status}` });
+          setSelectedIds(new Set()); load();
+        }}
+        onAssign={async (tid) => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").update({ assigned_telecaller: tid }).in("id", ids);
+          toast({ title: "Assigned" });
+          setSelectedIds(new Set()); load();
+        }}
+      />
     </div>
   );
 };
+
