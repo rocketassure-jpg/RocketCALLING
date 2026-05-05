@@ -16,9 +16,9 @@ export const BulkActionBar = ({
   count: number;
   telecallers: { id: string; full_name: string }[];
   onClear: () => void;
-  onDelete: () => void | Promise<void>;
-  onMove: (status: string) => void | Promise<void>;
-  onAssign: (telecallerId: string) => void | Promise<void>;
+  onDelete: () => any;
+  onMove: (status: string) => any;
+  onAssign: (telecallerId: string) => any;
 }) => {
   if (count === 0) return null;
   return (
