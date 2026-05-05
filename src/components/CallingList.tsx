@@ -293,6 +293,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           <span className="text-xs">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
                         )}
                       </div>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:justify-end">
