@@ -58,7 +58,7 @@ const daysUntil = (d: string | null) => {
 
 type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold";
 
-export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: string }) => {
+export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false }: { callerName?: string; filterAssigned?: boolean }) => {
   const { user } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,11 +79,15 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    let q = supabase
       .from("leads")
-      .select("id,customer_name,phone_number,policy_type,status,last_called_at,call_date,premium_amount,area_id,policy_expiry_date, areas(name)")
+      .select("id,customer_name,phone_number,policy_type,status,last_called_at,call_date,premium_amount,area_id,policy_expiry_date,assigned_telecaller, areas(name)")
       .not("status", "in", "(Unsubscribed,Done,Not Interested)")
       .order("call_date", { ascending: true });
+    if (filterAssigned && user) {
+      q = q.or(`assigned_telecaller.eq.${user.id},assigned_telecaller.is.null`);
+    }
+    const { data, error } = await q;
     if (error) toast({ title: "Failed to load leads", description: error.message, variant: "destructive" });
     const list = (data ?? []) as any[];
     setLeads(list as any);
