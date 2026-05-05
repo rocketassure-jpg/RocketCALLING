@@ -12,6 +12,8 @@ import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { UserActionMenu } from "@/components/UserActionMenu";
 import { TrainingModule } from "@/components/TrainingModule";
+import { HamburgerMenu } from "@/components/HamburgerMenu";
+import { InstallPWA } from "@/components/InstallPWA";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -74,11 +76,22 @@ const ManagerDashboard = () => {
       <header className="sticky top-0 z-30 border-b bg-background shadow-soft">
         <div className="container flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:px-4">
           <div className="flex min-w-0 items-center gap-2">
+            <HamburgerMenu
+              items={[
+                { id: "calling", label: "Calling", icon: Phone },
+                { id: "enquiries", label: "Enquiries", icon: Inbox },
+                { id: "team", label: "Team", icon: BarChart3 },
+                { id: "leads", label: "Leads", icon: Users },
+                { id: "training", label: "Training" },
+              ]}
+              onChange={(id) => { if (id === "training") setShowTraining(true); }}
+              userName={me?.full_name}
+            />
             <Logo />
             <Badge variant="secondary" className="hidden sm:inline-flex">Manager</Badge>
           </div>
           <div className="flex items-center gap-2">
-            <span className="hidden text-sm text-muted-foreground sm:inline">{me?.full_name}</span>
+            <InstallPWA />
             <UserActionMenu label={me?.full_name} onTraining={() => setShowTraining(true)} />
           </div>
         </div>

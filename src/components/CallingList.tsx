@@ -10,6 +10,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Phone, MessageCircle, MessageSquare, Search, Loader2, MapPin, Ban, Calendar, IndianRupee, AlarmClock, History, ArrowRight } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { BulkActionBar } from "@/components/BulkActionBar";
 import { LeadTimeline } from "./LeadTimeline";
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
@@ -58,7 +60,7 @@ const daysUntil = (d: string | null) => {
 
 type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold";
 
-export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: string }) => {
+export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false }: { callerName?: string; filterAssigned?: boolean }) => {
   const { user } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +70,17 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
   const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
   const [historyLead, setHistoryLead] = useState<Lead | null>(null);
   const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [telecallerList, setTelecallerList] = useState<{ id: string; full_name: string }[]>([]);
+
+  useEffect(() => {
+    supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "telecaller").then(({ data }) => {
+      const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean);
+      setTelecallerList(list);
+    });
+  }, []);
+
+  const toggleSelect = (id: string) => setSelectedIds((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const loadDialCounts = async (leadIds: string[]) => {
     if (leadIds.length === 0) return;
@@ -79,11 +92,15 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    let q = supabase
       .from("leads")
-      .select("id,customer_name,phone_number,policy_type,status,last_called_at,call_date,premium_amount,area_id,policy_expiry_date, areas(name)")
+      .select("id,customer_name,phone_number,policy_type,status,last_called_at,call_date,premium_amount,area_id,policy_expiry_date,assigned_telecaller, areas(name)")
       .not("status", "in", "(Unsubscribed,Done,Not Interested)")
       .order("call_date", { ascending: true });
+    if (filterAssigned && user) {
+      q = q.or(`assigned_telecaller.eq.${user.id},assigned_telecaller.is.null`);
+    }
+    const { data, error } = await q;
     if (error) toast({ title: "Failed to load leads", description: error.message, variant: "destructive" });
     const list = (data ?? []) as any[];
     setLeads(list as any);
@@ -210,6 +227,16 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
         />
       </div>
 
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1 text-sm">
+          <Checkbox
+            checked={filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id))}
+            onCheckedChange={(v) => setSelectedIds(v ? new Set(filtered.map((l) => l.id)) : new Set())}
+          />
+          <span className="text-muted-foreground">Select all ({filtered.length})</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : filtered.length === 0 ? (
@@ -232,7 +259,9 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
               >
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Checkbox className="mt-1" checked={selectedIds.has(lead.id)} onCheckedChange={() => toggleSelect(lead.id)} onClick={(e) => e.stopPropagation()} />
+                      <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-base font-semibold">{lead.customer_name}</h3>
                         <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
@@ -263,6 +292,7 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
                         {lead.last_called_at && (
                           <span className="text-xs">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
                         )}
+                      </div>
                       </div>
                     </div>
 
@@ -378,6 +408,31 @@ export const CallingList = ({ callerName = "Rocket Services" }: { callerName?: s
           </div>
         </DialogContent>
       </Dialog>
+
+      <BulkActionBar
+        count={selectedIds.size}
+        telecallers={telecallerList}
+        onClear={() => setSelectedIds(new Set())}
+        onDelete={async () => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").delete().in("id", ids);
+          toast({ title: `${ids.length} deleted` });
+          setSelectedIds(new Set()); load();
+        }}
+        onMove={async (status) => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").update({ status: status as any }).in("id", ids);
+          toast({ title: `Moved to ${status}` });
+          setSelectedIds(new Set()); load();
+        }}
+        onAssign={async (tid) => {
+          const ids = [...selectedIds];
+          await supabase.from("leads").update({ assigned_telecaller: tid }).in("id", ids);
+          toast({ title: "Assigned" });
+          setSelectedIds(new Set()); load();
+        }}
+      />
     </div>
   );
 };
+
