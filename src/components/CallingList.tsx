@@ -227,6 +227,16 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         />
       </div>
 
+      {filtered.length > 0 && (
+        <div className="flex items-center gap-2 px-1 text-sm">
+          <Checkbox
+            checked={filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id))}
+            onCheckedChange={(v) => setSelectedIds(v ? new Set(filtered.map((l) => l.id)) : new Set())}
+          />
+          <span className="text-muted-foreground">Select all ({filtered.length})</span>
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
       ) : filtered.length === 0 ? (
@@ -249,7 +259,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
               >
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                      <Checkbox className="mt-1" checked={selectedIds.has(lead.id)} onCheckedChange={() => toggleSelect(lead.id)} onClick={(e) => e.stopPropagation()} />
+                      <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-base font-semibold">{lead.customer_name}</h3>
                         <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
