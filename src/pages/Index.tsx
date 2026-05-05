@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Logo } from "@/components/Logo";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { Link } from "react-router-dom";
+import { InstallPWA } from "@/components/InstallPWA";
 import { Heart, Stethoscope, Car, ShieldCheck, Phone, Clock, Award, MessageCircle } from "lucide-react";
 import heroImg from "@/assets/hero-insurance.jpg";
 
@@ -20,9 +21,12 @@ const Index = () => {
             <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">Services</a>
             <a href="#why" className="text-sm font-medium text-muted-foreground hover:text-foreground">Why Us</a>
           </nav>
-          <Button asChild variant="hero" size="sm">
-            <Link to="/auth">Staff Login</Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <InstallPWA />
+            <Button asChild variant="hero" size="sm">
+              <Link to="/auth">Staff Login</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
