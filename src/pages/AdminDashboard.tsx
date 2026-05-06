@@ -168,7 +168,10 @@ const AdminDashboard = () => {
   const Content = () => {
     switch (section) {
       case "dashboard": return <WavelengthDashboard />;
-      case "calling": return <CallingList callerName="Owner" />;
+      case "calling": return <CallingList callerName="Owner" role="admin" />;
+      case "renewals": return <RenewalsPanel />;
+      case "customers": return <CustomersPanel />;
+      case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
       case "api": return <ApiKeysManager />;
