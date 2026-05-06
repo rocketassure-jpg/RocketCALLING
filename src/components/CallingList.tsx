@@ -471,6 +471,31 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         </DialogContent>
       </Dialog>
 
+      {/* Note dialog after disposition */}
+      <Dialog open={!!noteDialog} onOpenChange={(o) => !o && setNoteDialog(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add a note — {noteDialog?.status}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">{noteDialog?.lead.customer_name} — Customer ne kya kaha?</p>
+            <Textarea
+              placeholder="Customer said they will think about it..."
+              value={noteText}
+              onChange={(e) => setNoteText(e.target.value)}
+              rows={4}
+              autoFocus
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={async () => { if (noteDialog) { await updateStatus(noteDialog.lead, noteDialog.status); setNoteDialog(null); } }}>Skip</Button>
+              <Button variant="hero" onClick={async () => { if (noteDialog) { await updateStatus(noteDialog.lead, noteDialog.status, noteText.trim() || undefined); setNoteDialog(null); } }}>
+                <CheckCircle2 className="h-4 w-4" /> Save Note & Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <BulkActionBar
         count={selectedIds.size}
         telecallers={telecallerList}
