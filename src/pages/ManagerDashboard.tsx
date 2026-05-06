@@ -7,13 +7,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox } from "lucide-react";
+import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { UserActionMenu } from "@/components/UserActionMenu";
 import { TrainingModule } from "@/components/TrainingModule";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
+import { ManagerTeamPanel } from "@/components/ManagerTeamPanel";
+import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
+import { CustomersPanel } from "@/components/admin/CustomersPanel";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
