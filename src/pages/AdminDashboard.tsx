@@ -27,6 +27,9 @@ import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
+import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
+import { CustomersPanel } from "@/components/admin/CustomersPanel";
+import { PerformancePanel } from "@/components/admin/PerformancePanel";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
