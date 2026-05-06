@@ -59,7 +59,7 @@ const daysUntil = (d: string | null) => {
   return Math.round(ms / (1000 * 60 * 60 * 24));
 };
 
-type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold";
+type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold" | "untouched";
 
 export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false }: { callerName?: string; filterAssigned?: boolean }) => {
   const { user } = useAuth();
