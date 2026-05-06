@@ -28,6 +28,7 @@ const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 const ManagerDashboard = () => {
   const { user } = useAuth();
   const [showTraining, setShowTraining] = useState(false);
+  const [section, setSection] = useState("calling");
   const [me, setMe] = useState<Profile | null>(null);
   const [team, setTeam] = useState<Profile[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
