@@ -199,56 +199,84 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     interested: leads.filter((l) => l.status === "Interested").length,
     followup: leads.filter((l) => l.status === "Follow-up").length,
     cold: leads.filter((l) => l.status === "New" || l.status === "Not Picked").length,
-  }), [leads]);
+    untouched: leads.filter((l) => untouchedIds.has(l.id)).length,
+  }), [leads, untouchedIds]);
 
-  const filtered = useMemo(() => leads.filter((l) => {
-    // Last-4-digit / name search
-    const q = search.trim().toLowerCase();
-    if (q) {
-      const last4 = l.phone_number.replace(/\D/g, "").slice(-4);
-      if (!l.customer_name.toLowerCase().includes(q) && !l.phone_number.includes(q) && !last4.includes(q)) return false;
-    }
-    switch (bucket) {
-      case "today": return l.call_date <= today();
-      case "overdue": return isOverdue(l.call_date);
-      case "interested": return l.status === "Interested";
-      case "followup": return l.status === "Follow-up";
-      case "cold": return l.status === "New" || l.status === "Not Picked";
-      default: return true;
-    }
-  }), [leads, search, bucket]);
+  const filtered = useMemo(() => {
+    const list = leads.filter((l) => {
+      const q = search.trim().toLowerCase();
+      if (q) {
+        const last4 = l.phone_number.replace(/\D/g, "").slice(-4);
+        if (!l.customer_name.toLowerCase().includes(q) && !l.phone_number.includes(q) && !last4.includes(q)) return false;
+      }
+      switch (bucket) {
+        case "today": return l.call_date <= today();
+        case "overdue": return isOverdue(l.call_date);
+        case "interested": return l.status === "Interested";
+        case "followup": return l.status === "Follow-up";
+        case "cold": return l.status === "New" || l.status === "Not Picked";
+        case "untouched": return untouchedIds.has(l.id);
+        default: return true;
+      }
+    });
+    // Untouched leads always float to top in default views
+    return [...list].sort((a, b) => {
+      const ua = untouchedIds.has(a.id) ? 0 : 1;
+      const ub = untouchedIds.has(b.id) ? 0 : 1;
+      return ua - ub;
+    });
+  }, [leads, search, bucket, untouchedIds]);
 
-  const buckets: { id: Bucket; label: string; value: number; tone: string; dot: string }[] = [
-    { id: "today",      label: "To Call",   value: stats.today,      tone: "from-primary to-accent text-primary-foreground", dot: "bg-white/80" },
-    { id: "overdue",    label: "Overdue",   value: stats.overdue,    tone: "bg-card text-foreground border",                  dot: "bg-destructive" },
-    { id: "interested", label: "Interested",value: stats.interested, tone: "bg-card text-foreground border",                  dot: "bg-success" },
-    { id: "followup",   label: "Follow-up", value: stats.followup,   tone: "bg-card text-foreground border",                  dot: "bg-warning" },
-    { id: "cold",       label: "Cold",      value: stats.cold,       tone: "bg-card text-foreground border",                  dot: "bg-muted-foreground" },
+  const buckets: { id: Bucket; label: string; value: number; accent: string; icon: any }[] = [
+    { id: "today",      label: "To Call",    value: stats.today,      accent: "border-l-primary",       icon: PhoneCall },
+    { id: "overdue",    label: "Overdue",    value: stats.overdue,    accent: "border-l-destructive",   icon: AlarmClock },
+    { id: "untouched",  label: "Untouched",  value: stats.untouched,  accent: "border-l-warning",       icon: Sparkles },
+    { id: "interested", label: "Interested", value: stats.interested, accent: "border-l-success",       icon: ThumbsUp },
+    { id: "followup",   label: "Follow-up",  value: stats.followup,   accent: "border-l-warning",       icon: Clock },
+    { id: "cold",       label: "Cold",       value: stats.cold,       accent: "border-l-muted-foreground", icon: Flame },
   ];
 
   return (
     <div className="space-y-5">
-      {/* Stat buckets — horizontal scroll story row */}
-      <div className="-mx-3 flex snap-x gap-2.5 overflow-x-auto px-3 pb-1 scrollbar-hide sm:mx-0 sm:px-0 md:grid md:grid-cols-5 md:gap-3 md:overflow-visible">
+      {/* Stat cards — responsive 3-col mobile, 6-col desktop, hover scale */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
         {buckets.map((b) => {
           const active = bucket === b.id;
-          const isHero = b.id === "today";
+          const Icon = b.icon;
           return (
             <button
               key={b.id}
               onClick={() => setBucket(b.id)}
-              className={`relative shrink-0 snap-start overflow-hidden rounded-2xl px-4 py-3 text-left transition-all md:w-auto ${isHero ? `bg-gradient-to-br ${b.tone} shadow-dial` : `${b.tone} shadow-card-pop hover:shadow-elegant`} ${active && !isHero ? "ring-2 ring-primary" : ""} ${isHero ? "min-w-[140px]" : "min-w-[110px]"}`}
+              title="Click to filter leads"
+              className={`group relative overflow-hidden rounded-xl border-l-4 ${b.accent} bg-card p-3 text-left shadow-card-pop transition-all duration-200 hover:scale-[1.04] hover:shadow-elegant cursor-pointer md:p-4 ${active ? "ring-2 ring-primary" : ""}`}
             >
-              {isHero && <div className="absolute -right-6 -top-6 h-20 w-20 rounded-full bg-white/20 blur-2xl" />}
-              <div className="relative flex items-center gap-1.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${isHero ? "bg-white/80" : b.dot}`} />
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${isHero ? "text-white/90" : "text-muted-foreground"}`}>{b.label}</span>
+              <div className="flex items-center gap-1.5">
+                <Icon className="h-3 w-3 text-muted-foreground md:h-3.5 md:w-3.5" />
+                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground md:text-xs">{b.label}</span>
               </div>
-              <div className={`relative mt-1 text-3xl font-extrabold tabular-nums tracking-tight ${isHero ? "text-white" : "text-foreground"}`}>{b.value}</div>
+              <div className="mt-1 text-xl font-extrabold tabular-nums tracking-tight text-foreground md:text-2xl">{b.value}</div>
             </button>
           );
         })}
       </div>
+
+      {/* Today's session card (Dialed today + breakdown) */}
+      <Card className="border-l-4 border-l-purple-500">
+        <CardContent className="flex flex-wrap items-center justify-between gap-2 p-3 md:p-4">
+          <div className="flex items-center gap-2">
+            <PhoneCall className="h-4 w-4 text-purple-500" />
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Dialed today</div>
+              <div className="text-xl font-extrabold tabular-nums">{todayStats.total} <span className="text-xs font-normal text-muted-foreground">calls</span></div>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            <Badge className="bg-success text-success-foreground">{todayStats.interested} Interested</Badge>
+            <Badge className="bg-warning text-warning-foreground">{todayStats.followup} Follow-up</Badge>
+            <Badge variant="outline">{todayStats.notInterested} Not Int.</Badge>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Search */}
       <div className="relative">
