@@ -121,82 +121,36 @@ const ManagerDashboard = () => {
           <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><IndianRupee className="h-4 w-4 sm:h-5 sm:w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
-        <Tabs defaultValue="calling">
-          <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-max min-w-full sm:w-auto">
-              <TabsTrigger value="calling"><Phone className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Calling</span></TabsTrigger>
-              <TabsTrigger value="enquiries"><Inbox className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Enquiries</span></TabsTrigger>
-              <TabsTrigger value="team"><BarChart3 className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Team</span></TabsTrigger>
-              <TabsTrigger value="leads"><span className="text-xs sm:text-sm">Leads</span></TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="calling">
-            <CallingList callerName={me?.full_name || "Rocket Services"} />
-          </TabsContent>
-
-          <TabsContent value="enquiries">
-            <EnquiriesPanel />
-          </TabsContent>
-
-          <TabsContent value="team">
-            <Card>
-              <CardHeader><CardTitle>Per-telecaller performance</CardTitle></CardHeader>
-              <CardContent className="overflow-x-auto p-0">
-                <Table>
-                  <TableHeader><TableRow>
-                    <TableHead>Telecaller</TableHead>
-                    <TableHead className="text-right">Dials</TableHead>
-                    <TableHead className="text-right">Calls logged</TableHead>
-                    <TableHead className="text-right">Interested</TableHead>
-                    <TableHead className="text-right">Done</TableHead>
-                    <TableHead className="text-right">Unsubscribed</TableHead>
-                  </TableRow></TableHeader>
-                  <TableBody>
-                    {teamStats.length === 0 ? (
-                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No telecallers assigned to you yet.</TableCell></TableRow>
-                    ) : teamStats.map((t) => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">{t.full_name || "(no name)"}</TableCell>
-                        <TableCell className="text-right">{t.dials}</TableCell>
-                        <TableCell className="text-right">{t.calls}</TableCell>
-                        <TableCell className="text-right text-success">{t.interested}</TableCell>
-                        <TableCell className="text-right text-primary">{t.done}</TableCell>
-                        <TableCell className="text-right text-destructive">{t.unsubscribed}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="leads">
-            <Card>
-              <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>
-              <CardContent className="overflow-x-auto p-0">
-                <Table>
-                  <TableHeader><TableRow>
-                    <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
-                    <TableHead>Status</TableHead><TableHead>Call date</TableHead><TableHead className="text-right">Premium</TableHead>
-                  </TableRow></TableHeader>
-                  <TableBody>
-                    {activeLeads.map((l) => (
-                      <TableRow key={l.id}>
-                        <TableCell className="font-medium">{l.customer_name}</TableCell>
-                        <TableCell>{l.phone_number}</TableCell>
-                        <TableCell>{l.areas?.name}</TableCell>
-                        <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
-                        <TableCell>{l.call_date}</TableCell>
-                        <TableCell className="text-right">{fmt(Number(l.premium_amount || 0))}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {section === "calling" && <CallingList callerName={me?.full_name || "Rocket Services"} role="manager" />}
+        {section === "enquiries" && <EnquiriesPanel />}
+        {section === "team" && <ManagerTeamPanel />}
+        {section === "renewals" && <RenewalsPanel />}
+        {section === "customers" && <CustomersPanel />}
+        {section === "leads" && (
+          <Card>
+            <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>
+            <CardContent className="overflow-x-auto p-0">
+              <Table>
+                <TableHeader><TableRow>
+                  <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
+                  <TableHead>Status</TableHead><TableHead>Call date</TableHead><TableHead className="text-right">Premium</TableHead>
+                </TableRow></TableHeader>
+                <TableBody>
+                  {activeLeads.map((l) => (
+                    <TableRow key={l.id}>
+                      <TableCell className="font-medium">{l.customer_name}</TableCell>
+                      <TableCell>{l.phone_number}</TableCell>
+                      <TableCell>{l.areas?.name}</TableCell>
+                      <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
+                      <TableCell>{l.call_date}</TableCell>
+                      <TableCell className="text-right">{fmt(Number(l.premium_amount || 0))}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
         </>)}
       </main>
     </div>
