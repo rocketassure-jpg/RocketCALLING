@@ -497,6 +497,8 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
       </Dialog>
 
       <BulkActionBar
+        hideAssign={role === "telecaller"}
+        hideDelete={role === "telecaller"}
         count={selectedIds.size}
         telecallers={telecallerList}
         onClear={() => setSelectedIds(new Set())}
