@@ -61,7 +61,7 @@ const daysUntil = (d: string | null) => {
 
 type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold" | "untouched";
 
-export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false }: { callerName?: string; filterAssigned?: boolean }) => {
+export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false, role = "admin" }: { callerName?: string; filterAssigned?: boolean; role?: "admin" | "manager" | "telecaller" }) => {
   const { user } = useAuth();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
