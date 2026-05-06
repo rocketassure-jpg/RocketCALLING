@@ -73,6 +73,10 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [telecallerList, setTelecallerList] = useState<{ id: string; full_name: string }[]>([]);
+  const [untouchedIds, setUntouchedIds] = useState<Set<string>>(new Set());
+  const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
+  const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
+  const [noteText, setNoteText] = useState("");
 
   useEffect(() => {
     supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "telecaller").then(({ data }) => {
