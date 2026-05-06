@@ -111,15 +111,44 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     setLeads(list as any);
     setLoading(false);
     loadDialCounts(list.map((l) => l.id));
+    // Untouched = leads with no call_logs ever
+    const ids = list.map((l) => l.id);
+    if (ids.length) {
+      const { data: cl } = await supabase.from("call_logs").select("lead_id").in("lead_id", ids);
+      const called = new Set((cl ?? []).map((r: any) => r.lead_id));
+      setUntouchedIds(new Set(ids.filter((i) => !called.has(i))));
+    }
   };
 
-  useEffect(() => { load(); }, []);
+  const loadTodayStats = async () => {
+    if (!user) return;
+    const start = new Date(); start.setHours(0, 0, 0, 0);
+    const { data } = await supabase.from("call_logs").select("status").eq("telecaller_id", user.id).gte("called_at", start.toISOString());
+    const rows = data ?? [];
+    setTodayStats({
+      total: rows.length,
+      interested: rows.filter((r: any) => r.status === "Interested").length,
+      followup: rows.filter((r: any) => r.status === "Follow-up").length,
+      notInterested: rows.filter((r: any) => r.status === "Not Interested").length,
+    });
+  };
 
-  const updateStatus = async (lead: Lead, newStatus: Status) => {
+  useEffect(() => { load(); loadTodayStats(); }, []);
+
+  useEffect(() => {
+    if (!user) return;
+    const ch = supabase.channel("call_logs_today")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "call_logs", filter: `telecaller_id=eq.${user.id}` }, () => loadTodayStats())
+      .subscribe();
+    const iv = setInterval(loadTodayStats, 30000);
+    return () => { supabase.removeChannel(ch); clearInterval(iv); };
+  }, [user?.id]);
+
+  const updateStatus = async (lead: Lead, newStatus: Status, note?: string) => {
     const now = new Date().toISOString();
     const { error: e1 } = await supabase.from("leads").update({ status: newStatus, last_called_at: now }).eq("id", lead.id);
     if (e1) return toast({ title: "Update failed", description: e1.message, variant: "destructive" });
-    if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: newStatus });
+    if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: newStatus, notes: note || null });
     toast({ title: "Saved", description: `${lead.customer_name} → ${newStatus}` });
 
     // Auto-trigger Thank You message when marked Interested
