@@ -82,13 +82,16 @@ const ManagerDashboard = () => {
           <div className="flex min-w-0 items-center gap-2">
             <HamburgerMenu
               items={[
-                { id: "calling", label: "Calling", icon: Phone },
+                { id: "calling", label: "Calling List", icon: Phone },
+                { id: "leads", label: "My Leads", icon: Users },
+                { id: "team", label: "My Team", icon: BarChart3 },
+                { id: "renewals", label: "Renewals", icon: AlarmClock },
+                { id: "customers", label: "Customers", icon: Trophy },
                 { id: "enquiries", label: "Enquiries", icon: Inbox },
-                { id: "team", label: "Team", icon: BarChart3 },
-                { id: "leads", label: "Leads", icon: Users },
-                { id: "training", label: "Training" },
+                { id: "training", label: "Training", icon: GraduationCap },
               ]}
-              onChange={(id) => { if (id === "training") setShowTraining(true); }}
+              active={showTraining ? "training" : section}
+              onChange={(id) => { if (id === "training") { setShowTraining(true); } else { setShowTraining(false); setSection(id); } }}
               userName={me?.full_name}
             />
             <Logo />
