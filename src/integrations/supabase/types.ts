@@ -169,6 +169,7 @@ export type Database = {
           called_at: string
           id: string
           lead_id: string
+          notes: string | null
           status: Database["public"]["Enums"]["lead_status"]
           telecaller_id: string
         }
@@ -176,6 +177,7 @@ export type Database = {
           called_at?: string
           id?: string
           lead_id: string
+          notes?: string | null
           status: Database["public"]["Enums"]["lead_status"]
           telecaller_id: string
         }
@@ -183,6 +185,7 @@ export type Database = {
           called_at?: string
           id?: string
           lead_id?: string
+          notes?: string | null
           status?: Database["public"]["Enums"]["lead_status"]
           telecaller_id?: string
         }
@@ -192,6 +195,20 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
         ]
@@ -260,6 +277,20 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dial_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dial_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
         ]
@@ -366,6 +397,8 @@ export type Database = {
           expiry_date: string | null
           father_name: string | null
           fitness_upto: string | null
+          follow_up_date: string | null
+          follow_up_notes: string | null
           fuel_type: string | null
           id: string
           insurance_company: string | null
@@ -373,6 +406,7 @@ export type Database = {
           last_called_at: string | null
           lead_source: string | null
           maker_name: string | null
+          manager_id: string | null
           mobile_2: string | null
           model_name: string | null
           net_od: number | null
@@ -414,6 +448,8 @@ export type Database = {
           expiry_date?: string | null
           father_name?: string | null
           fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
           fuel_type?: string | null
           id?: string
           insurance_company?: string | null
@@ -421,6 +457,7 @@ export type Database = {
           last_called_at?: string | null
           lead_source?: string | null
           maker_name?: string | null
+          manager_id?: string | null
           mobile_2?: string | null
           model_name?: string | null
           net_od?: number | null
@@ -462,6 +499,8 @@ export type Database = {
           expiry_date?: string | null
           father_name?: string | null
           fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
           fuel_type?: string | null
           id?: string
           insurance_company?: string | null
@@ -469,6 +508,7 @@ export type Database = {
           last_called_at?: string | null
           lead_source?: string | null
           maker_name?: string | null
+          manager_id?: string | null
           mobile_2?: string | null
           model_name?: string | null
           net_od?: number | null
@@ -717,6 +757,20 @@ export type Database = {
             referencedRelation: "leads"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "webhook_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "webhook_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
         ]
       }
       whatsapp_logs: {
@@ -757,7 +811,337 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      renewal_leads: {
+        Row: {
+          agent_sm_name: string | null
+          area_id: string | null
+          assigned_telecaller: string | null
+          authorised_person: string | null
+          call_date: string | null
+          cash_back: number | null
+          chassis_number: string | null
+          city_village: string | null
+          created_at: string | null
+          current_address: string | null
+          customer_name: string | null
+          delivery_address: string | null
+          engine_number: string | null
+          expiry_date: string | null
+          father_name: string | null
+          fitness_upto: string | null
+          follow_up_date: string | null
+          follow_up_notes: string | null
+          fuel_type: string | null
+          id: string | null
+          insurance_company: string | null
+          issue_date: string | null
+          last_called_at: string | null
+          lead_source: string | null
+          maker_name: string | null
+          manager_id: string | null
+          mobile_2: string | null
+          model_name: string | null
+          net_od: number | null
+          notes: string | null
+          payment_mode: string | null
+          payment_status: string | null
+          permanent_address: string | null
+          phone_number: string | null
+          policy_copy_url: string | null
+          policy_expiry_date: string | null
+          policy_number: string | null
+          policy_type: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount: number | null
+          pucc_upto: string | null
+          reg_date: string | null
+          registration_number: string | null
+          remark: string | null
+          status: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst: number | null
+          tp_premium: number | null
+          updated_at: string | null
+          urgency: string | null
+          vehicle_type: string | null
+          vendor_name: string | null
+        }
+        Insert: {
+          agent_sm_name?: string | null
+          area_id?: string | null
+          assigned_telecaller?: string | null
+          authorised_person?: string | null
+          call_date?: string | null
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
+          created_at?: string | null
+          current_address?: string | null
+          customer_name?: string | null
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          fuel_type?: string | null
+          id?: string | null
+          insurance_company?: string | null
+          issue_date?: string | null
+          last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          manager_id?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
+          phone_number?: string | null
+          policy_copy_url?: string | null
+          policy_expiry_date?: string | null
+          policy_number?: string | null
+          policy_type?: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount?: number | null
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
+          updated_at?: string | null
+          urgency?: never
+          vehicle_type?: string | null
+          vendor_name?: string | null
+        }
+        Update: {
+          agent_sm_name?: string | null
+          area_id?: string | null
+          assigned_telecaller?: string | null
+          authorised_person?: string | null
+          call_date?: string | null
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
+          created_at?: string | null
+          current_address?: string | null
+          customer_name?: string | null
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          fuel_type?: string | null
+          id?: string | null
+          insurance_company?: string | null
+          issue_date?: string | null
+          last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          manager_id?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
+          phone_number?: string | null
+          policy_copy_url?: string | null
+          policy_expiry_date?: string | null
+          policy_number?: string | null
+          policy_type?: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount?: number | null
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
+          updated_at?: string | null
+          urgency?: never
+          vehicle_type?: string | null
+          vendor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      untouched_leads: {
+        Row: {
+          agent_sm_name: string | null
+          area_id: string | null
+          assigned_telecaller: string | null
+          authorised_person: string | null
+          call_date: string | null
+          cash_back: number | null
+          chassis_number: string | null
+          city_village: string | null
+          created_at: string | null
+          current_address: string | null
+          customer_name: string | null
+          delivery_address: string | null
+          engine_number: string | null
+          expiry_date: string | null
+          father_name: string | null
+          fitness_upto: string | null
+          follow_up_date: string | null
+          follow_up_notes: string | null
+          fuel_type: string | null
+          id: string | null
+          insurance_company: string | null
+          issue_date: string | null
+          last_called_at: string | null
+          lead_source: string | null
+          maker_name: string | null
+          manager_id: string | null
+          mobile_2: string | null
+          model_name: string | null
+          net_od: number | null
+          notes: string | null
+          payment_mode: string | null
+          payment_status: string | null
+          permanent_address: string | null
+          phone_number: string | null
+          policy_copy_url: string | null
+          policy_expiry_date: string | null
+          policy_number: string | null
+          policy_type: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount: number | null
+          pucc_upto: string | null
+          reg_date: string | null
+          registration_number: string | null
+          remark: string | null
+          status: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst: number | null
+          tp_premium: number | null
+          updated_at: string | null
+          vehicle_type: string | null
+          vendor_name: string | null
+        }
+        Insert: {
+          agent_sm_name?: string | null
+          area_id?: string | null
+          assigned_telecaller?: string | null
+          authorised_person?: string | null
+          call_date?: string | null
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
+          created_at?: string | null
+          current_address?: string | null
+          customer_name?: string | null
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          fuel_type?: string | null
+          id?: string | null
+          insurance_company?: string | null
+          issue_date?: string | null
+          last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          manager_id?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
+          phone_number?: string | null
+          policy_copy_url?: string | null
+          policy_expiry_date?: string | null
+          policy_number?: string | null
+          policy_type?: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount?: number | null
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
+          updated_at?: string | null
+          vehicle_type?: string | null
+          vendor_name?: string | null
+        }
+        Update: {
+          agent_sm_name?: string | null
+          area_id?: string | null
+          assigned_telecaller?: string | null
+          authorised_person?: string | null
+          call_date?: string | null
+          cash_back?: number | null
+          chassis_number?: string | null
+          city_village?: string | null
+          created_at?: string | null
+          current_address?: string | null
+          customer_name?: string | null
+          delivery_address?: string | null
+          engine_number?: string | null
+          expiry_date?: string | null
+          father_name?: string | null
+          fitness_upto?: string | null
+          follow_up_date?: string | null
+          follow_up_notes?: string | null
+          fuel_type?: string | null
+          id?: string | null
+          insurance_company?: string | null
+          issue_date?: string | null
+          last_called_at?: string | null
+          lead_source?: string | null
+          maker_name?: string | null
+          manager_id?: string | null
+          mobile_2?: string | null
+          model_name?: string | null
+          net_od?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          permanent_address?: string | null
+          phone_number?: string | null
+          policy_copy_url?: string | null
+          policy_expiry_date?: string | null
+          policy_number?: string | null
+          policy_type?: Database["public"]["Enums"]["policy_type"] | null
+          premium_amount?: number | null
+          pucc_upto?: string | null
+          reg_date?: string | null
+          registration_number?: string | null
+          remark?: string | null
+          status?: Database["public"]["Enums"]["lead_status"] | null
+          total_premium_incl_gst?: number | null
+          tp_premium?: number | null
+          updated_at?: string | null
+          vehicle_type?: string | null
+          vendor_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_area_id_fkey"
+            columns: ["area_id"]
+            isOneToOne: false
+            referencedRelation: "areas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       has_role: {
