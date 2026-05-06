@@ -12,6 +12,8 @@ export const BulkActionBar = ({
   onDelete,
   onMove,
   onAssign,
+  hideAssign = false,
+  hideDelete = false,
 }: {
   count: number;
   telecallers: { id: string; full_name: string }[];
@@ -19,6 +21,8 @@ export const BulkActionBar = ({
   onDelete: () => any;
   onMove: (status: string) => any;
   onAssign: (telecallerId: string) => any;
+  hideAssign?: boolean;
+  hideDelete?: boolean;
 }) => {
   if (count === 0) return null;
   return (
@@ -31,25 +35,29 @@ export const BulkActionBar = ({
           <SelectTrigger className="w-[160px]"><SelectValue placeholder="Move to…" /></SelectTrigger>
           <SelectContent>{SECTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
         </Select>
-        <Select onValueChange={onAssign}>
-          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Assign telecaller…" /></SelectTrigger>
-          <SelectContent>{telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}</SelectContent>
-        </Select>
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /> Delete</Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete {count} leads?</AlertDialogTitle>
-              <AlertDialogDescription>Yeh action permanent hai. Selected leads database se delete ho jayenge.</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {!hideAssign && (
+          <Select onValueChange={onAssign}>
+            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Assign telecaller…" /></SelectTrigger>
+            <SelectContent>{telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}</SelectContent>
+          </Select>
+        )}
+        {!hideDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm"><Trash2 className="h-4 w-4" /> Delete</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete {count} leads?</AlertDialogTitle>
+                <AlertDialogDescription>Yeh action permanent hai. Selected leads database se delete ho jayenge.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete}>Delete</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     </div>
   );

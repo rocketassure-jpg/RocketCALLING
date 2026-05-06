@@ -6,14 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox } from "lucide-react";
+// Tabs removed in favor of hamburger sections
+import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { UserActionMenu } from "@/components/UserActionMenu";
 import { TrainingModule } from "@/components/TrainingModule";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
+import { ManagerTeamPanel } from "@/components/ManagerTeamPanel";
+import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
+import { CustomersPanel } from "@/components/admin/CustomersPanel";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -25,6 +28,7 @@ const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 const ManagerDashboard = () => {
   const { user } = useAuth();
   const [showTraining, setShowTraining] = useState(false);
+  const [section, setSection] = useState("calling");
   const [me, setMe] = useState<Profile | null>(null);
   const [team, setTeam] = useState<Profile[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -78,13 +82,16 @@ const ManagerDashboard = () => {
           <div className="flex min-w-0 items-center gap-2">
             <HamburgerMenu
               items={[
-                { id: "calling", label: "Calling", icon: Phone },
+                { id: "calling", label: "Calling List", icon: Phone },
+                { id: "leads", label: "My Leads", icon: Users },
+                { id: "team", label: "My Team", icon: BarChart3 },
+                { id: "renewals", label: "Renewals", icon: AlarmClock },
+                { id: "customers", label: "Customers", icon: Trophy },
                 { id: "enquiries", label: "Enquiries", icon: Inbox },
-                { id: "team", label: "Team", icon: BarChart3 },
-                { id: "leads", label: "Leads", icon: Users },
-                { id: "training", label: "Training" },
+                { id: "training", label: "Training", icon: GraduationCap },
               ]}
-              onChange={(id) => { if (id === "training") setShowTraining(true); }}
+              active={showTraining ? "training" : section}
+              onChange={(id) => { if (id === "training") { setShowTraining(true); } else { setShowTraining(false); setSection(id); } }}
               userName={me?.full_name}
             />
             <Logo />
@@ -114,82 +121,36 @@ const ManagerDashboard = () => {
           <Card><CardContent className="p-3 sm:p-4"><div className="text-[11px] sm:text-xs text-muted-foreground">Premium</div><div className="mt-1 flex items-center gap-1.5 text-lg sm:text-2xl font-bold text-primary"><IndianRupee className="h-4 w-4 sm:h-5 sm:w-5" />{totals.premium.toLocaleString("en-IN")}</div></CardContent></Card>
         </div>
 
-        <Tabs defaultValue="calling">
-          <div className="-mx-3 overflow-x-auto px-3 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex w-max min-w-full sm:w-auto">
-              <TabsTrigger value="calling"><Phone className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Calling</span></TabsTrigger>
-              <TabsTrigger value="enquiries"><Inbox className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Enquiries</span></TabsTrigger>
-              <TabsTrigger value="team"><BarChart3 className="mr-1.5 h-4 w-4 sm:mr-2" /><span className="text-xs sm:text-sm">Team</span></TabsTrigger>
-              <TabsTrigger value="leads"><span className="text-xs sm:text-sm">Leads</span></TabsTrigger>
-            </TabsList>
-          </div>
-
-          <TabsContent value="calling">
-            <CallingList callerName={me?.full_name || "Rocket Services"} />
-          </TabsContent>
-
-          <TabsContent value="enquiries">
-            <EnquiriesPanel />
-          </TabsContent>
-
-          <TabsContent value="team">
-            <Card>
-              <CardHeader><CardTitle>Per-telecaller performance</CardTitle></CardHeader>
-              <CardContent className="overflow-x-auto p-0">
-                <Table>
-                  <TableHeader><TableRow>
-                    <TableHead>Telecaller</TableHead>
-                    <TableHead className="text-right">Dials</TableHead>
-                    <TableHead className="text-right">Calls logged</TableHead>
-                    <TableHead className="text-right">Interested</TableHead>
-                    <TableHead className="text-right">Done</TableHead>
-                    <TableHead className="text-right">Unsubscribed</TableHead>
-                  </TableRow></TableHeader>
-                  <TableBody>
-                    {teamStats.length === 0 ? (
-                      <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">No telecallers assigned to you yet.</TableCell></TableRow>
-                    ) : teamStats.map((t) => (
-                      <TableRow key={t.id}>
-                        <TableCell className="font-medium">{t.full_name || "(no name)"}</TableCell>
-                        <TableCell className="text-right">{t.dials}</TableCell>
-                        <TableCell className="text-right">{t.calls}</TableCell>
-                        <TableCell className="text-right text-success">{t.interested}</TableCell>
-                        <TableCell className="text-right text-primary">{t.done}</TableCell>
-                        <TableCell className="text-right text-destructive">{t.unsubscribed}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="leads">
-            <Card>
-              <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>
-              <CardContent className="overflow-x-auto p-0">
-                <Table>
-                  <TableHeader><TableRow>
-                    <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
-                    <TableHead>Status</TableHead><TableHead>Call date</TableHead><TableHead className="text-right">Premium</TableHead>
-                  </TableRow></TableHeader>
-                  <TableBody>
-                    {activeLeads.map((l) => (
-                      <TableRow key={l.id}>
-                        <TableCell className="font-medium">{l.customer_name}</TableCell>
-                        <TableCell>{l.phone_number}</TableCell>
-                        <TableCell>{l.areas?.name}</TableCell>
-                        <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
-                        <TableCell>{l.call_date}</TableCell>
-                        <TableCell className="text-right">{fmt(Number(l.premium_amount || 0))}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        {section === "calling" && <CallingList callerName={me?.full_name || "Rocket Services"} role="manager" />}
+        {section === "enquiries" && <EnquiriesPanel />}
+        {section === "team" && <ManagerTeamPanel />}
+        {section === "renewals" && <RenewalsPanel />}
+        {section === "customers" && <CustomersPanel />}
+        {section === "leads" && (
+          <Card>
+            <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>
+            <CardContent className="overflow-x-auto p-0">
+              <Table>
+                <TableHeader><TableRow>
+                  <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
+                  <TableHead>Status</TableHead><TableHead>Call date</TableHead><TableHead className="text-right">Premium</TableHead>
+                </TableRow></TableHeader>
+                <TableBody>
+                  {activeLeads.map((l) => (
+                    <TableRow key={l.id}>
+                      <TableCell className="font-medium">{l.customer_name}</TableCell>
+                      <TableCell>{l.phone_number}</TableCell>
+                      <TableCell>{l.areas?.name}</TableCell>
+                      <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
+                      <TableCell>{l.call_date}</TableCell>
+                      <TableCell className="text-right">{fmt(Number(l.premium_amount || 0))}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
         </>)}
       </main>
     </div>

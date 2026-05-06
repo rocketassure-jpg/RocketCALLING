@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3 } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
@@ -27,6 +27,9 @@ import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
+import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
+import { CustomersPanel } from "@/components/admin/CustomersPanel";
+import { PerformancePanel } from "@/components/admin/PerformancePanel";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -48,6 +51,9 @@ const NAV: { id: string; label: string; icon: any }[] = [
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
   { id: "areas", label: "Areas", icon: MapPin },
+  { id: "renewals", label: "Renewals", icon: AlarmClock },
+  { id: "customers", label: "Customers", icon: Trophy },
+  { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "team", label: "Team", icon: Shield },
   { id: "import", label: "Import", icon: Upload },
   { id: "training", label: "Training", icon: GraduationCap },
@@ -162,7 +168,10 @@ const AdminDashboard = () => {
   const Content = () => {
     switch (section) {
       case "dashboard": return <WavelengthDashboard />;
-      case "calling": return <CallingList callerName="Owner" />;
+      case "calling": return <CallingList callerName="Owner" role="admin" />;
+      case "renewals": return <RenewalsPanel />;
+      case "customers": return <CustomersPanel />;
+      case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
       case "api": return <ApiKeysManager />;

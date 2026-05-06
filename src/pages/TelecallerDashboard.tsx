@@ -65,7 +65,7 @@ const TelecallerDashboard = () => {
               <p className="text-sm text-muted-foreground">Sirf aaj ya overdue leads dikh rahe hain.</p>
             </div>
             <BreakToggle />
-            <CallingList callerName={fullName || "Rocket Services"} filterAssigned />
+            <CallingList callerName={fullName || "Rocket Services"} filterAssigned role="telecaller" />
           </>
         )}
         {tab === "home" && view === "training" && (
@@ -90,7 +90,7 @@ const TelecallerDashboard = () => {
         {tab === "leads" && (
           <>
             <h1 className="text-xl font-bold">All My Leads</h1>
-            <CallingList callerName={fullName || "Rocket Services"} filterAssigned />
+            <CallingList callerName={fullName || "Rocket Services"} filterAssigned role="telecaller" />
           </>
         )}
         {tab === "menu" && (
