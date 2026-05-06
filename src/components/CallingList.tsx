@@ -402,7 +402,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           <a href={`sms:${lead.phone_number}?body=${smsMessage}`}><MessageSquare className="h-4 w-4" /> SMS</a>
                         </Button>
                       )}
-                      <Select value={lead.status} onValueChange={(v) => updateStatus(lead, v as Status)}>
+                      <Select value={lead.status} onValueChange={(v) => { setNoteText(""); setNoteDialog({ lead, status: v as Status }); }}>
                         <SelectTrigger className="col-span-2 h-9 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
