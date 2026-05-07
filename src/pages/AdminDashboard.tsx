@@ -57,6 +57,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
   { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "team", label: "Team", icon: Shield },
   { id: "import", label: "Import", icon: Upload },
+  { id: "messaging", label: "WhatsApp", icon: MessageCircle },
   { id: "training", label: "Training", icon: GraduationCap },
   { id: "api", label: "API & Webhooks", icon: Webhook },
   { id: "secrets", label: "API Keys", icon: Lock },
