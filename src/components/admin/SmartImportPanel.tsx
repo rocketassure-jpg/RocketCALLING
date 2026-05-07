@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Upload, CheckCircle2, Loader2 } from "lucide-react";
+import { Upload, CheckCircle2, Loader2, Users, Shuffle, MapPin, User } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type Area = { id: string; name: string };
@@ -39,13 +40,30 @@ const autoMap = (header: string): string => {
   return SKIP;
 };
 
+type AssignMode = "none" | "single" | "roundrobin" | "byarea";
+
 export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [defaultArea, setDefaultArea] = useState("");
-  const [defaultTelecaller, setDefaultTelecaller] = useState("none");
+  const [assignMode, setAssignMode] = useState<AssignMode>("none");
+  const [singleTelecaller, setSingleTelecaller] = useState("");
+  const [rrSelected, setRrSelected] = useState<Set<string>>(new Set());
+  const [areaTelecallerMap, setAreaTelecallerMap] = useState<Record<string, string[]>>({});
   const [importing, setImporting] = useState(false);
+
+  // Load telecaller_areas for byarea mode
+  useEffect(() => {
+    if (assignMode !== "byarea") return;
+    supabase.from("telecaller_areas").select("area_id, telecaller_id").then(({ data }) => {
+      const map: Record<string, string[]> = {};
+      (data ?? []).forEach((r: any) => {
+        (map[r.area_id] ||= []).push(r.telecaller_id);
+      });
+      setAreaTelecallerMap(map);
+    });
+  }, [assignMode]);
 
   const handleFile = async (file: File) => {
     const ext = file.name.split(".").pop()?.toLowerCase();
@@ -82,12 +100,30 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     return o;
   }), [rows, mapping]);
 
+  const toggleRr = (id: string) => setRrSelected((s) => {
+    const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n;
+  });
+
+  const pickAssignee = (areaId: string, idx: number, rrList: string[]): string | null => {
+    if (assignMode === "single") return singleTelecaller || null;
+    if (assignMode === "roundrobin") return rrList.length ? rrList[idx % rrList.length] : null;
+    if (assignMode === "byarea") {
+      const pool = areaTelecallerMap[areaId] ?? [];
+      return pool.length ? pool[idx % pool.length] : null;
+    }
+    return null;
+  };
+
   const doImport = async () => {
     if (!defaultArea) return toast({ title: "Default area select karo", variant: "destructive" });
+    if (assignMode === "single" && !singleTelecaller) return toast({ title: "Telecaller select karo", variant: "destructive" });
+    if (assignMode === "roundrobin" && rrSelected.size === 0) return toast({ title: "Round-robin ke liye telecallers select karo", variant: "destructive" });
     setImporting(true);
     const areaMap = new Map(areas.map((a) => [a.name.toLowerCase(), a.id]));
+    const rrList = Array.from(rrSelected);
     const inserts: any[] = [];
-    let skipped = 0;
+    const assignCounts: Record<string, number> = {};
+    let skipped = 0, unassigned = 0, idx = 0;
     rows.forEach((r) => {
       const o: any = { area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import" };
       Object.entries(mapping).forEach(([col, target]) => {
@@ -108,8 +144,15 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
         }
       });
       if (!o.customer_name || !o.phone_number) { skipped++; return; }
-      if (defaultTelecaller !== "none") o.assigned_telecaller = defaultTelecaller;
+      const assignee = pickAssignee(o.area_id, idx, rrList);
+      if (assignee) {
+        o.assigned_telecaller = assignee;
+        assignCounts[assignee] = (assignCounts[assignee] || 0) + 1;
+      } else if (assignMode !== "none") {
+        unassigned++;
+      }
       inserts.push(o);
+      idx++;
     });
 
     let inserted = 0;
@@ -119,8 +162,17 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
       if (!error) inserted += count ?? chunk.length;
     }
     setImporting(false);
-    toast({ title: `✓ ${inserted} leads imported`, description: skipped ? `${skipped} skipped (missing name/phone)` : undefined });
-    setRows([]); setHeaders([]); setMapping({});
+    const tcName = (id: string) => telecallers.find((t) => t.id === id)?.full_name || id.slice(0, 6);
+    const distSummary = Object.entries(assignCounts).map(([id, n]) => `${tcName(id)}: ${n}`).join(", ");
+    toast({
+      title: `✓ ${inserted} leads imported`,
+      description: [
+        skipped ? `${skipped} skipped` : null,
+        unassigned ? `${unassigned} unassigned` : null,
+        distSummary || null,
+      ].filter(Boolean).join(" • ") || undefined,
+    });
+    setRows([]); setHeaders([]); setMapping({}); setRrSelected(new Set());
     onDone();
   };
 
@@ -128,25 +180,73 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     <Card>
       <CardHeader><CardTitle className="flex items-center gap-2"><Upload className="h-5 w-5 text-primary" /> Smart Import (CSV / Excel)</CardTitle></CardHeader>
       <CardContent className="space-y-5">
-        <div className="grid gap-3 md:grid-cols-3">
-          <div className="space-y-1.5"><Label>Default Area *</Label>
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="space-y-1.5"><Label>Default Area * (fallback)</Label>
             <Select value={defaultArea} onValueChange={setDefaultArea}>
               <SelectTrigger><SelectValue placeholder="Select area" /></SelectTrigger>
               <SelectContent>{areas.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
-          <div className="space-y-1.5"><Label>Assign Telecaller</Label>
-            <Select value={defaultTelecaller} onValueChange={setDefaultTelecaller}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">— none —</SelectItem>
-                {telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="space-y-1.5"><Label>File (.csv / .xlsx)</Label>
             <Input type="file" accept=".csv,.xlsx,.xls" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
           </div>
+        </div>
+
+        {/* Assignment flow */}
+        <div className="rounded-lg border p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Users className="h-4 w-4 text-primary" /> Lead Assignment</div>
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+            {[
+              { v: "none", label: "Unassigned", icon: User },
+              { v: "single", label: "Single Telecaller", icon: User },
+              { v: "roundrobin", label: "Round Robin", icon: Shuffle },
+              { v: "byarea", label: "By Area Map", icon: MapPin },
+            ].map(({ v, label, icon: Icon }) => (
+              <button
+                key={v}
+                type="button"
+                onClick={() => setAssignMode(v as AssignMode)}
+                className={`flex items-center gap-2 rounded-md border p-2 text-xs transition ${assignMode === v ? "border-primary bg-primary/10 font-medium" : "hover:bg-muted"}`}
+              >
+                <Icon className="h-3.5 w-3.5" /> {label}
+              </button>
+            ))}
+          </div>
+
+          {assignMode === "single" && (
+            <Select value={singleTelecaller} onValueChange={setSingleTelecaller}>
+              <SelectTrigger><SelectValue placeholder="Choose telecaller" /></SelectTrigger>
+              <SelectContent>
+                {telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+
+          {assignMode === "roundrobin" && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Leads in tabhi {rrSelected.size || 0} telecallers ke beech evenly distribute honge.</p>
+              <div className="grid max-h-40 grid-cols-2 gap-2 overflow-y-auto md:grid-cols-3">
+                {telecallers.map((t) => (
+                  <label key={t.id} className="flex items-center gap-2 rounded border p-2 text-xs cursor-pointer hover:bg-muted">
+                    <Checkbox checked={rrSelected.has(t.id)} onCheckedChange={() => toggleRr(t.id)} />
+                    <span className="truncate">{t.full_name || t.id.slice(0, 8)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {assignMode === "byarea" && (
+            <div className="rounded bg-muted/40 p-2 text-xs text-muted-foreground">
+              Har lead apne area ke assigned telecallers ko round-robin se milega. Areas without telecallers → unassigned.
+              <div className="mt-2 flex flex-wrap gap-1">
+                {areas.map((a) => {
+                  const count = areaTelecallerMap[a.id]?.length ?? 0;
+                  return <Badge key={a.id} variant={count ? "default" : "outline"}>{a.name}: {count}</Badge>;
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {headers.length > 0 && (
