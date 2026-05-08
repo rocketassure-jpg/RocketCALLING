@@ -11,7 +11,8 @@ import { TrainingModule } from "@/components/TrainingModule";
 import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
-import { Plus, Phone, GraduationCap } from "lucide-react";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
+import { Plus, Phone, GraduationCap, Calculator } from "lucide-react";
 
 type Area = { id: string; name: string };
 
