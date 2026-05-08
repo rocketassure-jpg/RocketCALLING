@@ -19,6 +19,7 @@ const Index = () => {
           <Logo />
           <nav className="hidden items-center gap-8 md:flex">
             <a href="#enquiry" className="text-sm font-medium text-muted-foreground hover:text-foreground">Enquiry</a>
+            <a href="#calculator" className="text-sm font-medium text-muted-foreground hover:text-foreground">Premium Calculator</a>
             <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">Services</a>
             <a href="#why" className="text-sm font-medium text-muted-foreground hover:text-foreground">Why Us</a>
           </nav>
