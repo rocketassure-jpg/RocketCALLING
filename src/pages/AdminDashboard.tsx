@@ -31,6 +31,7 @@ import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
