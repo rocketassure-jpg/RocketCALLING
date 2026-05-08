@@ -89,6 +89,7 @@ const ManagerDashboard = () => {
                 { id: "renewals", label: "Renewals", icon: AlarmClock },
                 { id: "customers", label: "Customers", icon: Trophy },
                 { id: "enquiries", label: "Enquiries", icon: Inbox },
+                { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
               ]}
               active={showTraining ? "training" : section}
