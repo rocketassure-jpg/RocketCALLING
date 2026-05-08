@@ -73,6 +73,17 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Premium Calculator */}
+      <section id="calculator" className="bg-secondary/30 py-16">
+        <div className="container">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">Motor Insurance Premium Calculator</h2>
+            <p className="mt-3 text-muted-foreground">Apni car / bike ka premium 30 second mein calculate karein. PDF download ya WhatsApp pe direct share karein.</p>
+          </div>
+          <PremiumCalculator />
+        </div>
+      </section>
+
       {/* Services */}
       <section id="services" className="container py-16">
         <div className="mx-auto mb-12 max-w-2xl text-center">
