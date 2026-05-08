@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 // Tabs removed in favor of hamburger sections
-import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap } from "lucide-react";
+import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap, Calculator } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { UserActionMenu } from "@/components/UserActionMenu";
@@ -17,6 +17,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { ManagerTeamPanel } from "@/components/ManagerTeamPanel";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -88,6 +89,7 @@ const ManagerDashboard = () => {
                 { id: "renewals", label: "Renewals", icon: AlarmClock },
                 { id: "customers", label: "Customers", icon: Trophy },
                 { id: "enquiries", label: "Enquiries", icon: Inbox },
+                { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
               ]}
               active={showTraining ? "training" : section}
@@ -126,6 +128,7 @@ const ManagerDashboard = () => {
         {section === "team" && <ManagerTeamPanel />}
         {section === "renewals" && <RenewalsPanel />}
         {section === "customers" && <CustomersPanel />}
+        {section === "calculator" && <PremiumCalculator />}
         {section === "leads" && (
           <Card>
             <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>

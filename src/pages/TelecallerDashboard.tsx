@@ -11,7 +11,8 @@ import { TrainingModule } from "@/components/TrainingModule";
 import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
-import { Plus, Phone, GraduationCap } from "lucide-react";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
+import { Plus, Phone, GraduationCap, Calculator } from "lucide-react";
 
 type Area = { id: string; name: string };
 
@@ -19,7 +20,7 @@ const TelecallerDashboard = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [tab, setTab] = useState<"home" | "leads" | "menu">("home");
-  const [view, setView] = useState<"calls" | "training" | "add">("calls");
+  const [view, setView] = useState<"calls" | "training" | "add" | "calculator">("calls");
   const [areas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
@@ -40,6 +41,7 @@ const TelecallerDashboard = () => {
               items={[
                 { id: "calls", label: "Calls", icon: Phone },
                 { id: "add", label: "Add Lead", icon: Plus },
+                { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
               ]}
               onChange={(id) => { setView(id as any); setTab("home"); }}
@@ -85,6 +87,12 @@ const TelecallerDashboard = () => {
             ) : (
               <AddCustomerForm areas={areas} onDone={() => setView("calls")} />
             )}
+          </>
+        )}
+        {tab === "home" && view === "calculator" && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => setView("calls")}>← Back to calls</Button>
+            <PremiumCalculator />
           </>
         )}
         {tab === "leads" && (

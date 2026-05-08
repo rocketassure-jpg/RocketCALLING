@@ -4,7 +4,8 @@ import { Logo } from "@/components/Logo";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { Link } from "react-router-dom";
 import { InstallPWA } from "@/components/InstallPWA";
-import { Heart, Stethoscope, Car, ShieldCheck, Phone, Clock, Award, MessageCircle } from "lucide-react";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
+import { Heart, Stethoscope, Car, ShieldCheck, Phone, Clock, Award, MessageCircle, Calculator } from "lucide-react";
 import heroImg from "@/assets/hero-insurance.jpg";
 
 const WA_NUMBER = "919669762808";
@@ -18,6 +19,7 @@ const Index = () => {
           <Logo />
           <nav className="hidden items-center gap-8 md:flex">
             <a href="#enquiry" className="text-sm font-medium text-muted-foreground hover:text-foreground">Enquiry</a>
+            <a href="#calculator" className="text-sm font-medium text-muted-foreground hover:text-foreground">Premium Calculator</a>
             <a href="#services" className="text-sm font-medium text-muted-foreground hover:text-foreground">Services</a>
             <a href="#why" className="text-sm font-medium text-muted-foreground hover:text-foreground">Why Us</a>
           </nav>
@@ -45,6 +47,7 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild variant="hero" size="lg"><a href="#enquiry">Get a free quote</a></Button>
+              <Button asChild variant="outline" size="lg"><a href="#calculator"><Calculator className="h-4 w-4" /> Premium Calculator</a></Button>
               <Button asChild variant="success" size="lg">
                 <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Mujhe insurance ki jaankari chahiye")}`} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="h-4 w-4" /> WhatsApp Expert
@@ -67,6 +70,17 @@ const Index = () => {
       <section id="enquiry" className="container py-16">
         <div className="mx-auto max-w-3xl">
           <EnquiryForm />
+        </div>
+      </section>
+
+      {/* Premium Calculator */}
+      <section id="calculator" className="bg-secondary/30 py-16">
+        <div className="container">
+          <div className="mx-auto mb-8 max-w-2xl text-center">
+            <h2 className="text-3xl font-bold md:text-4xl">Motor Insurance Premium Calculator</h2>
+            <p className="mt-3 text-muted-foreground">Apni car / bike ka premium 30 second mein calculate karein. PDF download ya WhatsApp pe direct share karein.</p>
+          </div>
+          <PremiumCalculator />
         </div>
       </section>
 
