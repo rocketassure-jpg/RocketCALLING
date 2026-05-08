@@ -149,6 +149,8 @@ export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) 
 
   const downloadPDF = () => {
     const doc = new jsPDF();
+    // jsPDF default font (Helvetica) doesn't support ₹ glyph — use "Rs." for PDF
+    const inrPdf = (n: number) => `Rs. ${Math.round(n).toLocaleString("en-IN")}`;
     doc.setFontSize(16);
     doc.text("Motor Insurance Premium Quote", 14, 16);
     doc.setFontSize(10);
