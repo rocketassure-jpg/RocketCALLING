@@ -128,6 +128,7 @@ const ManagerDashboard = () => {
         {section === "team" && <ManagerTeamPanel />}
         {section === "renewals" && <RenewalsPanel />}
         {section === "customers" && <CustomersPanel />}
+        {section === "calculator" && <PremiumCalculator />}
         {section === "leads" && (
           <Card>
             <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>
