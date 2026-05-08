@@ -41,6 +41,7 @@ const TelecallerDashboard = () => {
               items={[
                 { id: "calls", label: "Calls", icon: Phone },
                 { id: "add", label: "Add Lead", icon: Plus },
+                { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
               ]}
               onChange={(id) => { setView(id as any); setTab("home"); }}
