@@ -17,6 +17,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { ManagerTeamPanel } from "@/components/ManagerTeamPanel";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
+import { PremiumCalculator } from "@/components/PremiumCalculator";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
