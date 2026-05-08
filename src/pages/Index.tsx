@@ -47,6 +47,7 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild variant="hero" size="lg"><a href="#enquiry">Get a free quote</a></Button>
+              <Button asChild variant="outline" size="lg"><a href="#calculator"><Calculator className="h-4 w-4" /> Premium Calculator</a></Button>
               <Button asChild variant="success" size="lg">
                 <a href={`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Mujhe insurance ki jaankari chahiye")}`} target="_blank" rel="noopener noreferrer">
                   <MessageCircle className="h-4 w-4" /> WhatsApp Expert
