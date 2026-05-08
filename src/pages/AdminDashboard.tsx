@@ -178,7 +178,8 @@ const AdminDashboard = () => {
       case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
-      case "messaging": return <WhatsAppBulkMessaging />;
+     case "messaging": return <WhatsAppBulkMessaging />;
+     case "calculator": return <PremiumCalculator />;
       case "api": return <ApiKeysManager />;
       case "secrets": return <SecretsManager />;
       case "training": return <TrainingModule canManage={true} />;
