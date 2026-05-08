@@ -20,7 +20,7 @@ const TelecallerDashboard = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [tab, setTab] = useState<"home" | "leads" | "menu">("home");
-  const [view, setView] = useState<"calls" | "training" | "add">("calls");
+  const [view, setView] = useState<"calls" | "training" | "add" | "calculator">("calls");
   const [areas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
