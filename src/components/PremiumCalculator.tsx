@@ -149,6 +149,8 @@ export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) 
 
   const downloadPDF = () => {
     const doc = new jsPDF();
+    // jsPDF default font (Helvetica) doesn't support ₹ glyph — use "Rs." for PDF
+    const inrPdf = (n: number) => `Rs. ${Math.round(n).toLocaleString("en-IN")}`;
     doc.setFontSize(16);
     doc.text("Motor Insurance Premium Quote", 14, 16);
     doc.setFontSize(10);
@@ -164,7 +166,7 @@ export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) 
         ["Vehicle", `${f.make} ${f.model} ${f.variant}`],
         ["Type / Fuel / CC", `${f.vehicleType} / ${f.fuelType} / ${f.cc}`],
         ["Mfg Year / Age", `${f.mfgYear} (${calc.age} yrs)`],
-        ["Ex-Showroom", inr(f.exShowroom)],
+        ["Ex-Showroom", inrPdf(f.exShowroom)],
         ["Policy Type / Term", `${f.policyType} / ${f.policyTerm}Y`],
       ],
       theme: "striped",
@@ -174,20 +176,20 @@ export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) 
     autoTable(doc, {
       head: [["Premium Breakdown", "Amount"]],
       body: [
-        ["IDV (after depreciation " + (calc.dep * 100).toFixed(0) + "%)", inr(calc.idv)],
-        ["Base OD Premium (" + (calc.odRate * 100).toFixed(2) + "%)", inr(calc.baseOD)],
-        [`NCB Discount (${calc.ncbPct}%)`, "- " + inr(calc.ncbDisc)],
-        [`Company Discount (${f.companyDiscount}%)`, "- " + inr(calc.compDisc)],
-        ["Voluntary Deductible Discount", "- " + inr(calc.vdDisc)],
-        ["Anti-Theft Discount", "- " + inr(calc.atDisc)],
-        ["Net OD Premium", inr(calc.netOD)],
-        ["Third Party (IRDAI)", inr(calc.tp)],
-        ["Add-ons Total", inr(calc.addonsSum)],
-        ["Net Premium", inr(calc.netPremium)],
-        ["GST 18%", inr(calc.gst)],
-        ["GROSS PREMIUM", inr(calc.grossPremium)],
-        ["Customer Discount", "- " + inr(f.customerDiscount)],
-        ["TOTAL CUSTOMER PAYS", inr(calc.customerPays)],
+        ["IDV (after depreciation " + (calc.dep * 100).toFixed(0) + "%)", inrPdf(calc.idv)],
+        ["Base OD Premium (" + (calc.odRate * 100).toFixed(2) + "%)", inrPdf(calc.baseOD)],
+        [`NCB Discount (${calc.ncbPct}%)`, "- " + inrPdf(calc.ncbDisc)],
+        [`Company Discount (${f.companyDiscount}%)`, "- " + inrPdf(calc.compDisc)],
+        ["Voluntary Deductible Discount", "- " + inrPdf(calc.vdDisc)],
+        ["Anti-Theft Discount", "- " + inrPdf(calc.atDisc)],
+        ["Net OD Premium", inrPdf(calc.netOD)],
+        ["Third Party (IRDAI)", inrPdf(calc.tp)],
+        ["Add-ons Total", inrPdf(calc.addonsSum)],
+        ["Net Premium", inrPdf(calc.netPremium)],
+        ["GST 18%", inrPdf(calc.gst)],
+        ["GROSS PREMIUM", inrPdf(calc.grossPremium)],
+        ["Customer Discount", "- " + inrPdf(f.customerDiscount)],
+        ["TOTAL CUSTOMER PAYS", inrPdf(calc.customerPays)],
       ],
       theme: "grid",
       headStyles: { fillColor: [37, 99, 235] },
@@ -196,7 +198,7 @@ export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) 
     if (calc.addonsCalc.length) {
       autoTable(doc, {
         head: [["Add-on", "Amount"]],
-        body: calc.addonsCalc.map((a) => [a.label, inr(a.amt)]),
+        body: calc.addonsCalc.map((a) => [a.label, inrPdf(a.amt)]),
         theme: "striped",
         headStyles: { fillColor: [16, 185, 129] },
       });
