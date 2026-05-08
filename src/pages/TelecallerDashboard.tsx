@@ -89,6 +89,12 @@ const TelecallerDashboard = () => {
             )}
           </>
         )}
+        {tab === "home" && view === "calculator" && (
+          <>
+            <Button variant="outline" size="sm" onClick={() => setView("calls")}>← Back to calls</Button>
+            <PremiumCalculator />
+          </>
+        )}
         {tab === "leads" && (
           <>
             <h1 className="text-xl font-bold">All My Leads</h1>
