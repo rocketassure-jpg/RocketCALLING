@@ -1,21 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Phone, MessageCircle, MessageSquare, Search, Loader2, MapPin, Ban, Calendar, IndianRupee, AlarmClock, History, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2 } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
-import { LeadTimeline } from "./LeadTimeline";
 import { Textarea } from "@/components/ui/textarea";
 import { LeadActions } from "./LeadActions";
-
+import { useLeadsPaginated, LeadBucket } from "@/hooks/useLeadsPaginated";
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
@@ -37,21 +34,20 @@ const STATUS_OPTIONS: Status[] = ["New", "Interested", "Quote Sent", "Premium Qu
 
 const statusColor = (s: string) => {
   switch (s) {
-    case "Interested": return "bg-success text-success-foreground";
-    case "Quote Sent": return "bg-accent text-accent-foreground";
-    case "Premium Quoted": return "bg-warning text-warning-foreground";
-    case "Negotiation": return "bg-warning text-warning-foreground";
+    case "Interested":
     case "Converted": return "bg-success text-success-foreground";
-    case "Done": return "bg-primary text-primary-foreground";
-    case "Follow-up": return "bg-warning text-warning-foreground";
+    case "Quote Sent":
     case "Transfer to Senior": return "bg-accent text-accent-foreground";
+    case "Premium Quoted":
+    case "Negotiation":
+    case "Follow-up": return "bg-warning text-warning-foreground";
+    case "Done": return "bg-primary text-primary-foreground";
     case "Not Picked": return "bg-muted text-muted-foreground";
-    case "Not Interested": return "bg-destructive text-destructive-foreground";
+    case "Not Interested":
     case "Unsubscribed": return "bg-destructive text-destructive-foreground";
     default: return "bg-secondary text-secondary-foreground";
   }
 };
-
 
 const today = () => new Date().toISOString().slice(0, 10);
 const isOverdue = (d: string) => d < today();
@@ -61,25 +57,23 @@ const daysUntil = (d: string | null) => {
   return Math.round(ms / (1000 * 60 * 60 * 24));
 };
 
-type Bucket = "all" | "today" | "overdue" | "interested" | "followup" | "cold" | "untouched";
-
 export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false, role = "admin" }: { callerName?: string; filterAssigned?: boolean; role?: "admin" | "manager" | "telecaller" }) => {
   const { user } = useAuth();
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [bucket, setBucket] = useState<Bucket>("today");
+  const {
+    leads, totalCount, loading, loadingMore, hasMore,
+    search, setSearch, bucket, setBucket, stats,
+    loadMore, reload, patchLead, removeLead,
+  } = useLeadsPaginated({ role, userId: user?.id, filterAssigned });
+
   const [autoNextId, setAutoNextId] = useState<string | null>(null);
   const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
-  const [historyLead, setHistoryLead] = useState<Lead | null>(null);
-  const [dialHistory, setDialHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [telecallerList, setTelecallerList] = useState<{ id: string; full_name: string }[]>([]);
-  const [untouchedIds, setUntouchedIds] = useState<Set<string>>(new Set());
   const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
   const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
   const [noteText, setNoteText] = useState("");
 
+  // Telecaller list (for bulk assign)
   useEffect(() => {
     supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "telecaller").then(({ data }) => {
       const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean);
@@ -87,40 +81,16 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     });
   }, []);
 
-  const toggleSelect = (id: string) => setSelectedIds((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
-
-  const loadDialCounts = async (leadIds: string[]) => {
-    if (leadIds.length === 0) return;
-    const { data } = await supabase.from("dial_logs").select("lead_id").in("lead_id", leadIds);
-    const counts: Record<string, number> = {};
-    (data ?? []).forEach((r: any) => { counts[r.lead_id] = (counts[r.lead_id] ?? 0) + 1; });
-    setDialCounts(counts);
-  };
-
-  const load = async () => {
-    setLoading(true);
-    let q = supabase
-      .from("leads")
-      .select("id,customer_name,phone_number,policy_type,status,last_called_at,call_date,premium_amount,area_id,policy_expiry_date,assigned_telecaller, areas(name)")
-      .not("status", "in", "(Unsubscribed,Done,Not Interested)")
-      .order("call_date", { ascending: true });
-    if (filterAssigned && user) {
-      q = q.or(`assigned_telecaller.eq.${user.id},assigned_telecaller.is.null`);
-    }
-    const { data, error } = await q;
-    if (error) toast({ title: "Failed to load leads", description: error.message, variant: "destructive" });
-    const list = (data ?? []) as any[];
-    setLeads(list as any);
-    setLoading(false);
-    loadDialCounts(list.map((l) => l.id));
-    // Untouched = leads with no call_logs ever
-    const ids = list.map((l) => l.id);
-    if (ids.length) {
-      const { data: cl } = await supabase.from("call_logs").select("lead_id").in("lead_id", ids);
-      const called = new Set((cl ?? []).map((r: any) => r.lead_id));
-      setUntouchedIds(new Set(ids.filter((i) => !called.has(i))));
-    }
-  };
+  // Dial counts for currently loaded page only
+  useEffect(() => {
+    const ids = leads.map((l) => l.id);
+    if (!ids.length) { setDialCounts({}); return; }
+    supabase.from("dial_logs").select("lead_id").in("lead_id", ids).then(({ data }) => {
+      const counts: Record<string, number> = {};
+      (data ?? []).forEach((r: any) => { counts[r.lead_id] = (counts[r.lead_id] ?? 0) + 1; });
+      setDialCounts(counts);
+    });
+  }, [leads]);
 
   const loadTodayStats = async () => {
     if (!user) return;
@@ -135,7 +105,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     });
   };
 
-  useEffect(() => { load(); loadTodayStats(); }, []);
+  useEffect(() => { loadTodayStats(); }, [user?.id]);
 
   useEffect(() => {
     if (!user) return;
@@ -146,6 +116,8 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     return () => { supabase.removeChannel(ch); clearInterval(iv); };
   }, [user?.id]);
 
+  const toggleSelect = (id: string) => setSelectedIds((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
   const updateStatus = async (lead: Lead, newStatus: Status, note?: string) => {
     const now = new Date().toISOString();
     const { error: e1 } = await supabase.from("leads").update({ status: newStatus, last_called_at: now }).eq("id", lead.id);
@@ -153,19 +125,17 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: newStatus, notes: note || null });
     toast({ title: "Saved", description: `${lead.customer_name} → ${newStatus}` });
 
-    // Auto-trigger Thank You message when marked Interested
     if (newStatus === "Interested") {
       const msg = `Hi ${lead.customer_name}, thank you for your interest in Rocket Services Insurance! Our team will contact you shortly with the best ${lead.policy_type} policy options. — Rocket Services`;
       supabase.functions.invoke("send-whatsapp", { body: { lead_id: lead.id, phone_number: lead.phone_number, template: "thank_you", message: msg } }).catch(() => {});
       supabase.functions.invoke("send-sms", { body: { lead_id: lead.id, phone_number: lead.phone_number, message: msg } }).catch(() => {});
     }
 
-    // Auto-next: pick next visible lead in current filtered view
-    const idx = filtered.findIndex((l) => l.id === lead.id);
-    const next = filtered[idx + 1] ?? filtered.find((l) => l.id !== lead.id);
+    const idx = leads.findIndex((l) => l.id === lead.id);
+    const next = leads[idx + 1] ?? leads.find((l) => l.id !== lead.id);
     if (next) setAutoNextId(next.id);
-    if (["Done", "Not Interested"].includes(newStatus)) setLeads((prev) => prev.filter((l) => l.id !== lead.id));
-    else setLeads((prev) => prev.map((l) => (l.id === lead.id ? { ...l, status: newStatus, last_called_at: now } : l)));
+    if (["Done", "Not Interested", "Unsubscribed"].includes(newStatus)) removeLead(lead.id);
+    else patchLead(lead.id, { status: newStatus, last_called_at: now });
   };
 
   const unsubscribe = async (lead: Lead) => {
@@ -173,7 +143,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: "Unsubscribed" });
     toast({ title: "Marked DNC", description: `${lead.customer_name} ko ab call nahi lagega.` });
-    setLeads((prev) => prev.filter((l) => l.id !== lead.id));
+    removeLead(lead.id);
   };
 
   const logDial = async (lead: Lead) => {
@@ -181,66 +151,30 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     setDialCounts((prev) => ({ ...prev, [lead.id]: (prev[lead.id] ?? 0) + 1 }));
   };
 
-  const openDialHistory = async (lead: Lead) => {
-    setHistoryLead(lead);
-    const { data } = await supabase.from("dial_logs").select("clicked_at,connected").eq("lead_id", lead.id).order("clicked_at", { ascending: false });
-    setDialHistory((data ?? []) as any);
-  };
+  const buckets: { id: LeadBucket; label: string; value: number; accent: string; icon: any }[] = useMemo(() => ([
+    { id: "today",      label: "To Call",    value: stats?.to_call    ?? 0, accent: "border-l-primary",          icon: PhoneCall },
+    { id: "overdue",    label: "Overdue",    value: stats?.overdue    ?? 0, accent: "border-l-destructive",      icon: AlarmClock },
+    { id: "untouched",  label: "Untouched",  value: stats?.untouched  ?? 0, accent: "border-l-warning",          icon: Sparkles },
+    { id: "interested", label: "Interested", value: stats?.interested ?? 0, accent: "border-l-success",          icon: ThumbsUp },
+    { id: "followup",   label: "Follow-up",  value: stats?.follow_up  ?? 0, accent: "border-l-warning",          icon: Clock },
+    { id: "cold",       label: "Cold",       value: stats?.cold       ?? 0, accent: "border-l-muted-foreground", icon: Flame },
+  ]), [stats]);
 
-  const waMessage = (name: string) =>
-    encodeURIComponent(`Namaste ${name}, main Rocket Services se ${callerName} baat kar raha hoon. Aapke liye ek special insurance plan hai. Kya aap 2 minute baat kar sakte hain?`);
-  const waQuote = (name: string) =>
-    encodeURIComponent(`Namaste ${name}, Rocket Services se quote bhej rahe hain. Aapke liye best premium rate ready hai — confirm kariye to policy aaj hi process ho jayegi.`);
-  const waThanks = (name: string) =>
-    encodeURIComponent(`Dhanyavaad ${name} ji! Rocket Services par bharosa rakhne ke liye shukriya. Kisi bhi help ke liye humein call kar sakte hain.`);
-  const smsMessage = encodeURIComponent(`Namaste, Rocket Services se ${callerName}. Hum aapko ek special insurance offer dene ke liye call karna chahte hain.`);
-
-  const stats = useMemo(() => ({
-    today: leads.filter((l) => l.call_date === today()).length,
-    overdue: leads.filter((l) => isOverdue(l.call_date)).length,
-    interested: leads.filter((l) => l.status === "Interested").length,
-    followup: leads.filter((l) => l.status === "Follow-up").length,
-    cold: leads.filter((l) => l.status === "New" || l.status === "Not Picked").length,
-    untouched: leads.filter((l) => untouchedIds.has(l.id)).length,
-  }), [leads, untouchedIds]);
-
-  const filtered = useMemo(() => {
-    const list = leads.filter((l) => {
-      const q = search.trim().toLowerCase();
-      if (q) {
-        const last4 = l.phone_number.replace(/\D/g, "").slice(-4);
-        if (!l.customer_name.toLowerCase().includes(q) && !l.phone_number.includes(q) && !last4.includes(q)) return false;
-      }
-      switch (bucket) {
-        case "today": return l.call_date <= today();
-        case "overdue": return isOverdue(l.call_date);
-        case "interested": return l.status === "Interested";
-        case "followup": return l.status === "Follow-up";
-        case "cold": return l.status === "New" || l.status === "Not Picked";
-        case "untouched": return untouchedIds.has(l.id);
-        default: return true;
-      }
-    });
-    // Untouched leads always float to top in default views
-    return [...list].sort((a, b) => {
-      const ua = untouchedIds.has(a.id) ? 0 : 1;
-      const ub = untouchedIds.has(b.id) ? 0 : 1;
-      return ua - ub;
-    });
-  }, [leads, search, bucket, untouchedIds]);
-
-  const buckets: { id: Bucket; label: string; value: number; accent: string; icon: any }[] = [
-    { id: "today",      label: "To Call",    value: stats.today,      accent: "border-l-primary",       icon: PhoneCall },
-    { id: "overdue",    label: "Overdue",    value: stats.overdue,    accent: "border-l-destructive",   icon: AlarmClock },
-    { id: "untouched",  label: "Untouched",  value: stats.untouched,  accent: "border-l-warning",       icon: Sparkles },
-    { id: "interested", label: "Interested", value: stats.interested, accent: "border-l-success",       icon: ThumbsUp },
-    { id: "followup",   label: "Follow-up",  value: stats.followup,   accent: "border-l-warning",       icon: Clock },
-    { id: "cold",       label: "Cold",       value: stats.cold,       accent: "border-l-muted-foreground", icon: Flame },
-  ];
+  // Infinite scroll observer
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) loadMore();
+    }, { threshold: 0.1, rootMargin: "200px" });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [loadMore]);
 
   return (
     <div className="space-y-5">
-      {/* Stat cards — responsive 3-col mobile, 6-col desktop, hover scale */}
+      {/* Stat cards */}
       <div className="grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
         {buckets.map((b) => {
           const active = bucket === b.id;
@@ -256,13 +190,13 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                 <Icon className="h-3 w-3 text-muted-foreground md:h-3.5 md:w-3.5" />
                 <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground md:text-xs">{b.label}</span>
               </div>
-              <div className="mt-1 text-xl font-extrabold tabular-nums tracking-tight text-foreground md:text-2xl">{b.value}</div>
+              <div className="mt-1 text-xl font-extrabold tabular-nums tracking-tight text-foreground md:text-2xl">{b.value.toLocaleString("en-IN")}</div>
             </button>
           );
         })}
       </div>
 
-      {/* Today's session card (Dialed today + breakdown) */}
+      {/* Today's session card */}
       <Card className="border-l-4 border-l-purple-500">
         <CardContent className="flex flex-wrap items-center justify-between gap-2 p-3 md:p-4">
           <div className="flex items-center gap-2">
@@ -284,32 +218,54 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
       <div className="relative">
         <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          className="h-11 rounded-full border-border/70 bg-card pl-10 pr-4 shadow-card-pop focus-visible:ring-primary/30"
-          placeholder="Search name, phone, last 4 digits…"
+          className="h-11 rounded-full border-border/70 bg-card pl-10 pr-10 shadow-card-pop focus-visible:ring-primary/30"
+          placeholder="Search name or phone…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        {search && (
+          <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2" aria-label="Clear search">
+            <X className="h-4 w-4 text-muted-foreground" />
+          </button>
+        )}
       </div>
 
-      {filtered.length > 0 && (
-        <div className="flex items-center gap-2 px-1 text-sm">
-          <Checkbox
-            checked={filtered.length > 0 && filtered.every((l) => selectedIds.has(l.id))}
-            onCheckedChange={(v) => setSelectedIds(v ? new Set(filtered.map((l) => l.id)) : new Set())}
-          />
-          <span className="text-muted-foreground">Select all ({filtered.length})</span>
-        </div>
-      )}
+      {/* Results indicator */}
+      <div className="flex items-center justify-between gap-2 px-1 text-sm">
+        {leads.length > 0 ? (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={leads.length > 0 && leads.every((l) => selectedIds.has(l.id))}
+              onCheckedChange={(v) => setSelectedIds(v ? new Set(leads.map((l) => l.id)) : new Set())}
+            />
+            <span className="text-muted-foreground">Select all loaded ({leads.length})</span>
+          </div>
+        ) : <span />}
+        <span className="text-xs text-muted-foreground">
+          {loading ? "Loading…" : `${leads.length.toLocaleString("en-IN")} of ${totalCount.toLocaleString("en-IN")}`}
+        </span>
+      </div>
 
       {loading ? (
-        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-primary" /></div>
-      ) : filtered.length === 0 ? (
+        <div className="space-y-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="animate-pulse space-y-2 rounded-xl border p-4">
+              <div className="h-4 w-3/4 rounded bg-muted" />
+              <div className="h-3 w-1/2 rounded bg-muted" />
+              <div className="mt-3 flex gap-2">
+                <div className="h-9 flex-1 rounded bg-muted" />
+                <div className="h-9 flex-1 rounded bg-muted" />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : leads.length === 0 ? (
         <Card><CardContent className="p-12 text-center text-muted-foreground">
           🎉 Koi pending lead nahi hai. Shabaash!
         </CardContent></Card>
       ) : (
         <div className="space-y-3">
-          {filtered.map((lead) => {
+          {leads.map((lead: Lead) => {
             const overdue = isOverdue(lead.call_date);
             const blocked = lead.status === "Unsubscribed";
             const expiryDays = daysUntil(lead.policy_expiry_date);
@@ -323,40 +279,40 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
               >
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <div className="flex flex-1 min-w-0 items-start gap-3">
                       <Checkbox className="mt-1" checked={selectedIds.has(lead.id)} onCheckedChange={() => toggleSelect(lead.id)} onClick={(e) => e.stopPropagation()} />
-                      <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold">{lead.customer_name}</h3>
-                        <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
-                        <Badge variant="outline">{lead.policy_type}</Badge>
-                        {overdue && <Badge className="bg-primary text-primary-foreground">Overdue</Badge>}
-                        {isNext && <Badge className="bg-primary text-primary-foreground"><ArrowRight className="h-3 w-3" /> Next</Badge>}
-                        {expirySoon && (
-                          <Badge className="bg-destructive text-destructive-foreground animate-pulse">
-                            <AlarmClock className="h-3 w-3" /> Expires in {expiryDays}d
-                          </Badge>
-                        )}
-                        {expired && expiryDays !== null && expiryDays >= 0 && (
-                          <Badge className="bg-destructive text-destructive-foreground">Expires today/tomorrow</Badge>
-                        )}
-                      </div>
-                      <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {lead.phone_number}</span>
-                        <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
-                        <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
-                        {Number(lead.premium_amount) > 0 && (
-                          <span className="flex items-center gap-1"><IndianRupee className="h-3.5 w-3.5" />{Number(lead.premium_amount).toLocaleString("en-IN")}</span>
-                        )}
-                        {lead.policy_expiry_date && (
-                          <span className={`flex items-center gap-1 ${expirySoon ? "font-semibold text-destructive" : ""}`}>
-                            <AlarmClock className="h-3.5 w-3.5" /> Exp: {lead.policy_expiry_date}
-                          </span>
-                        )}
-                        {lead.last_called_at && (
-                          <span className="text-xs">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
-                        )}
-                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-base font-semibold">{lead.customer_name}</h3>
+                          <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
+                          <Badge variant="outline">{lead.policy_type}</Badge>
+                          {overdue && <Badge className="bg-primary text-primary-foreground">Overdue</Badge>}
+                          {isNext && <Badge className="bg-primary text-primary-foreground"><ArrowRight className="h-3 w-3" /> Next</Badge>}
+                          {expirySoon && (
+                            <Badge className="bg-destructive text-destructive-foreground animate-pulse">
+                              <AlarmClock className="h-3 w-3" /> Expires in {expiryDays}d
+                            </Badge>
+                          )}
+                          {expired && expiryDays !== null && expiryDays >= 0 && (
+                            <Badge className="bg-destructive text-destructive-foreground">Expires today/tomorrow</Badge>
+                          )}
+                        </div>
+                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {lead.phone_number}</span>
+                          <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
+                          <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
+                          {Number(lead.premium_amount) > 0 && (
+                            <span className="flex items-center gap-1"><IndianRupee className="h-3.5 w-3.5" />{Number(lead.premium_amount).toLocaleString("en-IN")}</span>
+                          )}
+                          {lead.policy_expiry_date && (
+                            <span className={`flex items-center gap-1 ${expirySoon ? "font-semibold text-destructive" : ""}`}>
+                              <AlarmClock className="h-3.5 w-3.5" /> Exp: {lead.policy_expiry_date}
+                            </span>
+                          )}
+                          {lead.last_called_at && (
+                            <span className="text-xs">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
+                          )}
+                        </div>
                       </div>
                     </div>
 
@@ -372,42 +328,28 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                         onUnsubscribe={() => unsubscribe(lead)}
                       />
                     </div>
-
                   </div>
                 </CardContent>
               </Card>
             );
           })}
+
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-4" />
+          {loadingMore && (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          )}
+          {!hasMore && leads.length > 0 && (
+            <p className="py-4 text-center text-xs text-muted-foreground">
+              Sab {leads.length.toLocaleString("en-IN")} leads load ho gaye
+            </p>
+          )}
         </div>
       )}
 
-      <Dialog open={!!historyLead} onOpenChange={(o) => !o && setHistoryLead(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Dial History — {historyLead?.customer_name}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-2">
-            <div className="text-sm text-muted-foreground">
-              Number: <span className="font-mono font-semibold text-foreground">{historyLead?.phone_number}</span>
-            </div>
-            <div className="text-sm">Total dials: <span className="font-bold text-primary">{dialHistory.length}</span></div>
-            <div className="max-h-72 space-y-1 overflow-y-auto rounded border p-2">
-              {dialHistory.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground">Abhi tak koi dial nahi.</p>
-              ) : dialHistory.map((d, i) => (
-                <div key={i} className="flex items-center justify-between rounded bg-muted/50 px-2 py-1.5 text-xs">
-                  <span>{new Date(d.clicked_at).toLocaleString()}</span>
-                  <Badge variant={d.connected ? "default" : "outline"} className="text-[10px]">
-                    {d.connected ? "Connected" : "Dialed"}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Note dialog after disposition */}
+      {/* Note dialog */}
       <Dialog open={!!noteDialog} onOpenChange={(o) => !o && setNoteDialog(null)}>
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -442,22 +384,21 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
           const ids = [...selectedIds];
           await supabase.from("leads").delete().in("id", ids);
           toast({ title: `${ids.length} deleted` });
-          setSelectedIds(new Set()); load();
+          setSelectedIds(new Set()); reload();
         }}
         onMove={async (status) => {
           const ids = [...selectedIds];
           await supabase.from("leads").update({ status: status as any }).in("id", ids);
           toast({ title: `Moved to ${status}` });
-          setSelectedIds(new Set()); load();
+          setSelectedIds(new Set()); reload();
         }}
         onAssign={async (tid) => {
           const ids = [...selectedIds];
           await supabase.from("leads").update({ assigned_telecaller: tid }).in("id", ids);
           toast({ title: "Assigned" });
-          setSelectedIds(new Set()); load();
+          setSelectedIds(new Set()); reload();
         }}
       />
     </div>
   );
 };
-
