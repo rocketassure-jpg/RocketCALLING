@@ -1,0 +1,1 @@
+ALTER VIEW public.leads_stats SET (security_invoker = on);
