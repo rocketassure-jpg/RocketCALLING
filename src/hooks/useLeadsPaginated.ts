@@ -85,7 +85,11 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
         case "cold":
           q = q.in("status", ["New", "Not Picked"]);
           break;
+        case "untouched":
+          q = q.is("last_called_at", null);
+          break;
       }
+
 
       const s = debouncedSearch.trim();
       if (s) {
