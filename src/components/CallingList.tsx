@@ -14,6 +14,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { LeadTimeline } from "./LeadTimeline";
 import { Textarea } from "@/components/ui/textarea";
+import { LeadActions } from "./LeadActions";
+
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
@@ -358,85 +360,19 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:justify-end">
-                      {!blocked && (
-                        <Button asChild variant="hero" size="sm" className="relative" onClick={() => logDial(lead)}>
-                          <a href={`tel:${lead.phone_number}`}>
-                            <Phone className="h-4 w-4" /> Dial
-                            {(dialCounts[lead.id] ?? 0) > 0 && (
-                              <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background/90 px-1.5 text-[11px] font-bold text-primary">
-                                {dialCounts[lead.id]}
-                              </span>
-                            )}
-                          </a>
-                        </Button>
-                      )}
-                      {!blocked && (
-                        <Button variant="outline" size="sm" onClick={() => openDialHistory(lead)} title="Dialed numbers history">
-                          <History className="h-4 w-4" /> Dialed ({dialCounts[lead.id] ?? 0})
-                        </Button>
-                      )}
-                      {!blocked && (
-                        <Button asChild variant="success" size="sm">
-                          <a href={`https://wa.me/${lead.phone_number.replace(/\D/g, "")}?text=${waMessage(lead.customer_name)}`} target="_blank" rel="noopener noreferrer">
-                            <MessageCircle className="h-4 w-4" /> WhatsApp
-                          </a>
-                        </Button>
-                      )}
-                      {!blocked && (
-                        <Button asChild variant="outline" size="sm">
-                          <a href={`https://wa.me/${lead.phone_number.replace(/\D/g, "")}?text=${waQuote(lead.customer_name)}`} target="_blank" rel="noopener noreferrer">
-                            Quote
-                          </a>
-                        </Button>
-                      )}
-                      {!blocked && (
-                        <Button asChild variant="outline" size="sm">
-                          <a href={`https://wa.me/${lead.phone_number.replace(/\D/g, "")}?text=${waThanks(lead.customer_name)}`} target="_blank" rel="noopener noreferrer">
-                            Thanks
-                          </a>
-                        </Button>
-                      )}
-                      {!blocked && (
-                        <Button asChild variant="outline" size="sm">
-                          <a href={`sms:${lead.phone_number}?body=${smsMessage}`}><MessageSquare className="h-4 w-4" /> SMS</a>
-                        </Button>
-                      )}
-                      <Select value={lead.status} onValueChange={(v) => { setNoteText(""); setNoteDialog({ lead, status: v as Status }); }}>
-                        <SelectTrigger className="col-span-2 h-9 w-full sm:w-[170px]"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          {STATUS_OPTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm"><History className="h-4 w-4" /> Timeline</Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-lg">
-                          <DialogHeader>
-                            <DialogTitle>{lead.customer_name} — Timeline</DialogTitle>
-                          </DialogHeader>
-                          <LeadTimeline leadId={lead.id} />
-                        </DialogContent>
-                      </Dialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="destructive" size="sm"><Ban className="h-4 w-4" /> DNC</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Mark as Do Not Call?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              {lead.customer_name} ({lead.phone_number}) ko Unsubscribed mark kiya jayega. Ye lead calling list se hat jayegi aur dobara dial nahi hoga.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => unsubscribe(lead)}>Confirm DNC</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                    <div className="w-full md:max-w-md md:flex-shrink-0">
+                      <LeadActions
+                        lead={lead as any}
+                        blocked={blocked}
+                        dialCount={dialCounts[lead.id] ?? 0}
+                        statusOptions={STATUS_OPTIONS as any}
+                        callerName={callerName}
+                        onDial={() => logDial(lead)}
+                        onStatusChange={(v) => { setNoteText(""); setNoteDialog({ lead, status: v as Status }); }}
+                        onUnsubscribe={() => unsubscribe(lead)}
+                      />
                     </div>
+
                   </div>
                 </CardContent>
               </Card>
