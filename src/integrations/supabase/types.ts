@@ -811,6 +811,19 @@ export type Database = {
       }
     }
     Views: {
+      leads_stats: {
+        Row: {
+          cold: number | null
+          converted: number | null
+          follow_up: number | null
+          interested: number | null
+          overdue: number | null
+          to_call: number | null
+          total_leads: number | null
+          untouched: number | null
+        }
+        Relationships: []
+      }
       renewal_leads: {
         Row: {
           agent_sm_name: string | null
