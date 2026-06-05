@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
@@ -32,6 +32,7 @@ import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
+import { AccountSettings } from "@/components/AccountSettings";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -63,6 +64,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
   { id: "training", label: "Training", icon: GraduationCap },
   { id: "api", label: "API & Webhooks", icon: Webhook },
   { id: "secrets", label: "API Keys", icon: Lock },
+  { id: "account", label: "Account Settings", icon: User },
   { id: "settings", label: "General", icon: Settings },
   { id: "permissions", label: "Permissions", icon: KeyRound },
   { id: "fields", label: "CRM Fields", icon: Tags },
@@ -184,6 +186,7 @@ const AdminDashboard = () => {
       case "secrets": return <SecretsManager />;
       case "training": return <TrainingModule canManage={true} />;
       case "settings": return <GeneralSettings />;
+      case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "fields": return <CRMFieldsManager />;
       case "statuses": return <StatusConfigurator />;
