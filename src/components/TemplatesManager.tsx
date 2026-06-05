@@ -31,10 +31,10 @@ export const fillTemplate = (
   vars: { name?: string; vehicle?: string; policy_date?: string; agent_name?: string }
 ) =>
   body
-    .replaceAll("{name}", vars.name ?? "")
-    .replaceAll("{vehicle}", vars.vehicle ?? "")
-    .replaceAll("{policy_date}", vars.policy_date ?? "")
-    .replaceAll("{agent_name}", vars.agent_name ?? "");
+    .replace(/\{name\}/g, vars.name ?? "")
+    .replace(/\{vehicle\}/g, vars.vehicle ?? "")
+    .replace(/\{policy_date\}/g, vars.policy_date ?? "")
+    .replace(/\{agent_name\}/g, vars.agent_name ?? "");
 
 export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
   const { user } = useAuth();
