@@ -12,11 +12,13 @@ export const HamburgerMenu = ({
   active,
   onChange,
   userName,
+  topSlot,
 }: {
   items: MenuItem[];
   active?: string;
   onChange: (id: string) => void;
   userName?: ReactNode;
+  topSlot?: ReactNode;
 }) => {
   const [open, setOpen] = useState(false);
   const { signOut, user } = useAuth();
@@ -24,10 +26,13 @@ export const HamburgerMenu = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Menu"><Menu className="h-5 w-5" /></Button>
+        <Button variant="ghost" size="icon" aria-label="Menu">
+          <Menu className="h-5 w-5" />
+        </Button>
       </SheetTrigger>
       <SheetContent side="left" className="flex w-72 flex-col p-0">
         <div className="flex h-16 items-center border-b px-4"><Logo /></div>
+        {topSlot && <div className="border-b p-3">{topSlot}</div>}
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {items.map((it) => {
             const isActive = active === it.id;
@@ -36,7 +41,7 @@ export const HamburgerMenu = ({
               <button
                 key={it.id}
                 onClick={() => { onChange(it.id); setOpen(false); }}
-                className={`flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                className={`flex min-h-[44px] w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive ? "bg-gradient-primary text-primary-foreground shadow-soft" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
@@ -48,7 +53,7 @@ export const HamburgerMenu = ({
         <div className="border-t p-3">
           <div className="mb-2 px-1 text-xs text-muted-foreground truncate">{userName || user?.email}</div>
           <Button variant="destructive" className="w-full" onClick={signOut}>
-            <LogOut className="h-4 w-4" /> Sign Out
+            <LogOut className="h-4 w-4" /> Logout
           </Button>
         </div>
       </SheetContent>

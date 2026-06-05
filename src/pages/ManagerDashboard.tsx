@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 // Tabs removed in favor of hamburger sections
-import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap, Calculator } from "lucide-react";
+import { Users, IndianRupee, PhoneCall, ThumbsUp, Ban, BarChart3, Phone, Inbox, AlarmClock, Trophy, GraduationCap, Calculator, Settings } from "lucide-react";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { UserActionMenu } from "@/components/UserActionMenu";
@@ -18,6 +18,8 @@ import { ManagerTeamPanel } from "@/components/ManagerTeamPanel";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
+import { AccountSettings } from "@/components/AccountSettings";
+import { BreakToggle } from "@/components/agent/BreakToggle";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -91,10 +93,12 @@ const ManagerDashboard = () => {
                 { id: "enquiries", label: "Enquiries", icon: Inbox },
                 { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
+                { id: "account", label: "Account Settings", icon: Settings },
               ]}
               active={showTraining ? "training" : section}
               onChange={(id) => { if (id === "training") { setShowTraining(true); } else { setShowTraining(false); setSection(id); } }}
               userName={me?.full_name}
+              topSlot={<BreakToggle />}
             />
             <Logo />
             <Badge variant="secondary" className="hidden sm:inline-flex">Manager</Badge>
@@ -129,6 +133,7 @@ const ManagerDashboard = () => {
         {section === "renewals" && <RenewalsPanel />}
         {section === "customers" && <CustomersPanel />}
         {section === "calculator" && <PremiumCalculator />}
+        {section === "account" && <AccountSettings />}
         {section === "leads" && (
           <Card>
             <CardHeader><CardTitle>Active leads in your team's areas ({activeLeads.length})</CardTitle></CardHeader>

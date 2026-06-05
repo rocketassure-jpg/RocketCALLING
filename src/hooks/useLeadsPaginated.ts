@@ -11,16 +11,31 @@ export type LeadBucket =
   | "interested"
   | "followup"
   | "cold"
-  | "untouched";
+  | "untouched"
+  | "not_picked"
+  | "quote_sent"
+  | "premium_quoted"
+  | "negotiation"
+  | "converted"
+  | "transfer_to_senior"
+  | "not_interested"
+  | "done";
 
 export type LeadsStats = {
   to_call: number;
-  interested: number;
-  follow_up: number;
   overdue: number;
   untouched: number;
+  interested: number;
+  follow_up: number;
   cold: number;
+  not_picked: number;
+  quote_sent: number;
+  premium_quoted: number;
+  negotiation: number;
   converted: number;
+  transfer_to_senior: number;
+  not_interested: number;
+  done: number;
   total_leads: number;
 };
 
@@ -31,6 +46,9 @@ type Args = {
   userId?: string;
   filterAssigned?: boolean;
 };
+
+// Statuses that count as "completed disposition" — leads with these are hidden from active calling list
+const COMPLETED_STATUSES = ["Unsubscribed", "Done", "Not Interested", "Converted"];
 
 export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
   const [leads, setLeads] = useState<any[]>([]);
@@ -61,35 +79,47 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
         .order("call_date", { ascending: true })
         .order("created_at", { ascending: false });
 
-      // Hide done/unsubscribed/not interested from active lists
-      q = q.not("status", "in", "(Unsubscribed,Done,Not Interested)");
-
       if (filterAssigned && userId) {
         q = q.or(`assigned_telecaller.eq.${userId},assigned_telecaller.is.null`);
       }
 
       const t = todayISO();
+      // Specific status buckets bypass the "active" filter
       switch (bucket) {
         case "today":
-          q = q.lte("call_date", t);
+          q = q.lte("call_date", t).not("status", "in", `(${COMPLETED_STATUSES.join(",")})`).is("last_called_at", null);
           break;
         case "overdue":
-          q = q.lt("call_date", t).not("status", "in", "(Interested)");
-          break;
-        case "interested":
-          q = q.eq("status", "Interested");
-          break;
-        case "followup":
-          q = q.eq("status", "Follow-up");
-          break;
-        case "cold":
-          q = q.in("status", ["New", "Not Picked"]);
+          q = q.lt("call_date", t).not("status", "in", `(Interested,${COMPLETED_STATUSES.join(",")})`);
           break;
         case "untouched":
-          q = q.is("last_called_at", null);
+          q = q.is("last_called_at", null).not("status", "in", `(${COMPLETED_STATUSES.join(",")})`);
+          break;
+        case "interested":
+          q = q.eq("status", "Interested"); break;
+        case "followup":
+          q = q.eq("status", "Follow-up"); break;
+        case "cold":
+          q = q.in("status", ["New", "Not Picked"]); break;
+        case "not_picked":
+          q = q.eq("status", "Not Picked"); break;
+        case "quote_sent":
+          q = q.eq("status", "Quote Sent"); break;
+        case "premium_quoted":
+          q = q.eq("status", "Premium Quoted"); break;
+        case "negotiation":
+          q = q.eq("status", "Negotiation"); break;
+        case "converted":
+          q = q.eq("status", "Converted"); break;
+        case "transfer_to_senior":
+          q = q.eq("status", "Transfer to Senior"); break;
+        case "not_interested":
+          q = q.eq("status", "Not Interested"); break;
+        case "done":
+          q = q.eq("status", "Done"); break;
+        case "all":
           break;
       }
-
 
       const s = debouncedSearch.trim();
       if (s) {
@@ -112,7 +142,6 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
       const to = from + PAGE_SIZE - 1;
       const { data, count, error } = await buildQuery(from, to);
 
-      // Stale response guard
       if (myReq !== reqIdRef.current) return;
 
       if (error) {
@@ -136,17 +165,13 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
     if (data) setStats(data as LeadsStats);
   }, []);
 
-  // Reset + reload when filters change
   useEffect(() => {
     loadPage(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSearch, bucket, filterAssigned, userId]);
 
-  useEffect(() => {
-    loadStats();
-  }, [loadStats]);
+  useEffect(() => { loadStats(); }, [loadStats]);
 
-  // Load more on page bump
   useEffect(() => {
     if (page > 0) loadPage(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,19 +197,8 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
   }, []);
 
   return {
-    leads,
-    totalCount,
-    loading,
-    loadingMore,
-    hasMore,
-    search,
-    setSearch,
-    bucket,
-    setBucket,
-    stats,
-    loadMore,
-    reload,
-    patchLead,
-    removeLead,
+    leads, totalCount, loading, loadingMore, hasMore,
+    search, setSearch, bucket, setBucket, stats,
+    loadMore, reload, patchLead, removeLead,
   };
 };

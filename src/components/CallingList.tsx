@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, UserCheck, ThumbsDown, CheckSquare, ArrowUpRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Textarea } from "@/components/ui/textarea";
@@ -131,11 +131,8 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
       supabase.functions.invoke("send-sms", { body: { lead_id: lead.id, phone_number: lead.phone_number, message: msg } }).catch(() => {});
     }
 
-    const idx = leads.findIndex((l) => l.id === lead.id);
-    const next = leads[idx + 1] ?? leads.find((l) => l.id !== lead.id);
-    if (next) setAutoNextId(next.id);
-    if (["Done", "Not Interested", "Unsubscribed"].includes(newStatus)) removeLead(lead.id);
-    else patchLead(lead.id, { status: newStatus, last_called_at: now });
+    // Auto-remove from calling list once any disposition is set (lead is no longer "untouched")
+    removeLead(lead.id);
   };
 
   const unsubscribe = async (lead: Lead) => {
@@ -152,12 +149,20 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   };
 
   const buckets: { id: LeadBucket; label: string; value: number; accent: string; icon: any }[] = useMemo(() => ([
-    { id: "today",      label: "To Call",    value: stats?.to_call    ?? 0, accent: "border-l-primary",          icon: PhoneCall },
-    { id: "overdue",    label: "Overdue",    value: stats?.overdue    ?? 0, accent: "border-l-destructive",      icon: AlarmClock },
-    { id: "untouched",  label: "Untouched",  value: stats?.untouched  ?? 0, accent: "border-l-warning",          icon: Sparkles },
-    { id: "interested", label: "Interested", value: stats?.interested ?? 0, accent: "border-l-success",          icon: ThumbsUp },
-    { id: "followup",   label: "Follow-up",  value: stats?.follow_up  ?? 0, accent: "border-l-warning",          icon: Clock },
-    { id: "cold",       label: "Cold",       value: stats?.cold       ?? 0, accent: "border-l-muted-foreground", icon: Flame },
+    { id: "today",              label: "To Call",         value: stats?.to_call            ?? 0, accent: "border-l-primary",          icon: PhoneCall },
+    { id: "overdue",            label: "Overdue",         value: stats?.overdue            ?? 0, accent: "border-l-destructive",      icon: AlarmClock },
+    { id: "untouched",          label: "Untouched",       value: stats?.untouched          ?? 0, accent: "border-l-warning",          icon: Sparkles },
+    { id: "interested",         label: "Interested",      value: stats?.interested         ?? 0, accent: "border-l-success",          icon: ThumbsUp },
+    { id: "followup",           label: "Follow-up",       value: stats?.follow_up          ?? 0, accent: "border-l-warning",          icon: Clock },
+    { id: "cold",               label: "Cold",            value: stats?.cold               ?? 0, accent: "border-l-muted-foreground", icon: Flame },
+    { id: "not_picked",         label: "Not Picked",      value: stats?.not_picked         ?? 0, accent: "border-l-muted-foreground", icon: PhoneOff },
+    { id: "quote_sent",         label: "Quote Sent",      value: stats?.quote_sent         ?? 0, accent: "border-l-accent",           icon: FileText },
+    { id: "premium_quoted",     label: "Premium",         value: stats?.premium_quoted     ?? 0, accent: "border-l-warning",          icon: Calculator },
+    { id: "negotiation",        label: "Negotiation",     value: stats?.negotiation        ?? 0, accent: "border-l-warning",          icon: Handshake },
+    { id: "converted",          label: "Converted",       value: stats?.converted          ?? 0, accent: "border-l-success",          icon: Trophy },
+    { id: "transfer_to_senior", label: "Transfer",        value: stats?.transfer_to_senior ?? 0, accent: "border-l-accent",           icon: ArrowUpRight },
+    { id: "not_interested",     label: "Not Int.",        value: stats?.not_interested     ?? 0, accent: "border-l-destructive",      icon: ThumbsDown },
+    { id: "done",               label: "Done",            value: stats?.done               ?? 0, accent: "border-l-primary",          icon: CheckSquare },
   ]), [stats]);
 
   // Infinite scroll observer
@@ -175,7 +180,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   return (
     <div className="space-y-5">
       {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 md:grid-cols-4 lg:grid-cols-6">
+      <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-4 md:grid-cols-7">
         {buckets.map((b) => {
           const active = bucket === b.id;
           const Icon = b.icon;
@@ -183,14 +188,14 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             <button
               key={b.id}
               onClick={() => setBucket(b.id)}
-              title="Click to filter leads"
-              className={`group relative overflow-hidden rounded-xl border-l-4 ${b.accent} bg-card p-3 text-left shadow-card-pop transition-all duration-200 hover:scale-[1.04] hover:shadow-elegant cursor-pointer md:p-4 ${active ? "ring-2 ring-primary" : ""}`}
+              title={`Filter: ${b.label}`}
+              className={`group flex flex-col rounded-lg border-l-[3px] ${b.accent} bg-card px-2 py-1.5 text-left shadow-card-pop transition-all duration-150 hover:shadow-elegant ${active ? "ring-2 ring-primary" : ""}`}
             >
-              <div className="flex items-center gap-1.5">
-                <Icon className="h-3 w-3 text-muted-foreground md:h-3.5 md:w-3.5" />
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground md:text-xs">{b.label}</span>
+              <div className="flex items-center gap-1">
+                <Icon className="h-3 w-3 text-muted-foreground" />
+                <span className="truncate text-[10px] font-semibold uppercase tracking-tight text-muted-foreground">{b.label}</span>
               </div>
-              <div className="mt-1 text-xl font-extrabold tabular-nums tracking-tight text-foreground md:text-2xl">{b.value.toLocaleString("en-IN")}</div>
+              <div className="mt-0.5 text-base font-extrabold tabular-nums leading-tight text-foreground">{b.value.toLocaleString("en-IN")}</div>
             </button>
           );
         })}
