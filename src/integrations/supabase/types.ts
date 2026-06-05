@@ -543,6 +543,39 @@ export type Database = {
           },
         ]
       }
+      message_templates: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          id: string
+          owner_id: string
+          shared: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          category?: string
+          created_at?: string
+          id?: string
+          owner_id: string
+          shared?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+          shared?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -815,11 +848,18 @@ export type Database = {
         Row: {
           cold: number | null
           converted: number | null
+          done: number | null
           follow_up: number | null
           interested: number | null
+          negotiation: number | null
+          not_interested: number | null
+          not_picked: number | null
           overdue: number | null
+          premium_quoted: number | null
+          quote_sent: number | null
           to_call: number | null
           total_leads: number | null
+          transfer_to_senior: number | null
           untouched: number | null
         }
         Relationships: []
