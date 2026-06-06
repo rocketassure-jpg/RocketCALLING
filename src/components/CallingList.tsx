@@ -64,11 +64,56 @@ const daysUntil = (d: string | null) => {
 
 export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false, role = "admin" }: { callerName?: string; filterAssigned?: boolean; role?: "admin" | "manager" | "telecaller" }) => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Math.max(0, parseInt(searchParams.get("page") ?? "1", 10) - 1);
+  const pageSize = [20, 50, 100].includes(parseInt(searchParams.get("size") ?? "50", 10))
+    ? parseInt(searchParams.get("size") ?? "50", 10)
+    : 50;
+  const revivalFromUrl = searchParams.get("revival_from");
+  const revivalToUrl = searchParams.get("revival_to");
+  const revivalLabelUrl = searchParams.get("revival_label");
+  const revival: RevivalRange = revivalFromUrl && revivalToUrl
+    ? { from: revivalFromUrl, to: revivalToUrl, label: revivalLabelUrl ?? revivalFromUrl }
+    : null;
+
+  const setRevival = (v: RevivalRange) => {
+    const next = new URLSearchParams(searchParams);
+    if (v) {
+      next.set("revival_from", v.from);
+      next.set("revival_to", v.to);
+      next.set("revival_label", v.label);
+    } else {
+      next.delete("revival_from");
+      next.delete("revival_to");
+      next.delete("revival_label");
+    }
+    next.set("page", "1");
+    setSearchParams(next, { replace: true });
+  };
+
+  const setPage = (p: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(p + 1));
+    setSearchParams(next, { replace: true });
+  };
+  const setPageSize = (s: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("size", String(s));
+    next.set("page", "1");
+    setSearchParams(next, { replace: true });
+  };
+
   const {
-    leads, totalCount, loading, loadingMore, hasMore,
+    leads, totalCount, loading,
     search, setSearch, bucket, setBucket, stats,
-    loadMore, reload, patchLead, removeLead,
-  } = useLeadsPaginated({ role, userId: user?.id, filterAssigned });
+    reload, patchLead, removeLead, totalPages,
+  } = useLeadsPaginated({
+    role, userId: user?.id, filterAssigned,
+    page, pageSize,
+    revivalFrom: revival?.from ?? null,
+    revivalTo: revival?.to ?? null,
+  });
 
   const [autoNextId, setAutoNextId] = useState<string | null>(null);
   const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
@@ -77,6 +122,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
   const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
   const [noteText, setNoteText] = useState("");
+
 
   // Telecaller list (for bulk assign)
   useEffect(() => {
