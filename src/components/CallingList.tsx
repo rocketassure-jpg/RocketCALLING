@@ -382,20 +382,21 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             );
           })}
 
-          {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className="h-4" />
-          {loadingMore && (
-            <div className="flex justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          {!hasMore && leads.length > 0 && (
-            <p className="py-4 text-center text-xs text-muted-foreground">
-              Sab {leads.length.toLocaleString("en-IN")} leads load ho gaye
-            </p>
-          )}
         </div>
       )}
+
+      {/* Pagination */}
+      {!loading && totalCount > 0 && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      )}
+
 
       {/* Note dialog */}
       <Dialog open={!!noteDialog} onOpenChange={(o) => !o && setNoteDialog(null)}>
