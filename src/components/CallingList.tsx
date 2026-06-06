@@ -262,6 +262,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         </CardContent>
       </Card>
 
+      {/* Revival Date Filter */}
+      <RevivalDateFilter value={revival} onChange={setRevival} />
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -286,13 +289,14 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
               checked={leads.length > 0 && leads.every((l) => selectedIds.has(l.id))}
               onCheckedChange={(v) => setSelectedIds(v ? new Set(leads.map((l) => l.id)) : new Set())}
             />
-            <span className="text-muted-foreground">Select all loaded ({leads.length})</span>
+            <span className="text-muted-foreground">Select page ({leads.length})</span>
           </div>
         ) : <span />}
         <span className="text-xs text-muted-foreground">
-          {loading ? "Loading…" : `${leads.length.toLocaleString("en-IN")} of ${totalCount.toLocaleString("en-IN")}`}
+          {loading ? "Loading…" : `Page ${page + 1} of ${totalPages} · ${totalCount.toLocaleString("en-IN")} total`}
         </span>
       </div>
+
 
       {loading ? (
         <div className="space-y-3">
