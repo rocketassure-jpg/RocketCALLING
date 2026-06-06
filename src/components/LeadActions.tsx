@@ -73,7 +73,7 @@ const IconBtn = ({
         {asChild && href ? (
           <a
             href={href} target={target} rel={rel} onClick={onClick}
-            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
@@ -81,7 +81,7 @@ const IconBtn = ({
         ) : (
           <button
             type="button" onClick={onClick}
-            className={`flex h-11 w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
@@ -92,6 +92,7 @@ const IconBtn = ({
     </Tooltip>
   </TooltipProvider>
 );
+
 
 export const LeadActions = ({
   lead, blocked, dialCount, statusOptions, callerName,
