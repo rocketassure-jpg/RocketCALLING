@@ -11,6 +11,8 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { LeadTimeline } from "@/components/LeadTimeline";
 import { toast } from "@/hooks/use-toast";
 import { fillTemplate, MessageTemplate } from "@/components/TemplatesManager";
+import { maskPhone } from "@/lib/utils";
+
 import {
   Phone, ChevronDown, MessageCircle, MessageSquare, FileText, MoreHorizontal,
   History, Loader2, StickyNote, Info, Ban, IndianRupee, PhoneOutgoing, Send,
