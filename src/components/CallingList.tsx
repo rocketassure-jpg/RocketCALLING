@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, UserCheck, ThumbsDown, CheckSquare, ArrowUpRight } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Textarea } from "@/components/ui/textarea";
 import { LeadActions } from "./LeadActions";
 import { useLeadsPaginated, LeadBucket } from "@/hooks/useLeadsPaginated";
+import { RevivalDateFilter, RevivalRange } from "@/components/RevivalDateFilter";
+import { maskPhone } from "@/lib/utils";
+
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
@@ -59,11 +64,56 @@ const daysUntil = (d: string | null) => {
 
 export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false, role = "admin" }: { callerName?: string; filterAssigned?: boolean; role?: "admin" | "manager" | "telecaller" }) => {
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Math.max(0, parseInt(searchParams.get("page") ?? "1", 10) - 1);
+  const pageSize = [20, 50, 100].includes(parseInt(searchParams.get("size") ?? "50", 10))
+    ? parseInt(searchParams.get("size") ?? "50", 10)
+    : 50;
+  const revivalFromUrl = searchParams.get("revival_from");
+  const revivalToUrl = searchParams.get("revival_to");
+  const revivalLabelUrl = searchParams.get("revival_label");
+  const revival: RevivalRange = revivalFromUrl && revivalToUrl
+    ? { from: revivalFromUrl, to: revivalToUrl, label: revivalLabelUrl ?? revivalFromUrl }
+    : null;
+
+  const setRevival = (v: RevivalRange) => {
+    const next = new URLSearchParams(searchParams);
+    if (v) {
+      next.set("revival_from", v.from);
+      next.set("revival_to", v.to);
+      next.set("revival_label", v.label);
+    } else {
+      next.delete("revival_from");
+      next.delete("revival_to");
+      next.delete("revival_label");
+    }
+    next.set("page", "1");
+    setSearchParams(next, { replace: true });
+  };
+
+  const setPage = (p: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("page", String(p + 1));
+    setSearchParams(next, { replace: true });
+  };
+  const setPageSize = (s: number) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("size", String(s));
+    next.set("page", "1");
+    setSearchParams(next, { replace: true });
+  };
+
   const {
-    leads, totalCount, loading, loadingMore, hasMore,
+    leads, totalCount, loading,
     search, setSearch, bucket, setBucket, stats,
-    loadMore, reload, patchLead, removeLead,
-  } = useLeadsPaginated({ role, userId: user?.id, filterAssigned });
+    reload, patchLead, removeLead, totalPages,
+  } = useLeadsPaginated({
+    role, userId: user?.id, filterAssigned,
+    page, pageSize,
+    revivalFrom: revival?.from ?? null,
+    revivalTo: revival?.to ?? null,
+  });
 
   const [autoNextId, setAutoNextId] = useState<string | null>(null);
   const [dialCounts, setDialCounts] = useState<Record<string, number>>({});
@@ -72,6 +122,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
   const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
   const [noteText, setNoteText] = useState("");
+
 
   // Telecaller list (for bulk assign)
   useEffect(() => {
@@ -165,17 +216,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     { id: "done",               label: "Done",            value: stats?.done               ?? 0, accent: "border-l-primary",          icon: CheckSquare },
   ]), [stats]);
 
-  // Infinite scroll observer
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) loadMore();
-    }, { threshold: 0.1, rootMargin: "200px" });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [loadMore]);
+  // Clear selections when leaving a page
+  useEffect(() => { setSelectedIds(new Set()); }, [page, pageSize, bucket, revival?.from, revival?.to]);
+
 
   return (
     <div className="space-y-5">
@@ -219,6 +262,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         </CardContent>
       </Card>
 
+      {/* Revival Date Filter */}
+      <RevivalDateFilter value={revival} onChange={setRevival} />
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -243,13 +289,14 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
               checked={leads.length > 0 && leads.every((l) => selectedIds.has(l.id))}
               onCheckedChange={(v) => setSelectedIds(v ? new Set(leads.map((l) => l.id)) : new Set())}
             />
-            <span className="text-muted-foreground">Select all loaded ({leads.length})</span>
+            <span className="text-muted-foreground">Select page ({leads.length})</span>
           </div>
         ) : <span />}
         <span className="text-xs text-muted-foreground">
-          {loading ? "Loading…" : `${leads.length.toLocaleString("en-IN")} of ${totalCount.toLocaleString("en-IN")}`}
+          {loading ? "Loading…" : `Page ${page + 1} of ${totalPages} · ${totalCount.toLocaleString("en-IN")} total`}
         </span>
       </div>
+
 
       {loading ? (
         <div className="space-y-3">
@@ -277,11 +324,15 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             const expirySoon = expiryDays !== null && expiryDays >= 2 && expiryDays <= 7;
             const expired = expiryDays !== null && expiryDays < 2;
             const isNext = autoNextId === lead.id;
+            const matchesRevival =
+              revival && lead.policy_expiry_date &&
+              lead.policy_expiry_date >= revival.from && lead.policy_expiry_date <= revival.to;
             return (
               <Card
                 key={lead.id}
-                className={`overflow-hidden transition-all hover:shadow-elegant ${expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
+                className={`overflow-hidden transition-all hover:shadow-elegant ${matchesRevival ? "border-l-4 border-l-warning bg-warning/5" : expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
               >
+
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-1 min-w-0 items-start gap-3">
@@ -303,7 +354,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           )}
                         </div>
                         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {lead.phone_number}</span>
+                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {maskPhone(lead.phone_number)}</span>
                           <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
                           <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
                           {Number(lead.premium_amount) > 0 && (
@@ -339,20 +390,21 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             );
           })}
 
-          {/* Infinite scroll sentinel */}
-          <div ref={sentinelRef} className="h-4" />
-          {loadingMore && (
-            <div className="flex justify-center py-4">
-              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-            </div>
-          )}
-          {!hasMore && leads.length > 0 && (
-            <p className="py-4 text-center text-xs text-muted-foreground">
-              Sab {leads.length.toLocaleString("en-IN")} leads load ho gaye
-            </p>
-          )}
         </div>
       )}
+
+      {/* Pagination */}
+      {!loading && totalCount > 0 && (
+        <Pagination
+          page={page}
+          pageSize={pageSize}
+          totalPages={totalPages}
+          totalCount={totalCount}
+          onPageChange={setPage}
+          onPageSizeChange={setPageSize}
+        />
+      )}
+
 
       {/* Note dialog */}
       <Dialog open={!!noteDialog} onOpenChange={(o) => !o && setNoteDialog(null)}>
@@ -407,3 +459,84 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     </div>
   );
 };
+
+const Pagination = ({
+  page, pageSize, totalPages, totalCount, onPageChange, onPageSizeChange,
+}: {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalCount: number;
+  onPageChange: (p: number) => void;
+  onPageSizeChange: (s: number) => void;
+}) => {
+  const current = page + 1; // 1-indexed for display
+  // Build page list with ellipsis (max 7 items)
+  const pages: (number | "…")[] = [];
+  const add = (n: number | "…") => pages.push(n);
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) add(i);
+  } else {
+    add(1);
+    if (current > 4) add("…");
+    const start = Math.max(2, current - 1);
+    const end = Math.min(totalPages - 1, current + 1);
+    for (let i = start; i <= end; i++) add(i);
+    if (current < totalPages - 3) add("…");
+    add(totalPages);
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-between gap-3 border-t pt-4 sm:flex-row">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Rows per page:</span>
+        <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
+          <SelectTrigger className="h-9 w-[80px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+            <SelectItem value="100">100</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="ml-2 tabular-nums">{totalCount.toLocaleString("en-IN")} total</span>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-1">
+        <Button
+          variant="outline" size="sm" className="h-9 px-2"
+          disabled={current <= 1}
+          onClick={() => onPageChange(page - 1)}
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span key={`e${i}`} className="px-2 text-xs text-muted-foreground">…</span>
+          ) : (
+            <Button
+              key={p}
+              variant={p === current ? "hero" : "outline"}
+              size="sm"
+              className="h-9 min-w-9 px-2 text-xs tabular-nums"
+              onClick={() => onPageChange(p - 1)}
+            >
+              {p}
+            </Button>
+          )
+        )}
+        <Button
+          variant="outline" size="sm" className="h-9 px-2"
+          disabled={current >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+          aria-label="Next page"
+        >
+          Next <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
