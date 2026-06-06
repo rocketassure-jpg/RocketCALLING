@@ -324,11 +324,15 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             const expirySoon = expiryDays !== null && expiryDays >= 2 && expiryDays <= 7;
             const expired = expiryDays !== null && expiryDays < 2;
             const isNext = autoNextId === lead.id;
+            const matchesRevival =
+              revival && lead.policy_expiry_date &&
+              lead.policy_expiry_date >= revival.from && lead.policy_expiry_date <= revival.to;
             return (
               <Card
                 key={lead.id}
-                className={`overflow-hidden transition-all hover:shadow-elegant ${expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
+                className={`overflow-hidden transition-all hover:shadow-elegant ${matchesRevival ? "border-l-4 border-l-warning bg-warning/5" : expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
               >
+
                 <CardContent className="p-3 sm:p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex flex-1 min-w-0 items-start gap-3">
