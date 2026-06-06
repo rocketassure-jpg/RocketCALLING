@@ -459,3 +459,84 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     </div>
   );
 };
+
+const Pagination = ({
+  page, pageSize, totalPages, totalCount, onPageChange, onPageSizeChange,
+}: {
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalCount: number;
+  onPageChange: (p: number) => void;
+  onPageSizeChange: (s: number) => void;
+}) => {
+  const current = page + 1; // 1-indexed for display
+  // Build page list with ellipsis (max 7 items)
+  const pages: (number | "…")[] = [];
+  const add = (n: number | "…") => pages.push(n);
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) add(i);
+  } else {
+    add(1);
+    if (current > 4) add("…");
+    const start = Math.max(2, current - 1);
+    const end = Math.min(totalPages - 1, current + 1);
+    for (let i = start; i <= end; i++) add(i);
+    if (current < totalPages - 3) add("…");
+    add(totalPages);
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-between gap-3 border-t pt-4 sm:flex-row">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Rows per page:</span>
+        <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
+          <SelectTrigger className="h-9 w-[80px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="20">20</SelectItem>
+            <SelectItem value="50">50</SelectItem>
+            <SelectItem value="100">100</SelectItem>
+          </SelectContent>
+        </Select>
+        <span className="ml-2 tabular-nums">{totalCount.toLocaleString("en-IN")} total</span>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-center gap-1">
+        <Button
+          variant="outline" size="sm" className="h-9 px-2"
+          disabled={current <= 1}
+          onClick={() => onPageChange(page - 1)}
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        {pages.map((p, i) =>
+          p === "…" ? (
+            <span key={`e${i}`} className="px-2 text-xs text-muted-foreground">…</span>
+          ) : (
+            <Button
+              key={p}
+              variant={p === current ? "hero" : "outline"}
+              size="sm"
+              className="h-9 min-w-9 px-2 text-xs tabular-nums"
+              onClick={() => onPageChange(p - 1)}
+            >
+              {p}
+            </Button>
+          )
+        )}
+        <Button
+          variant="outline" size="sm" className="h-9 px-2"
+          disabled={current >= totalPages}
+          onClick={() => onPageChange(page + 1)}
+          aria-label="Next page"
+        >
+          Next <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
