@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -6,13 +7,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, UserCheck, ThumbsDown, CheckSquare, ArrowUpRight } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Textarea } from "@/components/ui/textarea";
 import { LeadActions } from "./LeadActions";
 import { useLeadsPaginated, LeadBucket } from "@/hooks/useLeadsPaginated";
+import { RevivalDateFilter, RevivalRange } from "@/components/RevivalDateFilter";
+import { maskPhone } from "@/lib/utils";
+
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
 
