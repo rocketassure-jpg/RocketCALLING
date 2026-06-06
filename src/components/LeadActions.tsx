@@ -379,7 +379,7 @@ export const LeadActions = ({
                     <AlertDialogHeader>
                       <AlertDialogTitle>Mark as Do Not Call?</AlertDialogTitle>
                       <AlertDialogDescription>
-                        {lead.customer_name} ({lead.phone_number}) ko Unsubscribed mark kiya jayega.
+                        {lead.customer_name} ({maskPhone(lead.phone_number)}) ko Unsubscribed mark kiya jayega.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
