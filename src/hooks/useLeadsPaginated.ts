@@ -2,8 +2,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useDebounce } from "@/hooks/useDebounce";
 
-const PAGE_SIZE = 50;
-
 export type LeadBucket =
   | "all"
   | "today"
@@ -45,18 +43,23 @@ type Args = {
   role?: "admin" | "manager" | "telecaller";
   userId?: string;
   filterAssigned?: boolean;
+  page?: number;
+  pageSize?: number;
+  revivalFrom?: string | null;
+  revivalTo?: string | null;
 };
 
 // Statuses that count as "completed disposition" — leads with these are hidden from active calling list
 const COMPLETED_STATUSES = ["Unsubscribed", "Done", "Not Interested", "Converted"];
 
-export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
+export const useLeadsPaginated = ({
+  role, userId, filterAssigned,
+  page = 0, pageSize = 50,
+  revivalFrom = null, revivalTo = null,
+}: Args) => {
   const [leads, setLeads] = useState<any[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
   const [bucket, setBucket] = useState<LeadBucket>("today");
   const [stats, setStats] = useState<LeadsStats | null>(null);
@@ -84,7 +87,6 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
       }
 
       const t = todayISO();
-      // Specific status buckets bypass the "active" filter
       switch (bucket) {
         case "today":
           q = q.lte("call_date", t).not("status", "in", `(${COMPLETED_STATUSES.join(",")})`).is("last_called_at", null);
@@ -95,30 +97,22 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
         case "untouched":
           q = q.is("last_called_at", null).not("status", "in", `(${COMPLETED_STATUSES.join(",")})`);
           break;
-        case "interested":
-          q = q.eq("status", "Interested"); break;
-        case "followup":
-          q = q.eq("status", "Follow-up"); break;
-        case "cold":
-          q = q.in("status", ["New", "Not Picked"]); break;
-        case "not_picked":
-          q = q.eq("status", "Not Picked"); break;
-        case "quote_sent":
-          q = q.eq("status", "Quote Sent"); break;
-        case "premium_quoted":
-          q = q.eq("status", "Premium Quoted"); break;
-        case "negotiation":
-          q = q.eq("status", "Negotiation"); break;
-        case "converted":
-          q = q.eq("status", "Converted"); break;
-        case "transfer_to_senior":
-          q = q.eq("status", "Transfer to Senior"); break;
-        case "not_interested":
-          q = q.eq("status", "Not Interested"); break;
-        case "done":
-          q = q.eq("status", "Done"); break;
-        case "all":
-          break;
+        case "interested": q = q.eq("status", "Interested"); break;
+        case "followup": q = q.eq("status", "Follow-up"); break;
+        case "cold": q = q.in("status", ["New", "Not Picked"]); break;
+        case "not_picked": q = q.eq("status", "Not Picked"); break;
+        case "quote_sent": q = q.eq("status", "Quote Sent"); break;
+        case "premium_quoted": q = q.eq("status", "Premium Quoted"); break;
+        case "negotiation": q = q.eq("status", "Negotiation"); break;
+        case "converted": q = q.eq("status", "Converted"); break;
+        case "transfer_to_senior": q = q.eq("status", "Transfer to Senior"); break;
+        case "not_interested": q = q.eq("status", "Not Interested"); break;
+        case "done": q = q.eq("status", "Done"); break;
+        case "all": break;
+      }
+
+      if (revivalFrom && revivalTo) {
+        q = q.gte("policy_expiry_date", revivalFrom).lte("policy_expiry_date", revivalTo);
       }
 
       const s = debouncedSearch.trim();
@@ -128,37 +122,24 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
       }
       return q;
     },
-    [bucket, debouncedSearch, filterAssigned, userId]
+    [bucket, debouncedSearch, filterAssigned, userId, revivalFrom, revivalTo]
   );
 
-  const loadPage = useCallback(
-    async (reset: boolean) => {
-      const myReq = ++reqIdRef.current;
-      const currentPage = reset ? 0 : page;
-      if (reset) setLoading(true);
-      else setLoadingMore(true);
-
-      const from = currentPage * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
-      const { data, count, error } = await buildQuery(from, to);
-
-      if (myReq !== reqIdRef.current) return;
-
-      if (error) {
-        setLoading(false);
-        setLoadingMore(false);
-        return;
-      }
-      const rows = data ?? [];
-      setLeads((prev) => (reset ? rows : [...prev, ...rows]));
-      setTotalCount(count ?? 0);
-      setHasMore(rows.length === PAGE_SIZE);
-      if (reset) setPage(0);
+  const loadPage = useCallback(async () => {
+    const myReq = ++reqIdRef.current;
+    setLoading(true);
+    const from = page * pageSize;
+    const to = from + pageSize - 1;
+    const { data, count, error } = await buildQuery(from, to);
+    if (myReq !== reqIdRef.current) return;
+    if (error) {
       setLoading(false);
-      setLoadingMore(false);
-    },
-    [page, buildQuery]
-  );
+      return;
+    }
+    setLeads(data ?? []);
+    setTotalCount(count ?? 0);
+    setLoading(false);
+  }, [page, pageSize, buildQuery]);
 
   const loadStats = useCallback(async () => {
     const { data } = await supabase.from("leads_stats").select("*").maybeSingle();
@@ -166,24 +147,13 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
   }, []);
 
   useEffect(() => {
-    loadPage(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, bucket, filterAssigned, userId]);
+    loadPage();
+  }, [loadPage]);
 
   useEffect(() => { loadStats(); }, [loadStats]);
 
-  useEffect(() => {
-    if (page > 0) loadPage(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
-  const loadMore = useCallback(() => {
-    if (loadingMore || loading || !hasMore) return;
-    setPage((p) => p + 1);
-  }, [loadingMore, loading, hasMore]);
-
   const reload = useCallback(() => {
-    loadPage(true);
+    loadPage();
     loadStats();
   }, [loadPage, loadStats]);
 
@@ -196,9 +166,12 @@ export const useLeadsPaginated = ({ role, userId, filterAssigned }: Args) => {
     setTotalCount((c) => Math.max(0, c - 1));
   }, []);
 
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+
   return {
-    leads, totalCount, loading, loadingMore, hasMore,
+    leads, totalCount, loading,
     search, setSearch, bucket, setBucket, stats,
-    loadMore, reload, patchLead, removeLead,
+    reload, patchLead, removeLead,
+    totalPages,
   };
 };
