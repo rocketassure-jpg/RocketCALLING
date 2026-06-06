@@ -216,17 +216,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     { id: "done",               label: "Done",            value: stats?.done               ?? 0, accent: "border-l-primary",          icon: CheckSquare },
   ]), [stats]);
 
-  // Infinite scroll observer
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const el = sentinelRef.current;
-    if (!el) return;
-    const obs = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) loadMore();
-    }, { threshold: 0.1, rootMargin: "200px" });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [loadMore]);
+  // Clear selections when leaving a page
+  useEffect(() => { setSelectedIds(new Set()); }, [page, pageSize, bucket, revival?.from, revival?.to]);
+
 
   return (
     <div className="space-y-5">
