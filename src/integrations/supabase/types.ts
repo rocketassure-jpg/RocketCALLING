@@ -80,6 +80,7 @@ export type Database = {
           allow_logout_web: boolean
           auto_start_allocation: boolean
           id: string
+          invite_code: string | null
           master_sheet_url: string | null
           post_interaction_actions: boolean
           retry_1_hours: number
@@ -94,6 +95,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           id?: string
+          invite_code?: string | null
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
@@ -108,6 +110,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           id?: string
+          invite_code?: string | null
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
@@ -578,22 +581,43 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approved_at: string | null
+          approved_by: string | null
           created_at: string
+          department: string | null
           full_name: string
           id: string
+          is_active: boolean
+          is_approved: boolean
           manager_id: string | null
+          rejection_reason: string | null
+          requested_role: string | null
         }
         Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string
           id: string
+          is_active?: boolean
+          is_approved?: boolean
           manager_id?: string | null
+          rejection_reason?: string | null
+          requested_role?: string | null
         }
         Update: {
+          approved_at?: string | null
+          approved_by?: string | null
           created_at?: string
+          department?: string | null
           full_name?: string
           id?: string
+          is_active?: boolean
+          is_approved?: boolean
           manager_id?: string | null
+          rejection_reason?: string | null
+          requested_role?: string | null
         }
         Relationships: [
           {
@@ -1204,6 +1228,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_approved: { Args: { _user_id: string }; Returns: boolean }
       is_manager_of: {
         Args: { _manager_id: string; _telecaller_id: string }
         Returns: boolean
@@ -1216,6 +1241,7 @@ export type Database = {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean
       }
+      validate_invite_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "telecaller" | "manager"

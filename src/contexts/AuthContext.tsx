@@ -4,6 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Role = "admin" | "manager" | "telecaller" | null;
 
+type ProfileStatus = {
+  is_approved: boolean;
+  is_active: boolean;
+  rejection_reason: string | null;
+} | null;
+
 const pickRole = (roles: string[]): Role =>
   roles.includes("admin") ? "admin" : roles.includes("manager") ? "manager" : roles.includes("telecaller") ? "telecaller" : null;
 
@@ -11,6 +17,7 @@ interface AuthCtx {
   user: User | null;
   session: Session | null;
   role: Role;
+  profileStatus: ProfileStatus;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -21,29 +28,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<Role>(null);
+  const [profileStatus, setProfileStatus] = useState<ProfileStatus>(null);
   const [loading, setLoading] = useState(true);
+
+  const loadUserMeta = async (uid: string) => {
+    const [rolesRes, profRes] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+      supabase.from("profiles").select("is_approved,is_active,rejection_reason").eq("id", uid).maybeSingle(),
+    ]);
+    setRole(pickRole((rolesRes.data ?? []).map((r: any) => r.role)));
+    setProfileStatus(profRes.data ? {
+      is_approved: !!(profRes.data as any).is_approved,
+      is_active: (profRes.data as any).is_active !== false,
+      rejection_reason: (profRes.data as any).rejection_reason ?? null,
+    } : null);
+  };
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        setTimeout(async () => {
-          const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-          setRole(pickRole((data ?? []).map((r) => r.role)));
-        }, 0);
+        setTimeout(() => loadUserMeta(s.user.id), 0);
       } else {
         setRole(null);
+        setProfileStatus(null);
       }
     });
 
     supabase.auth.getSession().then(async ({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) {
-        const { data } = await supabase.from("user_roles").select("role").eq("user_id", s.user.id);
-        setRole(pickRole((data ?? []).map((r) => r.role)));
-      }
+      if (s?.user) await loadUserMeta(s.user.id);
       setLoading(false);
     });
 
@@ -55,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = "/";
   };
 
-  return <Ctx.Provider value={{ user, session, role, loading, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, session, role, profileStatus, loading, signOut }}>{children}</Ctx.Provider>;
 };
 
 export const useAuth = () => useContext(Ctx);

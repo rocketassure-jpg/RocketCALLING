@@ -33,6 +33,7 @@ import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
+import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -58,6 +59,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
   { id: "customers", label: "Customers", icon: Trophy },
   { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "team", label: "Team", icon: Shield },
+  { id: "approvals", label: "Pending Approvals", icon: UserPlus },
   { id: "import", label: "Import", icon: Upload },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle },
   { id: "calculator", label: "Premium Calculator", icon: Calculator },
@@ -188,6 +190,7 @@ const AdminDashboard = () => {
       case "settings": return <GeneralSettings />;
       case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
+      case "approvals": return <PendingApprovalsPanel />;
       case "fields": return <CRMFieldsManager />;
       case "statuses": return <StatusConfigurator />;
       case "leads": return (
