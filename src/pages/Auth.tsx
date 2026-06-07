@@ -34,12 +34,6 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Validate invite code via security-definer RPC (anon-callable)
-    const { data: ok, error: rpcErr } = await supabase.rpc("validate_invite_code", { _code: inviteCode.trim() });
-    if (rpcErr || !ok) {
-      setLoading(false);
-      return toast({ title: "Invalid invite code", description: "Apne admin se sahi invite code lein.", variant: "destructive" });
-    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -48,9 +42,15 @@ const Auth = () => {
         data: { full_name: fullName, department, requested_role: requestedRole },
       },
     });
+    if (error) {
+      setLoading(false);
+      return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+    }
+    // Auto sign-in if session not returned (depends on email confirm setting)
+    await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
     setLoading(false);
-    if (error) return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-    setSignedUp(true);
+    toast({ title: "Account created", description: "Welcome!" });
+    nav("/dashboard");
   };
 
   return (
@@ -61,21 +61,7 @@ const Auth = () => {
           <p className="mt-3 text-sm text-muted-foreground">Staff portal — Tele-CRM access</p>
         </div>
 
-        {signedUp ? (
-          <Card className="shadow-elegant">
-            <CardHeader className="text-center">
-              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-success/10">
-                <CheckCircle2 className="h-7 w-7 text-success" />
-              </div>
-              <CardTitle>Account created</CardTitle>
-              <CardDescription>Admin approval pending</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-center text-sm text-muted-foreground">
-              <p>Aapka account ban gaya hai. Admin approve karega tab login allow hoga.</p>
-              <Button variant="outline" className="w-full" onClick={() => { setSignedUp(false); }}>Back to sign in</Button>
-            </CardContent>
-          </Card>
-        ) : (
+        {false ? null : (
           <Card className="shadow-elegant">
             <CardHeader>
               <CardTitle>Welcome back</CardTitle>
@@ -141,10 +127,6 @@ const Auth = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ic">Invite code</Label>
-                      <Input id="ic" required value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Admin se lein" />
                     </div>
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account

@@ -11,13 +11,9 @@ export const ProtectedRoute = ({ children, requireRole }: { children: ReactNode;
   if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
   if (!user) return <Navigate to="/auth" replace />;
 
-  // Block deactivated users
+  // Block only deactivated users (approval flow disabled)
   if (profileStatus && !profileStatus.is_active) {
     return <PendingApproval reason={profileStatus.rejection_reason || "Aapka account admin ne deactivate kar diya hai. Admin se contact karein."} />;
-  }
-  // Block unapproved users
-  if (profileStatus && !profileStatus.is_approved) {
-    return <PendingApproval />;
   }
 
   // Admin (Owner) can access any role-protected page
