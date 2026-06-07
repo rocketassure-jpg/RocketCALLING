@@ -34,12 +34,6 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Validate invite code via security-definer RPC (anon-callable)
-    const { data: ok, error: rpcErr } = await supabase.rpc("validate_invite_code", { _code: inviteCode.trim() });
-    if (rpcErr || !ok) {
-      setLoading(false);
-      return toast({ title: "Invalid invite code", description: "Apne admin se sahi invite code lein.", variant: "destructive" });
-    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -48,9 +42,15 @@ const Auth = () => {
         data: { full_name: fullName, department, requested_role: requestedRole },
       },
     });
+    if (error) {
+      setLoading(false);
+      return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
+    }
+    // Auto sign-in if session not returned (depends on email confirm setting)
+    await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
     setLoading(false);
-    if (error) return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-    setSignedUp(true);
+    toast({ title: "Account created", description: "Welcome!" });
+    nav("/dashboard");
   };
 
   return (
