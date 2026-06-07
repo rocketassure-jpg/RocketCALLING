@@ -142,10 +142,6 @@ const Auth = () => {
                         </Select>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="ic">Invite code</Label>
-                      <Input id="ic" required value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Admin se lein" />
-                    </div>
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
                     </Button>
