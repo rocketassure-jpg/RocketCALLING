@@ -9,8 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Upload, CheckCircle2, Loader2, Users, Shuffle, MapPin, User } from "lucide-react";
+import { Upload, CheckCircle2, Loader2, Users, Shuffle, MapPin, User, Calendar as CalendarIcon, Flame, Briefcase } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+
+type Manager = { id: string; full_name: string };
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string };
@@ -43,6 +46,7 @@ const autoMap = (header: string): string => {
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
 
 export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
+  const { user } = useAuth();
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
@@ -52,6 +56,21 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
   const [rrSelected, setRrSelected] = useState<Set<string>>(new Set());
   const [areaTelecallerMap, setAreaTelecallerMap] = useState<Record<string, string[]>>({});
   const [importing, setImporting] = useState(false);
+
+  // NEW: Campaign / deadline / priority / manager
+  const [managers, setManagers] = useState<Manager[]>([]);
+  const [managerId, setManagerId] = useState<string>("none");
+  const [campaignName, setCampaignName] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [priority, setPriority] = useState<"normal" | "high" | "urgent">("normal");
+
+  // Load managers
+  useEffect(() => {
+    supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "manager").then(({ data }) => {
+      const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean) as Manager[];
+      setManagers(list);
+    });
+  }, []);
 
   // Load telecaller_areas for byarea mode
   useEffect(() => {
@@ -64,6 +83,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
       setAreaTelecallerMap(map);
     });
   }, [assignMode]);
+
 
   const handleFile = async (file: File) => {
     const ext = file.name.split(".").pop()?.toLowerCase();
