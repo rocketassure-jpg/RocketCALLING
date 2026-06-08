@@ -9,14 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon, ChevronDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Textarea } from "@/components/ui/textarea";
 import { LeadActions } from "./LeadActions";
 import { useLeadsPaginated, LeadBucket } from "@/hooks/useLeadsPaginated";
 import { RevivalDateFilter, RevivalRange } from "@/components/RevivalDateFilter";
-import { maskPhone } from "@/lib/utils";
+import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
@@ -122,6 +122,18 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
   const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [viewMode, setViewMode] = useState<"block" | "list">(
+    () => (localStorage.getItem("callingViewMode") as "block" | "list") || "block"
+  );
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const policy = useMaskingPolicy();
+
+  const changeView = (m: "block" | "list") => {
+    setViewMode(m);
+    localStorage.setItem("callingViewMode", m);
+    setExpandedId(null);
+  };
+
 
 
   // Telecaller list (for bulk assign)
