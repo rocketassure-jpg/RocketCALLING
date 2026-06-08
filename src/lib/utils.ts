@@ -6,20 +6,29 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Mask all but the first 5 digits of a phone number.
- * "9893012345" -> "98930 XXXXX"
- * "+919893012345" -> "+9198930 XXXXX" (preserves leading +country digits beyond 10)
+ * Mask all digits except the last 4.
+ * "9893037946" -> "XXXXXX 7946"
+ * "+919893037946" -> "+91 XXXXXX 7946"
  */
 export function maskPhone(phone?: string | null): string {
   if (!phone) return "—";
   const digits = phone.replace(/\D/g, "");
-  if (digits.length < 6) return phone;
-  // keep leading prefix (country code) + first 5 of last 10
+  if (digits.length < 5) return phone;
   const last10 = digits.slice(-10);
   const prefix = digits.slice(0, -10);
-  const visible = last10.slice(0, 5);
-  const masked = "X".repeat(last10.length - 5);
-  const pretty = `${visible} ${masked}`;
+  const visible = last10.slice(-4);
+  const masked = "X".repeat(last10.length - 4);
+  const pretty = `${masked} ${visible}`;
   return prefix ? `+${prefix} ${pretty}` : pretty;
 }
 
+export function formatPhone(phone?: string | null): string {
+  if (!phone) return "—";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length === 10) return `${digits.slice(0, 5)} ${digits.slice(5)}`;
+  if (digits.length > 10) {
+    const last10 = digits.slice(-10);
+    return `+${digits.slice(0, -10)} ${last10.slice(0, 5)} ${last10.slice(5)}`;
+  }
+  return phone;
+}
