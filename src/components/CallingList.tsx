@@ -366,7 +366,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           )}
                         </div>
                         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {maskPhone(lead.phone_number)}</span>
+                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {policy.display(lead.phone_number)}</span>
                           <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
                           <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
                           {Number(lead.premium_amount) > 0 && (
