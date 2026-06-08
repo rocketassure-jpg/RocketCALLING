@@ -9,8 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Upload, CheckCircle2, Loader2, Users, Shuffle, MapPin, User } from "lucide-react";
+import { Upload, CheckCircle2, Loader2, Users, Shuffle, MapPin, User, Calendar as CalendarIcon, Flame, Briefcase } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+
+type Manager = { id: string; full_name: string };
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string };
@@ -43,6 +46,7 @@ const autoMap = (header: string): string => {
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
 
 export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
+  const { user } = useAuth();
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
@@ -52,6 +56,21 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
   const [rrSelected, setRrSelected] = useState<Set<string>>(new Set());
   const [areaTelecallerMap, setAreaTelecallerMap] = useState<Record<string, string[]>>({});
   const [importing, setImporting] = useState(false);
+
+  // NEW: Campaign / deadline / priority / manager
+  const [managers, setManagers] = useState<Manager[]>([]);
+  const [managerId, setManagerId] = useState<string>("none");
+  const [campaignName, setCampaignName] = useState("");
+  const [deadline, setDeadline] = useState("");
+  const [priority, setPriority] = useState<"normal" | "high" | "urgent">("normal");
+
+  // Load managers
+  useEffect(() => {
+    supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "manager").then(({ data }) => {
+      const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean) as Manager[];
+      setManagers(list);
+    });
+  }, []);
 
   // Load telecaller_areas for byarea mode
   useEffect(() => {
@@ -64,6 +83,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
       setAreaTelecallerMap(map);
     });
   }, [assignMode]);
+
 
   const handleFile = async (file: File) => {
     const ext = file.name.split(".").pop()?.toLowerCase();
@@ -125,7 +145,13 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     const assignCounts: Record<string, number> = {};
     let skipped = 0, unassigned = 0, idx = 0;
     rows.forEach((r) => {
-      const o: any = { area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import" };
+      const o: any = {
+        area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import",
+        priority,
+      };
+      if (managerId && managerId !== "none") o.manager_id = managerId;
+      if (campaignName.trim()) o.campaign_name = campaignName.trim();
+      if (deadline) o.deadline = deadline;
       Object.entries(mapping).forEach(([col, target]) => {
         if (target === SKIP) return;
         let v: any = r[col];
@@ -154,6 +180,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
       inserts.push(o);
       idx++;
     });
+
 
     let inserted = 0;
     for (let i = 0; i < inserts.length; i += 100) {
@@ -191,6 +218,48 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
             <Input type="file" accept=".csv,.xlsx,.xls" onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
           </div>
         </div>
+
+        {/* Campaign / Manager / Deadline / Priority */}
+        <div className="rounded-lg border p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Briefcase className="h-4 w-4 text-primary" /> Campaign &amp; Assignment Details</div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Campaign / List Name</Label>
+              <Input value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g. June Renewals" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Assign Manager</Label>
+              <Select value={managerId} onValueChange={setManagerId}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— none —</SelectItem>
+                  {managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.id.slice(0, 8)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><CalendarIcon className="h-3.5 w-3.5" /> Follow-up Deadline</Label>
+              <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><Flame className="h-3.5 w-3.5" /> Priority</Label>
+              <div className="flex gap-1">
+                {(["normal", "high", "urgent"] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPriority(p)}
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium capitalize transition ${priority === p ? (p === "urgent" ? "border-destructive bg-destructive/10 text-destructive" : p === "high" ? "border-warning bg-warning/10 text-warning-foreground" : "border-primary bg-primary/10") : "hover:bg-muted"}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
 
         {/* Assignment flow */}
         <div className="rounded-lg border p-3 space-y-3">

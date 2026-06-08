@@ -12,6 +12,7 @@ import { LeadTimeline } from "@/components/LeadTimeline";
 import { toast } from "@/hooks/use-toast";
 import { fillTemplate, MessageTemplate } from "@/components/TemplatesManager";
 import { maskPhone } from "@/lib/utils";
+import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 import {
   Phone, ChevronDown, MessageCircle, MessageSquare, FileText, MoreHorizontal,
@@ -101,8 +102,10 @@ export const LeadActions = ({
   onDial, onStatusChange, onUnsubscribe,
 }: Props) => {
   const { user } = useAuth();
+  const policy = useMaskingPolicy();
   const [moreOpen, setMoreOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("notes");
+  const [revealed, setRevealed] = useState(false);
 
   const [historyOpen, setHistoryOpen] = useState(false);
   const [history, setHistory] = useState<{ clicked_at: string; connected: boolean }[]>([]);
@@ -117,6 +120,16 @@ export const LeadActions = ({
   const [tplLoading, setTplLoading] = useState(false);
 
   const [assignedName, setAssignedName] = useState<string | null>(null);
+
+  const phoneDisplay = revealed || !policy.masked ? policy.full(lead.phone_number) : policy.display(lead.phone_number);
+  const handleDialClick = () => {
+    if (policy.masked && policy.revealOnDial) {
+      setRevealed(true);
+      setTimeout(() => setRevealed(false), 2000);
+    }
+    onDial();
+  };
+
 
   const templateVars = useMemo(() => ({
     name: lead.customer_name,
@@ -186,11 +199,12 @@ export const LeadActions = ({
             <div className="flex items-center rounded-full bg-destructive text-destructive-foreground shadow-soft">
               <a
                 href={`tel:${lead.phone_number}`}
-                onClick={onDial}
+                onClick={handleDialClick}
                 className="flex h-11 items-center gap-1.5 rounded-l-full pl-3.5 pr-2.5 text-sm font-semibold transition-all active:scale-95"
-                aria-label={`Dial ${lead.phone_number}`}
+                aria-label={`Dial ${phoneDisplay}`}
               >
-                <Phone className="h-4 w-4" /> Dial
+                <Phone className="h-4 w-4" />
+                {revealed ? <span className="font-mono text-xs">{policy.full(lead.phone_number)}</span> : "Dial"}
                 {dialCount > 0 && (
                   <span className="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background/95 px-1.5 text-[11px] font-bold text-destructive">
                     {dialCount}

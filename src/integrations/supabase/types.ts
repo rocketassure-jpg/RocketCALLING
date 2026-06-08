@@ -79,8 +79,10 @@ export type Database = {
           allow_logout_mobile: boolean
           allow_logout_web: boolean
           auto_start_allocation: boolean
+          brand_config: Json
           id: string
           invite_code: string | null
+          masking_config: Json
           master_sheet_url: string | null
           post_interaction_actions: boolean
           retry_1_hours: number
@@ -94,8 +96,10 @@ export type Database = {
           allow_logout_mobile?: boolean
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
+          brand_config?: Json
           id?: string
           invite_code?: string | null
+          masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
@@ -109,8 +113,10 @@ export type Database = {
           allow_logout_mobile?: boolean
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
+          brand_config?: Json
           id?: string
           invite_code?: string | null
+          masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
           retry_1_hours?: number
@@ -389,12 +395,14 @@ export type Database = {
           assigned_telecaller: string | null
           authorised_person: string | null
           call_date: string
+          campaign_name: string | null
           cash_back: number | null
           chassis_number: string | null
           city_village: string | null
           created_at: string
           current_address: string | null
           customer_name: string
+          deadline: string | null
           delivery_address: string | null
           engine_number: string | null
           expiry_date: string | null
@@ -423,6 +431,7 @@ export type Database = {
           policy_number: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount: number
+          priority: string
           pucc_upto: string | null
           reg_date: string | null
           registration_number: string | null
@@ -440,12 +449,14 @@ export type Database = {
           assigned_telecaller?: string | null
           authorised_person?: string | null
           call_date?: string
+          campaign_name?: string | null
           cash_back?: number | null
           chassis_number?: string | null
           city_village?: string | null
           created_at?: string
           current_address?: string | null
           customer_name: string
+          deadline?: string | null
           delivery_address?: string | null
           engine_number?: string | null
           expiry_date?: string | null
@@ -474,6 +485,7 @@ export type Database = {
           policy_number?: string | null
           policy_type: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
+          priority?: string
           pucc_upto?: string | null
           reg_date?: string | null
           registration_number?: string | null
@@ -491,12 +503,14 @@ export type Database = {
           assigned_telecaller?: string | null
           authorised_person?: string | null
           call_date?: string
+          campaign_name?: string | null
           cash_back?: number | null
           chassis_number?: string | null
           city_village?: string | null
           created_at?: string
           current_address?: string | null
           customer_name?: string
+          deadline?: string | null
           delivery_address?: string | null
           engine_number?: string | null
           expiry_date?: string | null
@@ -525,6 +539,7 @@ export type Database = {
           policy_number?: string | null
           policy_type?: Database["public"]["Enums"]["policy_type"]
           premium_amount?: number
+          priority?: string
           pucc_upto?: string | null
           reg_date?: string | null
           registration_number?: string | null
@@ -592,6 +607,7 @@ export type Database = {
           manager_id: string | null
           rejection_reason: string | null
           requested_role: string | null
+          ui_theme: string
         }
         Insert: {
           approved_at?: string | null
@@ -605,6 +621,7 @@ export type Database = {
           manager_id?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
+          ui_theme?: string
         }
         Update: {
           approved_at?: string | null
@@ -618,6 +635,7 @@ export type Database = {
           manager_id?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
+          ui_theme?: string
         }
         Relationships: [
           {

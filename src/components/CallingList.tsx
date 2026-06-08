@@ -9,14 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, Search, Loader2, MapPin, Calendar, IndianRupee, AlarmClock, ArrowRight, Sparkles, Flame, ThumbsUp, Clock, PhoneCall, CheckCircle2, X, PhoneOff, FileText, Calculator, Handshake, Trophy, ThumbsDown, CheckSquare, ArrowUpRight, ChevronLeft, ChevronRight, LayoutGrid, List as ListIcon, ChevronDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { Textarea } from "@/components/ui/textarea";
 import { LeadActions } from "./LeadActions";
 import { useLeadsPaginated, LeadBucket } from "@/hooks/useLeadsPaginated";
 import { RevivalDateFilter, RevivalRange } from "@/components/RevivalDateFilter";
-import { maskPhone } from "@/lib/utils";
+import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 
 type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
@@ -122,6 +122,18 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
   const [todayStats, setTodayStats] = useState({ total: 0, interested: 0, followup: 0, notInterested: 0 });
   const [noteDialog, setNoteDialog] = useState<{ lead: Lead; status: Status } | null>(null);
   const [noteText, setNoteText] = useState("");
+  const [viewMode, setViewMode] = useState<"block" | "list">(
+    () => (localStorage.getItem("callingViewMode") as "block" | "list") || "block"
+  );
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const policy = useMaskingPolicy();
+
+  const changeView = (m: "block" | "list") => {
+    setViewMode(m);
+    localStorage.setItem("callingViewMode", m);
+    setExpandedId(null);
+  };
+
 
 
   // Telecaller list (for bulk assign)
@@ -281,7 +293,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         )}
       </div>
 
-      {/* Results indicator */}
+      {/* Results indicator + view toggle */}
       <div className="flex items-center justify-between gap-2 px-1 text-sm">
         {leads.length > 0 ? (
           <div className="flex items-center gap-2">
@@ -292,9 +304,27 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
             <span className="text-muted-foreground">Select page ({leads.length})</span>
           </div>
         ) : <span />}
-        <span className="text-xs text-muted-foreground">
-          {loading ? "Loading…" : `Page ${page + 1} of ${totalPages} · ${totalCount.toLocaleString("en-IN")} total`}
-        </span>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-0.5 rounded-full border bg-card p-0.5">
+            <button
+              onClick={() => changeView("block")}
+              className={`flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-medium transition-colors ${viewMode === "block" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              aria-label="Block view"
+            >
+              <LayoutGrid className="h-3.5 w-3.5" /> Block
+            </button>
+            <button
+              onClick={() => changeView("list")}
+              className={`flex h-7 items-center gap-1 rounded-full px-2.5 text-xs font-medium transition-colors ${viewMode === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              aria-label="List view"
+            >
+              <ListIcon className="h-3.5 w-3.5" /> List
+            </button>
+          </div>
+          <span className="text-xs text-muted-foreground">
+            {loading ? "Loading…" : `Page ${page + 1} of ${totalPages} · ${totalCount.toLocaleString("en-IN")} total`}
+          </span>
+        </div>
       </div>
 
 
@@ -315,6 +345,64 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
         <Card><CardContent className="p-12 text-center text-muted-foreground">
           🎉 Koi pending lead nahi hai. Shabaash!
         </CardContent></Card>
+      ) : viewMode === "list" ? (
+        <Card className="overflow-hidden">
+          <div className="divide-y">
+            {leads.map((lead: Lead) => {
+              const expanded = expandedId === lead.id;
+              const blocked = lead.status === "Unsubscribed";
+              return (
+                <div key={lead.id} className="bg-card">
+                  <div className="flex items-center gap-2 px-3 py-2">
+                    <Checkbox
+                      checked={selectedIds.has(lead.id)}
+                      onCheckedChange={() => toggleSelect(lead.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                    <button
+                      onClick={() => setExpandedId(expanded ? null : lead.id)}
+                      className="flex flex-1 items-center gap-2 text-left"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="truncate text-sm font-semibold">{lead.customer_name}</span>
+                          <Badge className={`${statusColor(lead.status)} text-[10px]`}>{lead.status}</Badge>
+                        </div>
+                        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+                          <span className="font-mono">{policy.display(lead.phone_number)}</span>
+                          {lead.last_called_at && <span>· {new Date(lead.last_called_at).toLocaleDateString()}</span>}
+                        </div>
+                      </div>
+                      <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`} />
+                    </button>
+                    <a
+                      href={`tel:${lead.phone_number}`}
+                      onClick={() => logDial(lead)}
+                      className="flex h-9 items-center gap-1 rounded-full bg-destructive px-3 text-xs font-semibold text-destructive-foreground active:scale-95"
+                      aria-label="Dial"
+                    >
+                      <Phone className="h-3.5 w-3.5" /> Dial
+                    </a>
+                  </div>
+                  {expanded && (
+                    <div className="border-t bg-muted/30 p-3">
+                      <LeadActions
+                        lead={lead as any}
+                        blocked={blocked}
+                        dialCount={dialCounts[lead.id] ?? 0}
+                        statusOptions={STATUS_OPTIONS as any}
+                        callerName={callerName}
+                        onDial={() => logDial(lead)}
+                        onStatusChange={(v) => { setNoteText(""); setNoteDialog({ lead, status: v as Status }); }}
+                        onUnsubscribe={() => unsubscribe(lead)}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </Card>
       ) : (
         <div className="space-y-3">
           {leads.map((lead: Lead) => {
@@ -354,7 +442,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           )}
                         </div>
                         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {maskPhone(lead.phone_number)}</span>
+                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {policy.display(lead.phone_number)}</span>
                           <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
                           <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
                           {Number(lead.premium_amount) > 0 && (

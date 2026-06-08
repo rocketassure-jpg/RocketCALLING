@@ -34,6 +34,7 @@ import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
+import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -50,7 +51,8 @@ type CallLog = { id: string; lead_id: string; telecaller_id: string; status: str
 const today = () => new Date().toISOString().slice(0, 10);
 
 const NAV: { id: string; label: string; icon: any }[] = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "overview", label: "Overview", icon: BarChart3 },
+  { id: "dashboard", label: "Wavelength", icon: LayoutDashboard },
   { id: "calling", label: "Calling", icon: Phone },
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
@@ -75,7 +77,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
 ];
 
 const AdminDashboard = () => {
-  const [section, setSection] = useState("dashboard");
+  const [section, setSection] = useState("overview");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -175,6 +177,7 @@ const AdminDashboard = () => {
 
   const Content = () => {
     switch (section) {
+      case "overview": return <AdminOverviewPanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
