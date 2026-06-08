@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -33,6 +34,10 @@ export const HamburgerMenu = ({
       <SheetContent side="left" className="flex w-72 flex-col p-0">
         <div className="flex h-16 items-center border-b px-4"><Logo /></div>
         {topSlot && <div className="border-b p-3">{topSlot}</div>}
+        <div className="border-b p-3">
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">Appearance</div>
+          <ThemeToggle />
+        </div>
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
           {items.map((it) => {
             const isActive = active === it.id;
