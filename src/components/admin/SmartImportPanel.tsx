@@ -219,6 +219,48 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
           </div>
         </div>
 
+        {/* Campaign / Manager / Deadline / Priority */}
+        <div className="rounded-lg border p-3 space-y-3">
+          <div className="flex items-center gap-2 text-sm font-semibold"><Briefcase className="h-4 w-4 text-primary" /> Campaign &amp; Assignment Details</div>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label>Campaign / List Name</Label>
+              <Input value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g. June Renewals" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Assign Manager</Label>
+              <Select value={managerId} onValueChange={setManagerId}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— none —</SelectItem>
+                  {managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name || m.id.slice(0, 8)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><CalendarIcon className="h-3.5 w-3.5" /> Follow-up Deadline</Label>
+              <Input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><Flame className="h-3.5 w-3.5" /> Priority</Label>
+              <div className="flex gap-1">
+                {(["normal", "high", "urgent"] as const).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPriority(p)}
+                    className={`flex-1 rounded-md border px-2 py-1.5 text-xs font-medium capitalize transition ${priority === p ? (p === "urgent" ? "border-destructive bg-destructive/10 text-destructive" : p === "high" ? "border-warning bg-warning/10 text-warning-foreground" : "border-primary bg-primary/10") : "hover:bg-muted"}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
         {/* Assignment flow */}
         <div className="rounded-lg border p-3 space-y-3">
           <div className="flex items-center gap-2 text-sm font-semibold"><Users className="h-4 w-4 text-primary" /> Lead Assignment</div>
