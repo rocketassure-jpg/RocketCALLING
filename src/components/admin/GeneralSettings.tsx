@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Save, Download } from "lucide-react";
+import { BrandingPanel } from "@/components/admin/BrandingPanel";
+import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
 
 type Settings = {
   id: string;
@@ -149,6 +151,10 @@ export const GeneralSettings = () => {
           </Row>
         </CardContent>
       </Card>
+
+      <BrandingPanel />
+      <MaskingPolicyPanel />
     </div>
   );
 };
+
