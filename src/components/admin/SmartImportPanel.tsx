@@ -145,7 +145,13 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     const assignCounts: Record<string, number> = {};
     let skipped = 0, unassigned = 0, idx = 0;
     rows.forEach((r) => {
-      const o: any = { area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import" };
+      const o: any = {
+        area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import",
+        priority,
+      };
+      if (managerId && managerId !== "none") o.manager_id = managerId;
+      if (campaignName.trim()) o.campaign_name = campaignName.trim();
+      if (deadline) o.deadline = deadline;
       Object.entries(mapping).forEach(([col, target]) => {
         if (target === SKIP) return;
         let v: any = r[col];
@@ -174,6 +180,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
       inserts.push(o);
       idx++;
     });
+
 
     let inserted = 0;
     for (let i = 0; i < inserts.length; i += 100) {
