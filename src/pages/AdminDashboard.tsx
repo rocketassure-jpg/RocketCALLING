@@ -78,6 +78,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
 ];
 
 const AdminDashboard = () => {
+  const { companyId } = useAuth();
   const [section, setSection] = useState("overview");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
