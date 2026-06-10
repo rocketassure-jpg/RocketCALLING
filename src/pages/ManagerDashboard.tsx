@@ -149,7 +149,7 @@ const ManagerDashboard = () => {
                   {activeLeads.map((l) => (
                     <TableRow key={l.id}>
                       <TableCell className="font-medium">{l.customer_name}</TableCell>
-                      <TableCell>{l.phone_number}</TableCell>
+                      <TableCell className="font-mono text-xs">{phoneMask.display(l.phone_number)}</TableCell>
                       <TableCell>{l.areas?.name}</TableCell>
                       <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
                       <TableCell>{l.call_date}</TableCell>
