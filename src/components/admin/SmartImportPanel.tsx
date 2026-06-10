@@ -46,7 +46,7 @@ const autoMap = (header: string): string => {
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
 
 export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
-  const { user } = useAuth();
+  const { user, companyId } = useAuth();
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
