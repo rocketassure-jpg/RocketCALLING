@@ -146,6 +146,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     let skipped = 0, unassigned = 0, idx = 0;
     rows.forEach((r) => {
       const o: any = {
+        company_id: companyId,
         area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import",
         priority,
       };
