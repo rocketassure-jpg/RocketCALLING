@@ -23,6 +23,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const normalizePhone = (p: string) => (p || "").replace(/\D/g, "").slice(-10);
 
 export const CSVImporter = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
+  const { companyId } = useAuth();
   const [defaultAreaId, setDefaultAreaId] = useState("");
   const [defaultTelecaller, setDefaultTelecaller] = useState<string>("none");
   const [duplicateMode, setDuplicateMode] = useState<"skip" | "merge">("merge");
