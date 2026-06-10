@@ -18,6 +18,8 @@ interface AuthCtx {
   session: Session | null;
   role: Role;
   profileStatus: ProfileStatus;
+  companyId: string | null;
+  isSuperAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -29,19 +31,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<Role>(null);
   const [profileStatus, setProfileStatus] = useState<ProfileStatus>(null);
+  const [companyId, setCompanyId] = useState<string | null>(null);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadUserMeta = async (uid: string) => {
     const [rolesRes, profRes] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("is_approved,is_active,rejection_reason").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("is_approved,is_active,rejection_reason,company_id,is_super_admin").eq("id", uid).maybeSingle(),
     ]);
     setRole(pickRole((rolesRes.data ?? []).map((r: any) => r.role)));
-    setProfileStatus(profRes.data ? {
-      is_approved: !!(profRes.data as any).is_approved,
-      is_active: (profRes.data as any).is_active !== false,
-      rejection_reason: (profRes.data as any).rejection_reason ?? null,
+    const p: any = profRes.data;
+    setProfileStatus(p ? {
+      is_approved: !!p.is_approved,
+      is_active: p.is_active !== false,
+      rejection_reason: p.rejection_reason ?? null,
     } : null);
+    setCompanyId(p?.company_id ?? null);
+    setIsSuperAdmin(!!p?.is_super_admin);
   };
 
   useEffect(() => {
@@ -53,6 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setRole(null);
         setProfileStatus(null);
+        setCompanyId(null);
+        setIsSuperAdmin(false);
       }
     });
 
@@ -71,7 +80,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = "/";
   };
 
-  return <Ctx.Provider value={{ user, session, role, profileStatus, loading, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, session, role, profileStatus, companyId, isSuperAdmin, loading, signOut }}>{children}</Ctx.Provider>;
 };
+
 
 export const useAuth = () => useContext(Ctx);
