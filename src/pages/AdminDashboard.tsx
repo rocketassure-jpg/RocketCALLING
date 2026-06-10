@@ -148,7 +148,7 @@ const AdminDashboard = () => {
     toast({ title: "Assigned" }); setSelectedIds(new Set()); load();
   };
 
-  const addArea = async () => { if (!newArea.trim()) return; const { error } = await supabase.from("areas").insert({ name: newArea.trim() }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); setNewArea(""); load(); };
+  const addArea = async () => { if (!newArea.trim() || !companyId) return; const { error } = await supabase.from("areas").insert({ name: newArea.trim(), company_id: companyId }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); setNewArea(""); load(); };
   const deleteArea = async (id: string) => { await supabase.from("areas").delete().eq("id", id); load(); };
   const addAssignment = async () => { if (!assignT || !assignA) return; const { error } = await supabase.from("telecaller_areas").insert({ telecaller_id: assignT, area_id: assignA }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); toast({ title: "Assigned" }); load(); };
   const removeAssignment = async (id: string) => { await supabase.from("telecaller_areas").delete().eq("id", id); load(); };
