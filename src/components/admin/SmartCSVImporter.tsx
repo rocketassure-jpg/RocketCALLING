@@ -107,6 +107,7 @@ const parseDate = (v: any): string | null => {
 const normPhone = (p: string) => (p || "").replace(/\D/g, "").slice(-10);
 
 export const SmartCSVImporter = ({ areas, onDone }: { areas: Area[]; onDone: () => void }) => {
+  const { companyId } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
