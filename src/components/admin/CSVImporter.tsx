@@ -78,6 +78,7 @@ export const CSVImporter = ({ areas, telecallers, onDone }: { areas: Area[]; tel
       if (!areaId) { skipped++; continue; }
       const phoneKey = normalizePhone(r.phone_number);
       const data: any = {
+        company_id: companyId,
         customer_name: r.customer_name,
         phone_number: r.phone_number,
         area_id: areaId,
