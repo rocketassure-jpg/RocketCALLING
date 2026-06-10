@@ -20,6 +20,7 @@ import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import { BreakToggle } from "@/components/agent/BreakToggle";
+import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
