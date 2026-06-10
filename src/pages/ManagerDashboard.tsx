@@ -31,6 +31,7 @@ const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
+  const phoneMask = useMaskingPolicy();
   const [showTraining, setShowTraining] = useState(false);
   const [section, setSection] = useState("calling");
   const [me, setMe] = useState<Profile | null>(null);
