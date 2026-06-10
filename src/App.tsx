@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import TelecallerDashboard from "./pages/TelecallerDashboard.tsx";
 import ManagerDashboard from "./pages/ManagerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
