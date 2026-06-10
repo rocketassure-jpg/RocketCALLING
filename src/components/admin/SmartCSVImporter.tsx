@@ -162,7 +162,7 @@ export const SmartCSVImporter = ({ areas, onDone }: { areas: Area[]; onDone: () 
     const inserts: any[] = [];
     const skipped: string[] = [];
     rows.forEach((row, idx) => {
-      const obj: any = { area_id: defaultAreaId, policy_type: defaultPolicyType, lead_source: "CSV Upload" };
+      const obj: any = { company_id: companyId, area_id: defaultAreaId, policy_type: defaultPolicyType, lead_source: "CSV Upload" };
       Object.entries(mapping).forEach(([col, target]) => {
         if (target === "__skip__") return;
         let val = row[col];
