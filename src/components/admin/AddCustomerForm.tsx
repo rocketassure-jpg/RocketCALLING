@@ -40,6 +40,7 @@ export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Ar
     setSaving(true);
     const customNotes = fields.length ? `\n\nCustom Fields:\n${fields.map((f) => `${f.name}: ${custom[f.id] || "—"}`).join("\n")}` : "";
     const { error } = await supabase.from("leads").insert({
+      company_id: companyId!,
       customer_name: form.customer_name,
       phone_number: form.phone_number,
       area_id: form.area_id,
