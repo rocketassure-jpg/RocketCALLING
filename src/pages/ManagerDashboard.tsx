@@ -20,6 +20,7 @@ import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import { BreakToggle } from "@/components/agent/BreakToggle";
+import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 type Profile = { id: string; full_name: string };
 type Lead = { id: string; customer_name: string; phone_number: string; status: string; premium_amount: number; call_date: string; area_id: string; areas?: { name: string } | null };
@@ -30,6 +31,7 @@ const fmt = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
 const ManagerDashboard = () => {
   const { user } = useAuth();
+  const phoneMask = useMaskingPolicy();
   const [showTraining, setShowTraining] = useState(false);
   const [section, setSection] = useState("calling");
   const [me, setMe] = useState<Profile | null>(null);
@@ -147,7 +149,7 @@ const ManagerDashboard = () => {
                   {activeLeads.map((l) => (
                     <TableRow key={l.id}>
                       <TableCell className="font-medium">{l.customer_name}</TableCell>
-                      <TableCell>{l.phone_number}</TableCell>
+                      <TableCell className="font-mono text-xs">{phoneMask.display(l.phone_number)}</TableCell>
                       <TableCell>{l.areas?.name}</TableCell>
                       <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
                       <TableCell>{l.call_date}</TableCell>
