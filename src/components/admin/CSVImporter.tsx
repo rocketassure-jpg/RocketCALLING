@@ -11,6 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Upload, FileText, CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string };
@@ -21,6 +23,7 @@ const today = () => new Date().toISOString().slice(0, 10);
 const normalizePhone = (p: string) => (p || "").replace(/\D/g, "").slice(-10);
 
 export const CSVImporter = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
+  const { companyId } = useAuth();
   const [defaultAreaId, setDefaultAreaId] = useState("");
   const [defaultTelecaller, setDefaultTelecaller] = useState<string>("none");
   const [duplicateMode, setDuplicateMode] = useState<"skip" | "merge">("merge");
@@ -75,6 +78,7 @@ export const CSVImporter = ({ areas, telecallers, onDone }: { areas: Area[]; tel
       if (!areaId) { skipped++; continue; }
       const phoneKey = normalizePhone(r.phone_number);
       const data: any = {
+        company_id: companyId,
         customer_name: r.customer_name,
         phone_number: r.phone_number,
         area_id: areaId,

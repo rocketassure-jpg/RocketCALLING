@@ -80,6 +80,7 @@ export type Database = {
           allow_logout_web: boolean
           auto_start_allocation: boolean
           brand_config: Json
+          company_id: string | null
           id: string
           invite_code: string | null
           masking_config: Json
@@ -97,6 +98,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           brand_config?: Json
+          company_id?: string | null
           id?: string
           invite_code?: string | null
           masking_config?: Json
@@ -114,6 +116,7 @@ export type Database = {
           allow_logout_web?: boolean
           auto_start_allocation?: boolean
           brand_config?: Json
+          company_id?: string | null
           id?: string
           invite_code?: string | null
           masking_config?: Json
@@ -126,25 +129,44 @@ export type Database = {
           whatsapp_business_messaging?: boolean
           whatsapp_notifications?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "app_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       areas: {
         Row: {
+          company_id: string
           created_at: string
           id: string
           name: string
         }
         Insert: {
+          company_id: string
           created_at?: string
           id?: string
           name: string
         }
         Update: {
+          company_id?: string
           created_at?: string
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "areas_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       break_logs: {
         Row: {
@@ -219,6 +241,102 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      companies: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          plan: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          plan?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          plan?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_subscriptions: {
+        Row: {
+          activated_by: string | null
+          billing_cycle: string
+          company_id: string
+          created_at: string
+          end_date: string | null
+          id: string
+          module_key: string
+          notes: string | null
+          price_paid: number
+          start_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          activated_by?: string | null
+          billing_cycle?: string
+          company_id: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          module_key: string
+          notes?: string | null
+          price_paid?: number
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          activated_by?: string | null
+          billing_cycle?: string
+          company_id?: string
+          created_at?: string
+          end_date?: string | null
+          id?: string
+          module_key?: string
+          notes?: string | null
+          price_paid?: number
+          start_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_module_key_fkey"
+            columns: ["module_key"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["module_key"]
           },
         ]
       }
@@ -399,6 +517,7 @@ export type Database = {
           cash_back: number | null
           chassis_number: string | null
           city_village: string | null
+          company_id: string
           created_at: string
           current_address: string | null
           customer_name: string
@@ -453,6 +572,7 @@ export type Database = {
           cash_back?: number | null
           chassis_number?: string | null
           city_village?: string | null
+          company_id: string
           created_at?: string
           current_address?: string | null
           customer_name: string
@@ -507,6 +627,7 @@ export type Database = {
           cash_back?: number | null
           chassis_number?: string | null
           city_village?: string | null
+          company_id?: string
           created_at?: string
           current_address?: string | null
           customer_name?: string
@@ -559,6 +680,13 @@ export type Database = {
             referencedRelation: "areas"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "leads_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
         ]
       }
       message_templates: {
@@ -594,16 +722,57 @@ export type Database = {
         }
         Relationships: []
       }
+      modules: {
+        Row: {
+          base_monthly_price: number
+          base_yearly_price: number
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_always_included: boolean
+          module_key: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          base_monthly_price?: number
+          base_yearly_price?: number
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_always_included?: boolean
+          module_key: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          base_monthly_price?: number
+          base_yearly_price?: number
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_always_included?: boolean
+          module_key?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           approved_at: string | null
           approved_by: string | null
+          company_id: string
           created_at: string
           department: string | null
           full_name: string
           id: string
           is_active: boolean
           is_approved: boolean
+          is_super_admin: boolean
           manager_id: string | null
           rejection_reason: string | null
           requested_role: string | null
@@ -612,12 +781,14 @@ export type Database = {
         Insert: {
           approved_at?: string | null
           approved_by?: string | null
+          company_id: string
           created_at?: string
           department?: string | null
           full_name?: string
           id: string
           is_active?: boolean
           is_approved?: boolean
+          is_super_admin?: boolean
           manager_id?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
@@ -626,18 +797,27 @@ export type Database = {
         Update: {
           approved_at?: string | null
           approved_by?: string | null
+          company_id?: string
           created_at?: string
           department?: string | null
           full_name?: string
           id?: string
           is_active?: boolean
           is_approved?: boolean
+          is_super_admin?: boolean
           manager_id?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
           ui_theme?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "profiles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "profiles_manager_id_fkey"
             columns: ["manager_id"]
@@ -1239,6 +1419,11 @@ export type Database = {
       }
     }
     Functions: {
+      get_active_modules: { Args: { _company_id: string }; Returns: string[] }
+      has_module: {
+        Args: { _company_id: string; _module_key: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1251,6 +1436,14 @@ export type Database = {
         Args: { _manager_id: string; _telecaller_id: string }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id?: string }; Returns: boolean }
+      lookup_company_by_code: {
+        Args: { _code: string }
+        Returns: {
+          id: string
+          name: string
+        }[]
+      }
       manager_can_see_lead: {
         Args: { _area_id: string; _manager_id: string }
         Returns: boolean
@@ -1259,6 +1452,7 @@ export type Database = {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean
       }
+      user_company_id: { Args: never; Returns: string }
       validate_invite_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {

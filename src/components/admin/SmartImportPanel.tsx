@@ -46,7 +46,7 @@ const autoMap = (header: string): string => {
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
 
 export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]; telecallers: Profile[]; onDone: () => void }) => {
-  const { user } = useAuth();
+  const { user, companyId } = useAuth();
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
   const [mapping, setMapping] = useState<Record<string, string>>({});
@@ -146,6 +146,7 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
     let skipped = 0, unassigned = 0, idx = 0;
     rows.forEach((r) => {
       const o: any = {
+        company_id: companyId,
         area_id: defaultArea, policy_type: "Motor", call_date: today(), lead_source: "Smart Import",
         priority,
       };

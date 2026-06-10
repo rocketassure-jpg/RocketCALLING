@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { User, Sparkles, Flag, MoreHorizontal, Loader2 } from "lucide-react";
 
 type Area = { id: string; name: string };
@@ -16,6 +17,7 @@ type CrmField = { id: string; name: string; field_type: string; mandatory: boole
 const today = () => new Date().toISOString().slice(0, 10);
 
 export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Area[]; telecallers?: { id: string; full_name: string }[]; onDone?: () => void }) => {
+  const { companyId } = useAuth();
   const [fields, setFields] = useState<CrmField[]>([]);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -38,6 +40,7 @@ export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Ar
     setSaving(true);
     const customNotes = fields.length ? `\n\nCustom Fields:\n${fields.map((f) => `${f.name}: ${custom[f.id] || "—"}`).join("\n")}` : "";
     const { error } = await supabase.from("leads").insert({
+      company_id: companyId!,
       customer_name: form.customer_name,
       phone_number: form.phone_number,
       area_id: form.area_id,

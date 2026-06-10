@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Upload, ArrowRight, Loader2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
 
@@ -106,6 +107,7 @@ const parseDate = (v: any): string | null => {
 const normPhone = (p: string) => (p || "").replace(/\D/g, "").slice(-10);
 
 export const SmartCSVImporter = ({ areas, onDone }: { areas: Area[]; onDone: () => void }) => {
+  const { companyId } = useAuth();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [headers, setHeaders] = useState<string[]>([]);
   const [rows, setRows] = useState<Record<string, any>[]>([]);
@@ -160,7 +162,7 @@ export const SmartCSVImporter = ({ areas, onDone }: { areas: Area[]; onDone: () 
     const inserts: any[] = [];
     const skipped: string[] = [];
     rows.forEach((row, idx) => {
-      const obj: any = { area_id: defaultAreaId, policy_type: defaultPolicyType, lead_source: "CSV Upload" };
+      const obj: any = { company_id: companyId, area_id: defaultAreaId, policy_type: defaultPolicyType, lead_source: "CSV Upload" };
       Object.entries(mapping).forEach(([col, target]) => {
         if (target === "__skip__") return;
         let val = row[col];

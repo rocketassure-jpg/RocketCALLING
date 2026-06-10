@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard.tsx";
 import TelecallerDashboard from "./pages/TelecallerDashboard.tsx";
 import ManagerDashboard from "./pages/ManagerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
+import SuperAdminDashboard from "./pages/SuperAdminDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/telecaller" element={<ProtectedRoute requireRole="telecaller"><TelecallerDashboard /></ProtectedRoute>} />
                 <Route path="/manager" element={<ProtectedRoute requireRole="manager"><ManagerDashboard /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/super-admin" element={<ProtectedRoute requireSuperAdmin><SuperAdminDashboard /></ProtectedRoute>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </SettingsProvider>

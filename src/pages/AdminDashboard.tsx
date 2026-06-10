@@ -35,6 +35,7 @@ import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -77,6 +78,7 @@ const NAV: { id: string; label: string; icon: any }[] = [
 ];
 
 const AdminDashboard = () => {
+  const { companyId } = useAuth();
   const [section, setSection] = useState("overview");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -146,7 +148,7 @@ const AdminDashboard = () => {
     toast({ title: "Assigned" }); setSelectedIds(new Set()); load();
   };
 
-  const addArea = async () => { if (!newArea.trim()) return; const { error } = await supabase.from("areas").insert({ name: newArea.trim() }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); setNewArea(""); load(); };
+  const addArea = async () => { if (!newArea.trim() || !companyId) return; const { error } = await supabase.from("areas").insert({ name: newArea.trim(), company_id: companyId }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); setNewArea(""); load(); };
   const deleteArea = async (id: string) => { await supabase.from("areas").delete().eq("id", id); load(); };
   const addAssignment = async () => { if (!assignT || !assignA) return; const { error } = await supabase.from("telecaller_areas").insert({ telecaller_id: assignT, area_id: assignA }); if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" }); toast({ title: "Assigned" }); load(); };
   const removeAssignment = async (id: string) => { await supabase.from("telecaller_areas").delete().eq("id", id); load(); };
@@ -359,6 +361,7 @@ const AdminDashboard = () => {
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
         <div className="flex items-center gap-2">
+          <SuperAdminLink />
           <InstallPWA />
         </div>
       </header>
@@ -394,5 +397,15 @@ const RemoveTeamButton = ({ name, onConfirm }: { name: string; onConfirm: () => 
     </AlertDialogContent>
   </AlertDialog>
 );
+
+const SuperAdminLink = () => {
+  const { isSuperAdmin } = useAuth();
+  if (!isSuperAdmin) return null;
+  return (
+    <Button asChild variant="outline" size="sm" className="gap-1">
+      <a href="/super-admin"><Shield className="h-4 w-4" /> Super Admin</a>
+    </Button>
+  );
+};
 
 export default AdminDashboard;
