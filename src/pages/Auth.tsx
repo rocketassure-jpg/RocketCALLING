@@ -142,10 +142,34 @@ const Auth = () => {
                         </Select>
                       </div>
                     </div>
+
+                    {/* Company selection */}
+                    <div className="rounded-lg border bg-muted/30 p-3 space-y-3">
+                      <div className="flex gap-2">
+                        <button type="button" onClick={() => setSignupMode("join")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "join" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Join Company</button>
+                        <button type="button" onClick={() => setSignupMode("create")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "create" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Create New Company</button>
+                      </div>
+                      {signupMode === "join" ? (
+                        <div className="space-y-1.5">
+                          <Label>Company Code</Label>
+                          <Input value={companyCode} onChange={(e) => { const v = e.target.value.toUpperCase(); setCompanyCode(v); verifyCode(v); }} placeholder="e.g. ROCKET" />
+                          {codeChecking && <p className="text-xs text-muted-foreground">Checking…</p>}
+                          {companyPreview && <p className="text-xs text-success">✓ Joining <strong>{companyPreview.name}</strong></p>}
+                          {!codeChecking && !companyPreview && companyCode.length >= 3 && <p className="text-xs text-destructive">Code not found</p>}
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <Label>Company Name</Label>
+                          <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. XYZ Insurance Broker" />
+                          <p className="text-xs text-muted-foreground">Tum is company ke admin banoge. Code automatic generate hoga.</p>
+                        </div>
+                      )}
+                    </div>
+
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground">First signup automatically becomes admin.</p>
+                    <p className="text-center text-xs text-muted-foreground">First signup automatically becomes super admin.</p>
                   </form>
                 </TabsContent>
               </Tabs>
