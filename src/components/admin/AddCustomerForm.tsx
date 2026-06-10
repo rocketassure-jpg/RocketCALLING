@@ -17,6 +17,7 @@ type CrmField = { id: string; name: string; field_type: string; mandatory: boole
 const today = () => new Date().toISOString().slice(0, 10);
 
 export const AddCustomerForm = ({ areas, telecallers = [], onDone }: { areas: Area[]; telecallers?: { id: string; full_name: string }[]; onDone?: () => void }) => {
+  const { companyId } = useAuth();
   const [fields, setFields] = useState<CrmField[]>([]);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
