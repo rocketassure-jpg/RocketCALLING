@@ -398,4 +398,14 @@ const RemoveTeamButton = ({ name, onConfirm }: { name: string; onConfirm: () => 
   </AlertDialog>
 );
 
+const SuperAdminLink = () => {
+  const { isSuperAdmin } = useAuth();
+  if (!isSuperAdmin) return null;
+  return (
+    <Button asChild variant="outline" size="sm" className="gap-1">
+      <a href="/super-admin"><Shield className="h-4 w-4" /> Super Admin</a>
+    </Button>
+  );
+};
+
 export default AdminDashboard;
