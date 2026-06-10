@@ -35,6 +35,7 @@ import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
