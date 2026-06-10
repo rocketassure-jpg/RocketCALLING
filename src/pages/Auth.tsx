@@ -11,6 +11,8 @@ import { Logo } from "@/components/Logo";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
+type SignupMode = "join" | "create";
+
 const Auth = () => {
   const nav = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -19,8 +21,11 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [department, setDepartment] = useState("Sales");
   const [requestedRole, setRequestedRole] = useState<"telecaller" | "manager">("telecaller");
-  const [inviteCode, setInviteCode] = useState("");
-  const [signedUp, setSignedUp] = useState(false);
+  const [signupMode, setSignupMode] = useState<SignupMode>("join");
+  const [companyCode, setCompanyCode] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [companyPreview, setCompanyPreview] = useState<{ name: string } | null>(null);
+  const [codeChecking, setCodeChecking] = useState(false);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,22 +36,31 @@ const Auth = () => {
     nav("/dashboard");
   };
 
+  const verifyCode = async (code: string) => {
+    setCompanyPreview(null);
+    if (!code || code.length < 3) return;
+    setCodeChecking(true);
+    const { data } = await (supabase as any).rpc("lookup_company_by_code", { _code: code });
+    setCodeChecking(false);
+    if (data && data.length) setCompanyPreview({ name: data[0].name });
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
+    if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
     setLoading(true);
+    const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole };
+    if (signupMode === "join") meta.company_code = companyCode;
+    else { meta.create_company = "true"; meta.company_name = companyName.trim(); }
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-        data: { full_name: fullName, department, requested_role: requestedRole },
-      },
+      email, password,
+      options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: meta },
     });
     if (error) {
       setLoading(false);
       return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
     }
-    // Auto sign-in if session not returned (depends on email confirm setting)
     await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
     setLoading(false);
     toast({ title: "Account created", description: "Welcome!" });
