@@ -361,6 +361,7 @@ const AdminDashboard = () => {
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
         <div className="flex items-center gap-2">
+          <SuperAdminLink />
           <InstallPWA />
         </div>
       </header>
