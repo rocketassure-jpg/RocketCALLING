@@ -824,6 +824,200 @@ export type Database = {
           },
         ]
       }
+      claim_documents: {
+        Row: {
+          claim_id: string
+          company_id: string
+          created_at: string
+          document_name: string
+          document_type: string | null
+          file_path: string | null
+          id: string
+          is_received: boolean | null
+          is_required: boolean | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          claim_id: string
+          company_id: string
+          created_at?: string
+          document_name: string
+          document_type?: string | null
+          file_path?: string | null
+          id?: string
+          is_received?: boolean | null
+          is_required?: boolean | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          claim_id?: string
+          company_id?: string
+          created_at?: string
+          document_name?: string
+          document_type?: string | null
+          file_path?: string | null
+          id?: string
+          is_received?: boolean | null
+          is_required?: boolean | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_documents_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_status_history: {
+        Row: {
+          changed_by: string | null
+          claim_id: string
+          company_id: string
+          created_at: string
+          from_status: string | null
+          id: string
+          remarks: string | null
+          to_status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          claim_id: string
+          company_id: string
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          remarks?: string | null
+          to_status: string
+        }
+        Update: {
+          changed_by?: string | null
+          claim_id?: string
+          company_id?: string
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          remarks?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_status_history_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claims: {
+        Row: {
+          approved_amount: number | null
+          assigned_to: string | null
+          branch_id: string | null
+          claim_amount: number | null
+          claim_number: string
+          claim_type: string | null
+          client_lead_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          garage_name: string | null
+          hospital_name: string | null
+          id: string
+          incident_date: string | null
+          insurer_id: string | null
+          intimation_date: string | null
+          policy_id: string | null
+          policy_type: string
+          remarks: string | null
+          settled_amount: number | null
+          status: string
+          surveyor_contact: string | null
+          surveyor_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          approved_amount?: number | null
+          assigned_to?: string | null
+          branch_id?: string | null
+          claim_amount?: number | null
+          claim_number: string
+          claim_type?: string | null
+          client_lead_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          garage_name?: string | null
+          hospital_name?: string | null
+          id?: string
+          incident_date?: string | null
+          insurer_id?: string | null
+          intimation_date?: string | null
+          policy_id?: string | null
+          policy_type: string
+          remarks?: string | null
+          settled_amount?: number | null
+          status?: string
+          surveyor_contact?: string | null
+          surveyor_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          approved_amount?: number | null
+          assigned_to?: string | null
+          branch_id?: string | null
+          claim_amount?: number | null
+          claim_number?: string
+          claim_type?: string | null
+          client_lead_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          garage_name?: string | null
+          hospital_name?: string | null
+          id?: string
+          incident_date?: string | null
+          insurer_id?: string | null
+          intimation_date?: string | null
+          policy_id?: string | null
+          policy_type?: string
+          remarks?: string | null
+          settled_amount?: number | null
+          status?: string
+          surveyor_contact?: string | null
+          surveyor_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_rates: {
         Row: {
           company_id: string
@@ -3526,6 +3720,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      unified_policies: {
+        Row: {
+          agent_id: string | null
+          client_lead_id: string | null
+          company_id: string | null
+          created_at: string | null
+          end_date: string | null
+          id: string | null
+          insurer_id: string | null
+          policy_number: string | null
+          policy_type: string | null
+          premium: number | null
+          start_date: string | null
+          status: string | null
+          sum_amount: number | null
+        }
+        Relationships: []
       }
       untouched_leads: {
         Row: {
