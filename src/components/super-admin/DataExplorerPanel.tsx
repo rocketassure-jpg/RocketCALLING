@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Database, Download, RefreshCw, Loader2 } from "lucide-react";
+import { Database, Download, RefreshCw, Loader2, Sparkles } from "lucide-react";
 
 const TABLES = [
   "companies","profiles","user_roles","leads","customers","enquiries",
