@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { InstallPWA } from "@/components/InstallPWA";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { Heart, Stethoscope, Car, ShieldCheck, Phone, Clock, Award, MessageCircle, Calculator } from "lucide-react";
-import heroImg from "@/assets/hero-insurance.jpg";
+
 
 const WA_NUMBER = "919669762808";
 
