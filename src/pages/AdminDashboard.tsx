@@ -213,6 +213,7 @@ const AdminDashboard = () => {
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
       case "operations": return <OperationsPanel />;
+      case "reports": return <ReportsPanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
