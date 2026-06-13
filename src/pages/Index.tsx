@@ -43,7 +43,7 @@ const Index = () => {
       {/* Hero — image right, headline left, Martian condensed type */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10"
-             style={{ background: "radial-gradient(900px 500px at 80% 30%, rgba(57,255,20,0.08), transparent 60%), radial-gradient(700px 400px at 10% 80%, rgba(0,212,255,0.07), transparent 60%), #06121f" }} />
+             style={{ background: "radial-gradient(900px 500px at 80% 30%, rgba(255,123,0,0.06), transparent 60%), radial-gradient(700px 400px at 10% 80%, rgba(0,212,255,0.05), transparent 60%), #f8fafc" }} />
         <div className="container grid items-center gap-10 py-16 md:py-24 lg:grid-cols-2 lg:py-32">
           <div className="space-y-7">
             <span className="inline-flex items-center gap-2 rounded-full neon-glass px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-white">
