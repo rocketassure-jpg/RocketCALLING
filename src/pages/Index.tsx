@@ -55,7 +55,7 @@ const Index = () => {
               <span className="block neon-text-glow">EXPERT</span>
               <span className="block text-slate-400" style={{ fontSize: "0.55em" }}>FOR EVERY FAMILY</span>
             </h1>
-            <p className="max-w-md text-base text-white/60 md:text-lg">
+            <p className="max-w-md text-base text-slate-500 md:text-lg">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
             </p>
             <div className="flex flex-wrap gap-3">
