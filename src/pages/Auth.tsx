@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -29,13 +29,11 @@ const Auth = () => {
   const [inviteCode, setInviteCode] = useState("");
   const [inviteRequired, setInviteRequired] = useState(false);
 
-  // Check whether an invite code is required for signup
-  useState(() => {
+  useEffect(() => {
     (supabase as any).rpc("invite_code_required").then(({ data }: any) => {
       if (data === true) setInviteRequired(true);
     });
-    return undefined as any;
-  });
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
