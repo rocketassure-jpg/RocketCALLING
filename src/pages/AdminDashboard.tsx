@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet } from "lucide-react";
+import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
+import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
@@ -51,12 +53,13 @@ type CallLog = { id: string; lead_id: string; telecaller_id: string; status: str
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const NAV: { id: string; label: string; icon: any }[] = [
+const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "dashboard", label: "Wavelength", icon: LayoutDashboard },
   { id: "calling", label: "Calling", icon: Phone },
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
+  { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts" },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
   { id: "customers", label: "Customers", icon: Trophy },
@@ -79,6 +82,8 @@ const NAV: { id: string; label: string; icon: any }[] = [
 
 const AdminDashboard = () => {
   const { companyId } = useAuth();
+  const { has: hasModule } = useModuleAccess();
+  const NAV = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
   const [section, setSection] = useState("overview");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -180,6 +185,7 @@ const AdminDashboard = () => {
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
+      case "accounts": return <AccountsPanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;

@@ -14,6 +14,168 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_payouts: {
+        Row: {
+          agent_id: string
+          company_id: string
+          created_at: string | null
+          id: string
+          net_payable: number | null
+          notes: string | null
+          paid_amount: number | null
+          payment_date: string | null
+          payment_mode: string | null
+          period_month: number
+          period_year: number
+          status: string | null
+          tds_deducted: number | null
+          total_business: number | null
+          total_commission: number | null
+          total_reward: number | null
+          updated_at: string | null
+          utr_ref: string | null
+        }
+        Insert: {
+          agent_id: string
+          company_id: string
+          created_at?: string | null
+          id?: string
+          net_payable?: number | null
+          notes?: string | null
+          paid_amount?: number | null
+          payment_date?: string | null
+          payment_mode?: string | null
+          period_month: number
+          period_year: number
+          status?: string | null
+          tds_deducted?: number | null
+          total_business?: number | null
+          total_commission?: number | null
+          total_reward?: number | null
+          updated_at?: string | null
+          utr_ref?: string | null
+        }
+        Update: {
+          agent_id?: string
+          company_id?: string
+          created_at?: string | null
+          id?: string
+          net_payable?: number | null
+          notes?: string | null
+          paid_amount?: number | null
+          payment_date?: string | null
+          payment_mode?: string | null
+          period_month?: number
+          period_year?: number
+          status?: string | null
+          tds_deducted?: number | null
+          total_business?: number | null
+          total_commission?: number | null
+          total_reward?: number | null
+          updated_at?: string | null
+          utr_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_payouts_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_payouts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agents_profile: {
+        Row: {
+          aadhaar: string | null
+          agent_code: string | null
+          agent_type: string | null
+          bank_account: string | null
+          bank_name: string | null
+          company_id: string
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          ifsc: string | null
+          is_active: boolean | null
+          notes: string | null
+          pan: string | null
+          parent_agent_id: string | null
+          phone: string | null
+          posp_license_expiry: string | null
+          posp_license_no: string | null
+          split_percent: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          aadhaar?: string | null
+          agent_code?: string | null
+          agent_type?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          company_id: string
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          ifsc?: string | null
+          is_active?: boolean | null
+          notes?: string | null
+          pan?: string | null
+          parent_agent_id?: string | null
+          phone?: string | null
+          posp_license_expiry?: string | null
+          posp_license_no?: string | null
+          split_percent?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          aadhaar?: string | null
+          agent_code?: string | null
+          agent_type?: string | null
+          bank_account?: string | null
+          bank_name?: string | null
+          company_id?: string
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          ifsc?: string | null
+          is_active?: boolean | null
+          notes?: string | null
+          pan?: string | null
+          parent_agent_id?: string | null
+          phone?: string | null
+          posp_license_expiry?: string | null
+          posp_license_no?: string | null
+          split_percent?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agents_profile_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agents_profile_parent_agent_id_fkey"
+            columns: ["parent_agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_suggestions: {
         Row: {
           created_at: string
@@ -244,6 +406,72 @@ export type Database = {
           },
         ]
       }
+      commission_rates: {
+        Row: {
+          company_id: string
+          created_at: string | null
+          effective_from: string | null
+          effective_to: string | null
+          id: string
+          insurer_id: string
+          net_rate: number | null
+          notes: string | null
+          od_rate: number | null
+          policy_type: string
+          product_subtype: string | null
+          reward_rate: number | null
+          tp_rate: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          insurer_id: string
+          net_rate?: number | null
+          notes?: string | null
+          od_rate?: number | null
+          policy_type: string
+          product_subtype?: string | null
+          reward_rate?: number | null
+          tp_rate?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string | null
+          effective_from?: string | null
+          effective_to?: string | null
+          id?: string
+          insurer_id?: string
+          net_rate?: number | null
+          notes?: string | null
+          od_rate?: number | null
+          policy_type?: string
+          product_subtype?: string | null
+          reward_rate?: number | null
+          tp_rate?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_rates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_rates_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companies: {
         Row: {
           code: string
@@ -454,6 +682,68 @@ export type Database = {
           vehicle_number?: string | null
         }
         Relationships: []
+      }
+      insurers: {
+        Row: {
+          category: string | null
+          company_id: string
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string | null
+          gst_applicable: boolean | null
+          id: string
+          is_active: boolean | null
+          name: string
+          notes: string | null
+          payout_cycle: string | null
+          short_code: string | null
+          tds_rate: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          category?: string | null
+          company_id: string
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          gst_applicable?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          notes?: string | null
+          payout_cycle?: string | null
+          short_code?: string | null
+          tds_rate?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string | null
+          company_id?: string
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string | null
+          gst_applicable?: boolean | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          notes?: string | null
+          payout_cycle?: string | null
+          short_code?: string | null
+          tds_rate?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insurers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_notes: {
         Row: {
@@ -760,6 +1050,154 @@ export type Database = {
           sort_order?: number
         }
         Relationships: []
+      }
+      policy_transactions: {
+        Row: {
+          agent_id: string | null
+          agent_payout: number | null
+          client_name: string | null
+          client_phone: string | null
+          commission_amount: number | null
+          commission_rate: number | null
+          company_id: string
+          company_share: number | null
+          created_at: string | null
+          created_by: string | null
+          expected_payout_date: string | null
+          gross_premium: number | null
+          gst_amount: number | null
+          id: string
+          insurer_id: string | null
+          lead_id: string | null
+          net_premium: number | null
+          notes: string | null
+          od_premium: number | null
+          payment_mode: string | null
+          policy_no: string | null
+          policy_type: string | null
+          product_subtype: string | null
+          received_amount: number | null
+          received_date: string | null
+          reward_amount: number | null
+          status: string | null
+          tds_amount: number | null
+          tp_premium: number | null
+          txn_date: string
+          updated_at: string | null
+          utr_ref: string | null
+        }
+        Insert: {
+          agent_id?: string | null
+          agent_payout?: number | null
+          client_name?: string | null
+          client_phone?: string | null
+          commission_amount?: number | null
+          commission_rate?: number | null
+          company_id: string
+          company_share?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          expected_payout_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          lead_id?: string | null
+          net_premium?: number | null
+          notes?: string | null
+          od_premium?: number | null
+          payment_mode?: string | null
+          policy_no?: string | null
+          policy_type?: string | null
+          product_subtype?: string | null
+          received_amount?: number | null
+          received_date?: string | null
+          reward_amount?: number | null
+          status?: string | null
+          tds_amount?: number | null
+          tp_premium?: number | null
+          txn_date?: string
+          updated_at?: string | null
+          utr_ref?: string | null
+        }
+        Update: {
+          agent_id?: string | null
+          agent_payout?: number | null
+          client_name?: string | null
+          client_phone?: string | null
+          commission_amount?: number | null
+          commission_rate?: number | null
+          company_id?: string
+          company_share?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          expected_payout_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          lead_id?: string | null
+          net_premium?: number | null
+          notes?: string | null
+          od_premium?: number | null
+          payment_mode?: string | null
+          policy_no?: string | null
+          policy_type?: string | null
+          product_subtype?: string | null
+          received_amount?: number | null
+          received_date?: string | null
+          reward_amount?: number | null
+          status?: string | null
+          tds_amount?: number | null
+          tp_premium?: number | null
+          txn_date?: string
+          updated_at?: string | null
+          utr_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "policy_transactions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
