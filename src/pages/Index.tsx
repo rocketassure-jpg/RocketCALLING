@@ -146,7 +146,7 @@ const Index = () => {
           <div className="grid gap-8 md:grid-cols-3">
             {[
               { num: "10K+", label: "Happy customers" },
-              { num: "₹50Cr+", label: "Claims settled" },
+              { num: "hundred", label: "Claims settled" },
               { num: "98%", label: "Claim success rate" },
             ].map((s) => (
               <div key={s.label} className="text-center neon-glass py-10">
