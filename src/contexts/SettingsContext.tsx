@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-export type RoleKey = "admin" | "manager" | "telecaller" | "agent";
+export type RoleKey = "admin" | "manager" | "telecaller" | "agent" | "sub_agent";
 
 export type MaskingConfig = Record<RoleKey, { masked: boolean; reveal_on_dial: boolean }>;
 
@@ -18,6 +18,7 @@ const DEFAULT_MASKING: MaskingConfig = {
   manager:    { masked: false, reveal_on_dial: false },
   telecaller: { masked: true,  reveal_on_dial: true  },
   agent:      { masked: true,  reveal_on_dial: false },
+  sub_agent:  { masked: true,  reveal_on_dial: false },
 };
 
 const DEFAULT_BRAND: BrandConfig = {
