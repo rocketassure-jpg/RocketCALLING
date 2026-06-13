@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2 } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench } from "lucide-react";
 import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
 import { MotorPanel } from "@/components/admin/motor/MotorPanel";
 import { HealthPanel } from "@/components/admin/health/HealthPanel";
@@ -39,6 +39,7 @@ import { Customer360Panel } from "@/components/admin/customers360/Customer360Pan
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
+import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -74,6 +75,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
   { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
   { id: "claims", label: "Claims", icon: ShieldCheck },
+  { id: "operations", label: "Operations", icon: Wrench },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "branches", label: "Branches", icon: Building2 },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
@@ -208,6 +210,7 @@ const AdminDashboard = () => {
       case "life": return <LifePanel />;
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
+      case "operations": return <OperationsPanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
