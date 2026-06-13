@@ -37,6 +37,7 @@ import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
+import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
