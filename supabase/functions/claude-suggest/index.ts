@@ -5,6 +5,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const truncate = (v: unknown, n: number) => String(v ?? "").replace(/[\r\n]+/g, " ").slice(0, n);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
@@ -15,15 +17,26 @@ Deno.serve(async (req) => {
     if (!claims?.claims) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
     const userId = claims.claims.sub;
 
+    // Role check — only CRM users can spend AI credits
+    const { data: roleRow } = await supabase
+      .from("user_roles").select("role").eq("user_id", userId)
+      .in("role", ["admin", "manager", "telecaller"]).maybeSingle();
+    if (!roleRow) return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
     const { lead_id, notes, customer_name, status } = await req.json();
     if (!notes && !customer_name) return new Response(JSON.stringify({ error: "notes or customer_name required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    // Sanitize / cap user-controlled prompt parts to limit prompt-injection / cost abuse
+    const safeName = truncate(customer_name, 120);
+    const safeStatus = truncate(status, 60);
+    const safeNotes = String(notes ?? "").slice(0, 2000);
 
     const claudeKey = Deno.env.get("ANTHROPIC_API_KEY");
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
     let suggestion = "";
     let model = "claude-3-5-sonnet-20241022";
 
-    const prompt = `You are an insurance CRM assistant for Rocket Services. Customer: ${customer_name || "—"}. Status: ${status || "—"}. Agent notes:\n${notes || "(no notes)"}\n\nGive 3 concise next-step recommendations for the agent in Hinglish, as a numbered list. Be practical and brief.`;
+    const prompt = `You are an insurance CRM assistant for Rocket Services. Customer: ${safeName || "—"}. Status: ${safeStatus || "—"}. Agent notes:\n${safeNotes || "(no notes)"}\n\nGive 3 concise next-step recommendations for the agent in Hinglish, as a numbered list. Be practical and brief.`;
 
     if (claudeKey) {
       const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -38,7 +51,6 @@ Deno.serve(async (req) => {
       const data = await r.json();
       suggestion = data.content?.[0]?.text || "";
     } else if (lovableKey) {
-      // Fallback to Lovable AI
       model = "google/gemini-3-flash-preview";
       const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",

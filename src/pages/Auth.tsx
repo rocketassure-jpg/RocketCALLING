@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,14 @@ const Auth = () => {
   const [companyName, setCompanyName] = useState("");
   const [companyPreview, setCompanyPreview] = useState<{ name: string } | null>(null);
   const [codeChecking, setCodeChecking] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteRequired, setInviteRequired] = useState(false);
+
+  useEffect(() => {
+    (supabase as any).rpc("invite_code_required").then(({ data }: any) => {
+      if (data === true) setInviteRequired(true);
+    });
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +57,14 @@ const Auth = () => {
     e.preventDefault();
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
+
+    // Enforce invite code when configured by admin
+    if (inviteRequired) {
+      if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
+      const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
+      if (!valid) return toast({ title: "Invalid invite code", variant: "destructive" });
+    }
+
     setLoading(true);
     const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole };
     if (signupMode === "join") meta.company_code = companyCode;
@@ -165,6 +181,15 @@ const Auth = () => {
                         </div>
                       )}
                     </div>
+
+                    {inviteRequired && (
+                      <div className="space-y-1.5">
+                        <Label>Invite Code *</Label>
+                        <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Admin se invite code lo" />
+                        <p className="text-xs text-muted-foreground">Aapki organisation ne signup ke liye invite code zaroori kar diya hai.</p>
+                      </div>
+                    )}
+
 
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account

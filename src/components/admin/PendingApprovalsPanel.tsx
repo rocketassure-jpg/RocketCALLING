@@ -38,8 +38,8 @@ export const PendingApprovalsPanel = () => {
       .eq("is_approved", false)
       .order("created_at", { ascending: false });
     setPending((data ?? []) as Pending[]);
-    const { data: s } = await (supabase as any).from("app_settings").select("invite_code").maybeSingle();
-    setInviteCode(s?.invite_code ?? "");
+    const { data: code } = await (supabase as any).rpc("get_invite_code");
+    setInviteCode(code ?? "");
     setLoading(false);
   };
 

@@ -1858,6 +1858,7 @@ export type Database = {
     }
     Functions: {
       get_active_modules: { Args: { _company_id: string }; Returns: string[] }
+      get_invite_code: { Args: never; Returns: string }
       has_module: {
         Args: { _company_id: string; _module_key: string }
         Returns: boolean
@@ -1869,6 +1870,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_code_required: { Args: never; Returns: boolean }
       is_approved: { Args: { _user_id: string }; Returns: boolean }
       is_manager_of: {
         Args: { _manager_id: string; _telecaller_id: string }
