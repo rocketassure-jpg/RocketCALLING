@@ -193,6 +193,8 @@ const AdminDashboard = () => {
       case "overview": return <AdminOverviewPanel />;
       case "accounts": return <AccountsPanel />;
       case "motor": return <MotorPanel />;
+      case "health": return <HealthPanel />;
+      case "life": return <LifePanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
