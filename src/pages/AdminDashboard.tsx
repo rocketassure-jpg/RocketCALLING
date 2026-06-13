@@ -132,6 +132,9 @@ const AdminDashboard = () => {
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"manager" | "telecaller">("telecaller");
+  // Team edit state
+  const [branchList, setBranchList] = useState<{ id: string; name: string }[]>([]);
+  const [editMember, setEditMember] = useState<{ profile: any; role: "admin" | "manager" | "telecaller" | "sub_agent" } | null>(null);
 
   const load = async () => {
     const [a, p, r, ta, l, cl] = await Promise.all([
