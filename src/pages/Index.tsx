@@ -83,13 +83,13 @@ const Index = () => {
 
           <div className="relative">
             <div className="absolute -inset-6 -z-10 rounded-3xl"
-                 style={{ background: "radial-gradient(circle at 50% 50%, rgba(57,255,20,0.25), transparent 60%)", filter: "blur(40px)" }} />
+                 style={{ background: "radial-gradient(circle at 50% 50%, rgba(255,123,0,0.20), transparent 60%)", filter: "blur(40px)" }} />
             <img
               src={heroImage.url}
               alt="Indian family protected by a neon insurance shield around their home and car"
               width={1920}
               height={1080}
-              className="w-full rounded-2xl border border-white/10 shadow-[0_0_60px_rgba(57,255,20,0.18)]"
+              className="w-full rounded-2xl border border-slate-200/60 shadow-[0_0_60px_rgba(255,123,0,0.12)]"
             />
           </div>
         </div>
