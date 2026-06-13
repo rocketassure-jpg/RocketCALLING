@@ -126,7 +126,35 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     () => (localStorage.getItem("callingViewMode") as "block" | "list") || "block"
   );
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [relatedPolicies, setRelatedPolicies] = useState<Record<string, string[]>>({});
   const policy = useMaskingPolicy();
+
+  // Group same-phone leads → show other policy types as badges on each row
+  useEffect(() => {
+    if (!leads.length) { setRelatedPolicies({}); return; }
+    const phones = Array.from(new Set(leads.map((l) => l.phone_number).filter(Boolean)));
+    if (!phones.length) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("leads")
+        .select("id,phone_number,policy_type")
+        .in("phone_number", phones);
+      if (cancelled) return;
+      const byPhone: Record<string, Set<string>> = {};
+      ((data ?? []) as any[]).forEach((r) => {
+        if (!r.phone_number || !r.policy_type) return;
+        (byPhone[r.phone_number] ||= new Set()).add(r.policy_type);
+      });
+      const map: Record<string, string[]> = {};
+      leads.forEach((l) => {
+        const others = Array.from(byPhone[l.phone_number] ?? new Set()).filter((p) => p !== l.policy_type);
+        if (others.length) map[l.id] = others;
+      });
+      setRelatedPolicies(map);
+    })();
+    return () => { cancelled = true; };
+  }, [leads]);
 
   const changeView = (m: "block" | "list") => {
     setViewMode(m);
@@ -430,6 +458,9 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                           <h3 className="text-base font-semibold">{lead.customer_name}</h3>
                           <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
                           <Badge variant="outline">{lead.policy_type}</Badge>
+                          {(relatedPolicies[lead.id] ?? []).map((p) => (
+                            <Badge key={p} variant="outline" className="border-accent/50 bg-accent/10 text-accent" title={`Same customer also has ${p} policy`}>+{p}</Badge>
+                          ))}
                           {overdue && <Badge className="bg-primary text-primary-foreground">Overdue</Badge>}
                           {isNext && <Badge className="bg-primary text-primary-foreground"><ArrowRight className="h-3 w-3" /> Next</Badge>}
                           {expirySoon && (
