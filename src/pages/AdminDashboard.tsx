@@ -200,6 +200,7 @@ const AdminDashboard = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
       case "accounts": return <AccountsPanel />;
+      case "brokers": return <BrokerPanel />;
       case "motor": return <MotorPanel />;
       case "health": return <HealthPanel />;
       case "life": return <LifePanel />;
