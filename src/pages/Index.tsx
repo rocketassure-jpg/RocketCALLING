@@ -20,9 +20,9 @@ const Index = () => {
       <div className="neon-particles" aria-hidden="true" />
 
       {/* Nav — Martian-style minimal */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#06121f]/80 backdrop-blur-lg">
+      <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur-lg">
         <div className="container flex h-16 items-center justify-between">
-          <div className="[&_span:last-child]:text-white [&_span:first-child]:!bg-transparent [&_svg]:!text-[#39ff14]">
+          <div className="[&_span:last-child]:text-slate-900 [&_span:first-child]:!bg-transparent [&_svg]:!text-[#ff7b00]">
             <Logo />
           </div>
           <nav className="hidden items-center gap-10 md:flex">
