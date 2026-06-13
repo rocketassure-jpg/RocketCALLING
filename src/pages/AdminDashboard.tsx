@@ -435,6 +435,14 @@ const AdminDashboard = () => {
           onAssign={bulkAssign}
         />
       )}
+      <EditMemberDialog
+        open={!!editMember}
+        onOpenChange={(v) => !v && setEditMember(null)}
+        member={editMember?.profile ?? null}
+        branches={branchList}
+        currentRole={editMember?.role ?? "telecaller"}
+        onSaved={load}
+      />
     </div>
   );
 };
