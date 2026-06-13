@@ -419,6 +419,362 @@ export type Database = {
         }
         Relationships: []
       }
+      broker_achievements: {
+        Row: {
+          achieved_amount: number
+          broker_id: string
+          company_id: string
+          id: string
+          last_updated: string
+          target_id: string
+        }
+        Insert: {
+          achieved_amount?: number
+          broker_id: string
+          company_id: string
+          id?: string
+          last_updated?: string
+          target_id: string
+        }
+        Update: {
+          achieved_amount?: number
+          broker_id?: string
+          company_id?: string
+          id?: string
+          last_updated?: string
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_achievements_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_achievements_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_achievements_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: true
+            referencedRelation: "broker_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_company_mapping: {
+        Row: {
+          broker_code: string | null
+          broker_id: string
+          company_id: string
+          created_at: string
+          id: string
+          insurer_id: string
+          is_active: boolean
+        }
+        Insert: {
+          broker_code?: string | null
+          broker_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+          insurer_id: string
+          is_active?: boolean
+        }
+        Update: {
+          broker_code?: string | null
+          broker_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          insurer_id?: string
+          is_active?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_company_mapping_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_company_mapping_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_company_mapping_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_payouts: {
+        Row: {
+          broker_id: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expected_amount: number
+          id: string
+          payout_date: string | null
+          period_end: string | null
+          period_label: string
+          period_start: string | null
+          received_amount: number
+          remarks: string | null
+          status: string
+          updated_at: string
+          utr_number: string | null
+        }
+        Insert: {
+          broker_id: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expected_amount?: number
+          id?: string
+          payout_date?: string | null
+          period_end?: string | null
+          period_label: string
+          period_start?: string | null
+          received_amount?: number
+          remarks?: string | null
+          status?: string
+          updated_at?: string
+          utr_number?: string | null
+        }
+        Update: {
+          broker_id?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expected_amount?: number
+          id?: string
+          payout_date?: string | null
+          period_end?: string | null
+          period_label?: string
+          period_start?: string | null
+          received_amount?: number
+          remarks?: string | null
+          status?: string
+          updated_at?: string
+          utr_number?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_payouts_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_payouts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_slabs: {
+        Row: {
+          broker_id: string
+          commission_rate: number
+          company_id: string
+          created_at: string
+          effective_from: string
+          effective_to: string | null
+          id: string
+          notes: string | null
+          slab_max: number | null
+          slab_min: number
+          target_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          broker_id: string
+          commission_rate: number
+          company_id: string
+          created_at?: string
+          effective_from: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          slab_max?: number | null
+          slab_min?: number
+          target_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          broker_id?: string
+          commission_rate?: number
+          company_id?: string
+          created_at?: string
+          effective_from?: string
+          effective_to?: string | null
+          id?: string
+          notes?: string | null
+          slab_max?: number | null
+          slab_min?: number
+          target_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_slabs_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_slabs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_slabs_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "broker_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      broker_targets: {
+        Row: {
+          broker_id: string
+          company_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          period_end: string
+          period_start: string
+          period_type: string
+          product_category: string
+          target_amount: number
+          updated_at: string
+        }
+        Insert: {
+          broker_id: string
+          company_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_end: string
+          period_start: string
+          period_type: string
+          product_category: string
+          target_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          broker_id?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          period_end?: string
+          period_start?: string
+          period_type?: string
+          product_category?: string
+          target_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "broker_targets_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "broker_targets_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brokers: {
+        Row: {
+          agreement_end: string | null
+          agreement_start: string | null
+          company_id: string
+          contact_person: string | null
+          created_at: string
+          created_by: string | null
+          email: string | null
+          gstin: string | null
+          id: string
+          mobile: string | null
+          name: string
+          notes: string | null
+          pan: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agreement_end?: string | null
+          agreement_start?: string | null
+          company_id: string
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          mobile?: string | null
+          name: string
+          notes?: string | null
+          pan?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agreement_end?: string | null
+          agreement_start?: string | null
+          company_id?: string
+          contact_person?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          gstin?: string | null
+          id?: string
+          mobile?: string | null
+          name?: string
+          notes?: string | null
+          pan?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brokers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       call_logs: {
         Row: {
           called_at: string
@@ -2041,6 +2397,7 @@ export type Database = {
         Row: {
           agent_id: string | null
           agent_payout: number | null
+          broker_id: string | null
           client_name: string | null
           client_phone: string | null
           commission_amount: number | null
@@ -2075,6 +2432,7 @@ export type Database = {
         Insert: {
           agent_id?: string | null
           agent_payout?: number | null
+          broker_id?: string | null
           client_name?: string | null
           client_phone?: string | null
           commission_amount?: number | null
@@ -2109,6 +2467,7 @@ export type Database = {
         Update: {
           agent_id?: string | null
           agent_payout?: number | null
+          broker_id?: string | null
           client_name?: string | null
           client_phone?: string | null
           commission_amount?: number | null
@@ -2146,6 +2505,13 @@ export type Database = {
             columns: ["agent_id"]
             isOneToOne: false
             referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_transactions_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
             referencedColumns: ["id"]
           },
           {
@@ -3328,6 +3694,21 @@ export type Database = {
     }
     Functions: {
       get_active_modules: { Args: { _company_id: string }; Returns: string[] }
+      get_applicable_slab: {
+        Args: {
+          _amount: number
+          _broker_id: string
+          _category: string
+          _on_date?: string
+        }
+        Returns: {
+          commission_rate: number
+          slab_id: string
+          slab_max: number
+          slab_min: number
+          target_id: string
+        }[]
+      }
       get_invite_code: { Args: never; Returns: string }
       has_module: {
         Args: { _company_id: string; _module_key: string }
