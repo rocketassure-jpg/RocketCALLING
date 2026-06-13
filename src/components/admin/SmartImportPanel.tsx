@@ -261,6 +261,16 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
               <Input value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g. June Renewals" />
             </div>
             <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" /> Branch (filter telecallers)</Label>
+              <Select value={branchId} onValueChange={(v) => { setBranchId(v); setSingleTelecaller(""); setRrSelected(new Set()); }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All branches</SelectItem>
+                  {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label>Assign Manager</Label>
               <Select value={managerId} onValueChange={setManagerId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
