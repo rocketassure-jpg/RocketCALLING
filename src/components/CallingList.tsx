@@ -148,7 +148,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
       });
       const map: Record<string, string[]> = {};
       leads.forEach((l) => {
-        const others = Array.from(byPhone[l.phone_number] ?? new Set()).filter((p) => p !== l.policy_type);
+        const others = Array.from(byPhone[l.phone_number] ?? new Set<string>()).filter((p) => p !== l.policy_type);
         if (others.length) map[l.id] = others;
       });
       setRelatedPolicies(map);
