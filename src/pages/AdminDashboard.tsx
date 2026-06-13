@@ -67,6 +67,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
   { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts" },
+  { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts" },
   { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance" },
   { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance" },
   { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
