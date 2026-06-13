@@ -71,20 +71,37 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
   const [areaTelecallerMap, setAreaTelecallerMap] = useState<Record<string, string[]>>({});
   const [importing, setImporting] = useState(false);
 
-  // NEW: Campaign / deadline / priority / manager
+  // NEW: Campaign / deadline / priority / manager / branch
   const [managers, setManagers] = useState<Manager[]>([]);
+  const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
+  const [branchId, setBranchId] = useState<string>("all");
+  const [tcBranchMap, setTcBranchMap] = useState<Record<string, string | null>>({});
   const [managerId, setManagerId] = useState<string>("none");
   const [campaignName, setCampaignName] = useState("");
   const [deadline, setDeadline] = useState("");
   const [priority, setPriority] = useState<"normal" | "high" | "urgent">("normal");
 
-  // Load managers
+  // Load managers + branches + tc→branch map
   useEffect(() => {
     supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "manager").then(({ data }) => {
       const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean) as Manager[];
       setManagers(list);
     });
+    supabase.from("branches").select("id,name").eq("is_active", true).order("name").then(({ data }) => {
+      setBranches((data ?? []) as any);
+    });
+    supabase.from("profiles").select("id,branch_id").then(({ data }) => {
+      const m: Record<string, string | null> = {};
+      ((data ?? []) as any[]).forEach((p) => { m[p.id] = p.branch_id ?? null; });
+      setTcBranchMap(m);
+    });
   }, []);
+
+  // Telecallers filtered by branch
+  const branchTelecallers = useMemo(() => {
+    if (branchId === "all") return telecallers;
+    return telecallers.filter((t) => tcBranchMap[t.id] === branchId);
+  }, [telecallers, tcBranchMap, branchId]);
 
   // Load telecaller_areas for byarea mode
   useEffect(() => {
