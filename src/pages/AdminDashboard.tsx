@@ -63,41 +63,48 @@ type CallLog = { id: string; lead_id: string; telecaller_id: string; status: str
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
-  { id: "overview", label: "Overview", icon: BarChart3 },
-  { id: "dashboard", label: "Wavelength", icon: LayoutDashboard },
-  { id: "calling", label: "Calling", icon: Phone },
-  { id: "enquiries", label: "Enquiries", icon: Inbox },
-  { id: "leads", label: "Leads", icon: Users },
-  { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts" },
-  { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts" },
-  { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance" },
-  { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance" },
-  { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
-  { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
-  { id: "claims", label: "Claims", icon: ShieldCheck },
-  { id: "operations", label: "Operations", icon: Wrench },
-  { id: "reports", label: "Reports", icon: BarChart3 },
-  { id: "areas", label: "Areas", icon: MapPin },
-  { id: "branches", label: "Branches", icon: Building2 },
-  { id: "renewals", label: "Renewals", icon: AlarmClock },
-  { id: "customer360", label: "Customer 360", icon: UserPlus },
-  { id: "customers", label: "Customers (Won)", icon: Trophy },
-  { id: "performance", label: "Performance", icon: BarChart3 },
-  { id: "team", label: "Team", icon: Shield },
-  { id: "approvals", label: "Pending Approvals", icon: UserPlus },
-  { id: "import", label: "Import", icon: Upload },
-  { id: "messaging", label: "WhatsApp", icon: MessageCircle },
-  { id: "calculator", label: "Premium Calculator", icon: Calculator },
-  { id: "training", label: "Training", icon: GraduationCap },
-  { id: "api", label: "API & Webhooks", icon: Webhook },
-  { id: "secrets", label: "API Keys", icon: Lock },
-  { id: "account", label: "Account Settings", icon: User },
-  { id: "settings", label: "General", icon: Settings },
-  { id: "permissions", label: "Permissions", icon: KeyRound },
-  { id: "fields", label: "CRM Fields", icon: Tags },
-  { id: "statuses", label: "Statuses", icon: ListChecks },
-  { id: "trash", label: "Trash (DNC)", icon: Ban },
+const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: string }[] = [
+  // Dashboards
+  { id: "overview", label: "Overview", icon: BarChart3, group: "Dashboards" },
+  { id: "dashboard", label: "Wavelength", icon: LayoutDashboard, group: "Dashboards" },
+  { id: "reports", label: "Reports", icon: BarChart3, group: "Dashboards" },
+  { id: "performance", label: "Performance", icon: BarChart3, group: "Dashboards" },
+  // Sales
+  { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
+  { id: "enquiries", label: "Enquiries", icon: Inbox, group: "Sales" },
+  { id: "leads", label: "Leads", icon: Users, group: "Sales" },
+  { id: "customers", label: "Customers (Won)", icon: Trophy, group: "Sales" },
+  { id: "customer360", label: "Customer 360", icon: UserPlus, group: "Sales" },
+  // Policies
+  { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance", group: "Policies" },
+  { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance", group: "Policies" },
+  { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance", group: "Policies" },
+  { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services", group: "Policies" },
+  { id: "renewals", label: "Renewals", icon: AlarmClock, group: "Policies" },
+  { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies" },
+  // Finance
+  { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts", group: "Finance" },
+  { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts", group: "Finance" },
+  { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
+  // Organization
+  { id: "branches", label: "Branches", icon: Building2, group: "Organization" },
+  { id: "areas", label: "Areas", icon: MapPin, group: "Organization" },
+  { id: "team", label: "Team", icon: Shield, group: "Organization" },
+  { id: "approvals", label: "Pending Approvals", icon: UserPlus, group: "Organization" },
+  // Tools
+  { id: "import", label: "Import", icon: Upload, group: "Tools" },
+  { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
+  { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
+  { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
+  // Settings
+  { id: "api", label: "API & Webhooks", icon: Webhook, group: "Settings" },
+  { id: "secrets", label: "API Keys", icon: Lock, group: "Settings" },
+  { id: "account", label: "Account Settings", icon: User, group: "Settings" },
+  { id: "settings", label: "General", icon: Settings, group: "Settings" },
+  { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
+  { id: "fields", label: "CRM Fields", icon: Tags, group: "Settings" },
+  { id: "statuses", label: "Statuses", icon: ListChecks, group: "Settings" },
+  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Settings" },
 ];
 
 const AdminDashboard = () => {
