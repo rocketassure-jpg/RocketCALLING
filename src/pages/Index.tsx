@@ -72,10 +72,10 @@ const Index = () => {
               </Button>
             </div>
             <div className="flex flex-wrap gap-3 pt-2 text-sm">
-              <div className="neon-glass flex items-center gap-2 px-4 py-2 text-white">
+              <div className="neon-glass flex items-center gap-2 px-4 py-2 text-slate-900">
                 <Award className="h-4 w-4 neon-accent" /> IRDAI certified
               </div>
-              <div className="neon-glass neon-glass-cyan flex items-center gap-2 px-4 py-2 text-white">
+              <div className="neon-glass neon-glass-cyan flex items-center gap-2 px-4 py-2 text-slate-900">
                 <Clock className="h-4 w-4 neon-cyan" /> 24×7 claim support
               </div>
             </div>
