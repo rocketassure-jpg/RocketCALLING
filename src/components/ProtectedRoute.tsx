@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
 import { PendingApproval } from "@/components/PendingApproval";
 
-type Role = "admin" | "manager" | "telecaller";
+type Role = "admin" | "manager" | "telecaller" | "sub_agent";
 
 export const ProtectedRoute = ({ children, requireRole, requireSuperAdmin }: { children: ReactNode; requireRole?: Role; requireSuperAdmin?: boolean }) => {
   const { user, role, loading, profileStatus, isSuperAdmin } = useAuth();
