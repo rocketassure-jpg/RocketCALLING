@@ -106,8 +106,15 @@ export const DataExplorerPanel = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Database className="h-5 w-5 text-primary" /> Platform Data Explorer</CardTitle>
-        <p className="text-xs text-muted-foreground">View &amp; download data from any company. Super admin only — bypasses RLS via service role.</p>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <CardTitle className="flex items-center gap-2"><Database className="h-5 w-5 text-primary" /> Platform Data Explorer</CardTitle>
+            <p className="text-xs text-muted-foreground">View &amp; download data from any company. Super admin only — bypasses RLS via service role.</p>
+          </div>
+          <Button size="sm" variant="default" onClick={seedDemo} disabled={seeding}>
+            {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Seed Wave Infocom Demo
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid gap-2 md:grid-cols-[1fr_1fr_120px_auto]">
