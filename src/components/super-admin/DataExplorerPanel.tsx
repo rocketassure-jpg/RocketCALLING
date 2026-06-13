@@ -21,7 +21,9 @@ const TABLES = [
 
 const toCSV = (rows: any[]) => {
   if (!rows.length) return "";
-  const cols = Array.from(rows.reduce((s, r) => { Object.keys(r).forEach((k) => s.add(k)); return s; }, new Set<string>()));
+  const colSet = new Set<string>();
+  rows.forEach((r) => Object.keys(r).forEach((k) => colSet.add(k)));
+  const cols = Array.from(colSet);
   const esc = (v: any) => {
     if (v == null) return "";
     const s = typeof v === "object" ? JSON.stringify(v) : String(v);
