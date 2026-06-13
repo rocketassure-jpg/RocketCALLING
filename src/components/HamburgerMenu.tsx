@@ -6,7 +6,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-export type MenuItem = { id: string; label: string; icon?: any };
+export type MenuItem = { id: string; label: string; icon?: any; group?: string };
 
 export const HamburgerMenu = ({
   items,
