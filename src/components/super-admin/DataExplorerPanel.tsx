@@ -40,7 +40,25 @@ export const DataExplorerPanel = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [seeding, setSeeding] = useState(false);
   const [filter, setFilter] = useState("");
+
+  const seedDemo = async () => {
+    if (!confirm("Seed Wave Infocom demo company with employees, customers, leads, brokers, policies, claims? (Login: admin@waveinfocom.demo / Demo@12345)")) return;
+    setSeeding(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(`https://lgqgnsngxhqdzpstiddj.supabase.co/functions/v1/super-admin-actions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ action: "seed_demo" }),
+    });
+    const j = await res.json();
+    setSeeding(false);
+    if (!res.ok) return toast({ title: "Seed failed", description: j.error, variant: "destructive" });
+    toast({ title: "Demo seeded ✓", description: `Login admin@waveinfocom.demo / Demo@12345. ${(j.log ?? []).length} steps done.` });
+    supabase.from("companies").select("id,name").order("name").then(({ data }) => setCompanies(data ?? []));
+    console.log("[seed_demo]", j);
+  };
 
   useEffect(() => {
     supabase.from("companies").select("id,name").order("name").then(({ data }) => setCompanies(data ?? []));
