@@ -42,6 +42,7 @@ import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
 import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
 import { ReportsPanel } from "@/components/admin/reports/ReportsPanel";
 import { AuditLogViewer } from "@/components/admin/audit/AuditLogViewer";
+import { AnnouncementsBanner } from "@/components/AnnouncementsBanner";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -411,6 +412,7 @@ const AdminDashboard = () => {
           <InstallPWA />
         </div>
       </header>
+      <AnnouncementsBanner />
       <main className="p-4 md:p-6"><Content /></main>
       {section === "leads" && (
         <BulkActionBar
