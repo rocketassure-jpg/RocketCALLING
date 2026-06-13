@@ -2147,6 +2147,259 @@ export type Database = {
         }
         Relationships: []
       }
+      rto_case_documents: {
+        Row: {
+          case_id: string
+          collected_at: string | null
+          company_id: string
+          created_at: string
+          document_name: string
+          document_url: string | null
+          id: string
+          is_collected: boolean | null
+          is_required: boolean | null
+          is_verified: boolean | null
+          notes: string | null
+        }
+        Insert: {
+          case_id: string
+          collected_at?: string | null
+          company_id: string
+          created_at?: string
+          document_name: string
+          document_url?: string | null
+          id?: string
+          is_collected?: boolean | null
+          is_required?: boolean | null
+          is_verified?: boolean | null
+          notes?: string | null
+        }
+        Update: {
+          case_id?: string
+          collected_at?: string | null
+          company_id?: string
+          created_at?: string
+          document_name?: string
+          document_url?: string | null
+          id?: string
+          is_collected?: boolean | null
+          is_required?: boolean | null
+          is_verified?: boolean | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rto_case_documents_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "rto_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rto_cases: {
+        Row: {
+          amount_collected: number | null
+          application_number: string | null
+          assigned_to: string | null
+          client_lead_id: string | null
+          company_id: string
+          completed_date: string | null
+          created_at: string
+          created_by: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          expected_completion_date: string | null
+          govt_fees: number | null
+          id: string
+          notes: string | null
+          payment_status: string | null
+          received_date: string | null
+          rto_office: string | null
+          service_charge: number | null
+          service_type_id: string
+          status: string
+          submitted_date: string | null
+          total_charges: number | null
+          updated_at: string
+          vehicle_id: string | null
+        }
+        Insert: {
+          amount_collected?: number | null
+          application_number?: string | null
+          assigned_to?: string | null
+          client_lead_id?: string | null
+          company_id: string
+          completed_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          expected_completion_date?: string | null
+          govt_fees?: number | null
+          id?: string
+          notes?: string | null
+          payment_status?: string | null
+          received_date?: string | null
+          rto_office?: string | null
+          service_charge?: number | null
+          service_type_id: string
+          status?: string
+          submitted_date?: string | null
+          total_charges?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Update: {
+          amount_collected?: number | null
+          application_number?: string | null
+          assigned_to?: string | null
+          client_lead_id?: string | null
+          company_id?: string
+          completed_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          expected_completion_date?: string | null
+          govt_fees?: number | null
+          id?: string
+          notes?: string | null
+          payment_status?: string | null
+          received_date?: string | null
+          rto_office?: string | null
+          service_charge?: number | null
+          service_type_id?: string
+          status?: string
+          submitted_date?: string | null
+          total_charges?: number | null
+          updated_at?: string
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rto_cases_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_cases_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_cases_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_cases_service_type_id_fkey"
+            columns: ["service_type_id"]
+            isOneToOne: false
+            referencedRelation: "rto_service_types"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rto_cases_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rto_service_types: {
+        Row: {
+          category: string
+          code: string
+          created_at: string
+          default_charges: number | null
+          default_documents: Json | null
+          description: string | null
+          estimated_days: number | null
+          govt_fees: number | null
+          id: string
+          is_active: boolean
+          name: string
+          service_charge: number | null
+        }
+        Insert: {
+          category: string
+          code: string
+          created_at?: string
+          default_charges?: number | null
+          default_documents?: Json | null
+          description?: string | null
+          estimated_days?: number | null
+          govt_fees?: number | null
+          id?: string
+          is_active?: boolean
+          name: string
+          service_charge?: number | null
+        }
+        Update: {
+          category?: string
+          code?: string
+          created_at?: string
+          default_charges?: number | null
+          default_documents?: Json | null
+          description?: string | null
+          estimated_days?: number | null
+          govt_fees?: number | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          service_charge?: number | null
+        }
+        Relationships: []
+      }
+      rto_status_history: {
+        Row: {
+          case_id: string
+          changed_at: string
+          changed_by: string | null
+          company_id: string
+          from_status: string | null
+          id: string
+          notes: string | null
+          to_status: string
+        }
+        Insert: {
+          case_id: string
+          changed_at?: string
+          changed_by?: string | null
+          company_id: string
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          to_status: string
+        }
+        Update: {
+          case_id?: string
+          changed_at?: string
+          changed_by?: string | null
+          company_id?: string
+          from_status?: string | null
+          id?: string
+          notes?: string | null
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rto_status_history_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "rto_cases"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sms_logs: {
         Row: {
           created_at: string
