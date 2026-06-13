@@ -736,6 +736,215 @@ export type Database = {
           },
         ]
       }
+      health_policies: {
+        Row: {
+          addons: Json | null
+          agent_id: string | null
+          base_sum_insured: number | null
+          client_lead_id: string | null
+          company_id: string
+          copay_percent: number | null
+          cover_type: string | null
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          end_date: string | null
+          gross_premium: number | null
+          gst_amount: number | null
+          id: string
+          insurer_id: string | null
+          issue_date: string | null
+          net_premium: number | null
+          network_hospitals: string | null
+          no_claim_bonus_percent: number | null
+          notes: string | null
+          payment_mode: string | null
+          payment_status: string | null
+          plan_name: string | null
+          plan_type: string | null
+          policy_number: string | null
+          pre_existing_disease: string | null
+          pre_existing_waiting_period: number | null
+          proposer_dob: string | null
+          proposer_name: string | null
+          proposer_phone: string | null
+          restore_benefit: boolean | null
+          room_rent_limit: string | null
+          start_date: string | null
+          status: string | null
+          sum_insured: number | null
+          tpa_card_number: string | null
+          tpa_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          addons?: Json | null
+          agent_id?: string | null
+          base_sum_insured?: number | null
+          client_lead_id?: string | null
+          company_id: string
+          copay_percent?: number | null
+          cover_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          end_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          issue_date?: string | null
+          net_premium?: number | null
+          network_hospitals?: string | null
+          no_claim_bonus_percent?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          plan_name?: string | null
+          plan_type?: string | null
+          policy_number?: string | null
+          pre_existing_disease?: string | null
+          pre_existing_waiting_period?: number | null
+          proposer_dob?: string | null
+          proposer_name?: string | null
+          proposer_phone?: string | null
+          restore_benefit?: boolean | null
+          room_rent_limit?: string | null
+          start_date?: string | null
+          status?: string | null
+          sum_insured?: number | null
+          tpa_card_number?: string | null
+          tpa_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          addons?: Json | null
+          agent_id?: string | null
+          base_sum_insured?: number | null
+          client_lead_id?: string | null
+          company_id?: string
+          copay_percent?: number | null
+          cover_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          end_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          issue_date?: string | null
+          net_premium?: number | null
+          network_hospitals?: string | null
+          no_claim_bonus_percent?: number | null
+          notes?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          plan_name?: string | null
+          plan_type?: string | null
+          policy_number?: string | null
+          pre_existing_disease?: string | null
+          pre_existing_waiting_period?: number | null
+          proposer_dob?: string | null
+          proposer_name?: string | null
+          proposer_phone?: string | null
+          restore_benefit?: boolean | null
+          room_rent_limit?: string | null
+          start_date?: string | null
+          status?: string | null
+          sum_insured?: number | null
+          tpa_card_number?: string | null
+          tpa_name?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_policies_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "health_policies_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_policy_members: {
+        Row: {
+          age: number | null
+          company_id: string
+          created_at: string
+          date_of_birth: string | null
+          gender: string | null
+          id: string
+          member_name: string
+          policy_id: string
+          pre_existing_conditions: string | null
+          relationship: string | null
+          sum_insured_share: number | null
+        }
+        Insert: {
+          age?: number | null
+          company_id: string
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          member_name: string
+          policy_id: string
+          pre_existing_conditions?: string | null
+          relationship?: string | null
+          sum_insured_share?: number | null
+        }
+        Update: {
+          age?: number | null
+          company_id?: string
+          created_at?: string
+          date_of_birth?: string | null
+          gender?: string | null
+          id?: string
+          member_name?: string
+          policy_id?: string
+          pre_existing_conditions?: string | null
+          relationship?: string | null
+          sum_insured_share?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_policy_members_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "health_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurers: {
         Row: {
           category: string | null
@@ -1028,6 +1237,262 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      life_nominees: {
+        Row: {
+          appointee_name: string | null
+          company_id: string
+          created_at: string
+          date_of_birth: string | null
+          id: string
+          is_minor: boolean | null
+          nominee_name: string
+          policy_id: string
+          relationship: string | null
+          share_percent: number | null
+        }
+        Insert: {
+          appointee_name?: string | null
+          company_id: string
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          is_minor?: boolean | null
+          nominee_name: string
+          policy_id: string
+          relationship?: string | null
+          share_percent?: number | null
+        }
+        Update: {
+          appointee_name?: string | null
+          company_id?: string
+          created_at?: string
+          date_of_birth?: string | null
+          id?: string
+          is_minor?: boolean | null
+          nominee_name?: string
+          policy_id?: string
+          relationship?: string | null
+          share_percent?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_nominees_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "life_policies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      life_policies: {
+        Row: {
+          agent_id: string | null
+          bonus_accumulated: number | null
+          client_lead_id: string | null
+          commencement_date: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          fund_value: number | null
+          grace_period_days: number | null
+          gross_premium: number | null
+          gst_amount: number | null
+          id: string
+          insurer_id: string | null
+          issue_date: string | null
+          lapsed_on: string | null
+          last_paid_date: string | null
+          life_assured_dob: string | null
+          life_assured_name: string | null
+          maturity_date: string | null
+          net_premium: number | null
+          next_due_date: string | null
+          notes: string | null
+          payment_mode: string | null
+          plan_name: string | null
+          plan_type: string | null
+          policy_number: string | null
+          policy_term_years: number | null
+          policyholder_dob: string | null
+          policyholder_name: string | null
+          policyholder_phone: string | null
+          premium_amount: number | null
+          premium_frequency: string | null
+          premium_paying_term_years: number | null
+          revival_window_days: number | null
+          rider_details: Json | null
+          status: string | null
+          sum_assured: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          bonus_accumulated?: number | null
+          client_lead_id?: string | null
+          commencement_date?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          fund_value?: number | null
+          grace_period_days?: number | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          issue_date?: string | null
+          lapsed_on?: string | null
+          last_paid_date?: string | null
+          life_assured_dob?: string | null
+          life_assured_name?: string | null
+          maturity_date?: string | null
+          net_premium?: number | null
+          next_due_date?: string | null
+          notes?: string | null
+          payment_mode?: string | null
+          plan_name?: string | null
+          plan_type?: string | null
+          policy_number?: string | null
+          policy_term_years?: number | null
+          policyholder_dob?: string | null
+          policyholder_name?: string | null
+          policyholder_phone?: string | null
+          premium_amount?: number | null
+          premium_frequency?: string | null
+          premium_paying_term_years?: number | null
+          revival_window_days?: number | null
+          rider_details?: Json | null
+          status?: string | null
+          sum_assured?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          bonus_accumulated?: number | null
+          client_lead_id?: string | null
+          commencement_date?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          fund_value?: number | null
+          grace_period_days?: number | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          issue_date?: string | null
+          lapsed_on?: string | null
+          last_paid_date?: string | null
+          life_assured_dob?: string | null
+          life_assured_name?: string | null
+          maturity_date?: string | null
+          net_premium?: number | null
+          next_due_date?: string | null
+          notes?: string | null
+          payment_mode?: string | null
+          plan_name?: string | null
+          plan_type?: string | null
+          policy_number?: string | null
+          policy_term_years?: number | null
+          policyholder_dob?: string | null
+          policyholder_name?: string | null
+          policyholder_phone?: string | null
+          premium_amount?: number | null
+          premium_frequency?: string | null
+          premium_paying_term_years?: number | null
+          revival_window_days?: number | null
+          rider_details?: Json | null
+          status?: string | null
+          sum_assured?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_policies_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "life_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "life_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "life_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "life_policies_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      life_premium_schedule: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          due_date: string
+          id: string
+          paid_amount: number | null
+          paid_date: string | null
+          payment_reference: string | null
+          policy_id: string
+          status: string | null
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          due_date: string
+          id?: string
+          paid_amount?: number | null
+          paid_date?: string | null
+          payment_reference?: string | null
+          policy_id: string
+          status?: string | null
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          due_date?: string
+          id?: string
+          paid_amount?: number | null
+          paid_date?: string | null
+          payment_reference?: string | null
+          policy_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "life_premium_schedule_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "life_policies"
             referencedColumns: ["id"]
           },
         ]
