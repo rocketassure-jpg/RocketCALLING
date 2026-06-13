@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Database, Download, RefreshCw, Loader2 } from "lucide-react";
+import { Database, Download, RefreshCw, Loader2, Sparkles } from "lucide-react";
 
 const TABLES = [
   "companies","profiles","user_roles","leads","customers","enquiries",
@@ -40,7 +40,25 @@ export const DataExplorerPanel = () => {
   const [rows, setRows] = useState<any[]>([]);
   const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [seeding, setSeeding] = useState(false);
   const [filter, setFilter] = useState("");
+
+  const seedDemo = async () => {
+    if (!confirm("Seed Wave Infocom demo company with employees, customers, leads, brokers, policies, claims? (Login: admin@waveinfocom.demo / Demo@12345)")) return;
+    setSeeding(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch(`https://lgqgnsngxhqdzpstiddj.supabase.co/functions/v1/super-admin-actions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+      body: JSON.stringify({ action: "seed_demo" }),
+    });
+    const j = await res.json();
+    setSeeding(false);
+    if (!res.ok) return toast({ title: "Seed failed", description: j.error, variant: "destructive" });
+    toast({ title: "Demo seeded ✓", description: `Login admin@waveinfocom.demo / Demo@12345. ${(j.log ?? []).length} steps done.` });
+    supabase.from("companies").select("id,name").order("name").then(({ data }) => setCompanies(data ?? []));
+    console.log("[seed_demo]", j);
+  };
 
   useEffect(() => {
     supabase.from("companies").select("id,name").order("name").then(({ data }) => setCompanies(data ?? []));
@@ -88,8 +106,15 @@ export const DataExplorerPanel = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2"><Database className="h-5 w-5 text-primary" /> Platform Data Explorer</CardTitle>
-        <p className="text-xs text-muted-foreground">View &amp; download data from any company. Super admin only — bypasses RLS via service role.</p>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <CardTitle className="flex items-center gap-2"><Database className="h-5 w-5 text-primary" /> Platform Data Explorer</CardTitle>
+            <p className="text-xs text-muted-foreground">View &amp; download data from any company. Super admin only — bypasses RLS via service role.</p>
+          </div>
+          <Button size="sm" variant="default" onClick={seedDemo} disabled={seeding}>
+            {seeding ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Seed Wave Infocom Demo
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid gap-2 md:grid-cols-[1fr_1fr_120px_auto]">
