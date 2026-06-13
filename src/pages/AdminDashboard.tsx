@@ -53,12 +53,13 @@ type CallLog = { id: string; lead_id: string; telecaller_id: string; status: str
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-const NAV: { id: string; label: string; icon: any }[] = [
+const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "overview", label: "Overview", icon: BarChart3 },
   { id: "dashboard", label: "Wavelength", icon: LayoutDashboard },
   { id: "calling", label: "Calling", icon: Phone },
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
+  { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts" },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
   { id: "customers", label: "Customers", icon: Trophy },
