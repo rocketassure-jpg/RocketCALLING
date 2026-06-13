@@ -40,6 +40,7 @@ import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
 import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
+import { ReportsPanel } from "@/components/admin/reports/ReportsPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -76,6 +77,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
   { id: "claims", label: "Claims", icon: ShieldCheck },
   { id: "operations", label: "Operations", icon: Wrench },
+  { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "branches", label: "Branches", icon: Building2 },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
@@ -211,6 +213,7 @@ const AdminDashboard = () => {
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
       case "operations": return <OperationsPanel />;
+      case "reports": return <ReportsPanel />;
       case "dashboard": return <WavelengthDashboard />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
