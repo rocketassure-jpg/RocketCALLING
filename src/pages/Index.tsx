@@ -16,13 +16,13 @@ const Index = () => {
   const [calcOpen, setCalcOpen] = useState(false);
 
   return (
-    <div className="neon-root min-h-screen relative" style={{ background: "#06121f" }}>
+    <div className="neon-root min-h-screen relative" style={{ background: "#f8fafc" }}>
       <div className="neon-particles" aria-hidden="true" />
 
       {/* Nav — Martian-style minimal */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#06121f]/80 backdrop-blur-lg">
+      <header className="sticky top-0 z-40 border-b border-slate-200/60 bg-white/70 backdrop-blur-lg">
         <div className="container flex h-16 items-center justify-between">
-          <div className="[&_span:last-child]:text-white [&_span:first-child]:!bg-transparent [&_svg]:!text-[#39ff14]">
+          <div className="[&_span:last-child]:text-slate-900 [&_span:first-child]:!bg-transparent [&_svg]:!text-[#ff7b00]">
             <Logo />
           </div>
           <nav className="hidden items-center gap-10 md:flex">
@@ -43,19 +43,19 @@ const Index = () => {
       {/* Hero — image right, headline left, Martian condensed type */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10"
-             style={{ background: "radial-gradient(900px 500px at 80% 30%, rgba(57,255,20,0.08), transparent 60%), radial-gradient(700px 400px at 10% 80%, rgba(0,212,255,0.07), transparent 60%), #06121f" }} />
+             style={{ background: "radial-gradient(900px 500px at 80% 30%, rgba(255,123,0,0.06), transparent 60%), radial-gradient(700px 400px at 10% 80%, rgba(0,212,255,0.05), transparent 60%), #f8fafc" }} />
         <div className="container grid items-center gap-10 py-16 md:py-24 lg:grid-cols-2 lg:py-32">
           <div className="space-y-7">
-            <span className="inline-flex items-center gap-2 rounded-full neon-glass px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-white">
+            <span className="inline-flex items-center gap-2 rounded-full neon-glass px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-900">
               <ShieldCheck className="h-3.5 w-3.5 neon-accent" /> Trusted by 10,000+ families
             </span>
-            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-white"
+            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900"
                 style={{ fontSize: "clamp(2.75rem, 8vw, 6.5rem)", fontStretch: "condensed", letterSpacing: "-0.02em" }}>
               <span className="block">INSURANCE</span>
               <span className="block neon-text-glow">EXPERT</span>
-              <span className="block text-white/40" style={{ fontSize: "0.55em" }}>FOR EVERY FAMILY</span>
+              <span className="block text-slate-400" style={{ fontSize: "0.55em" }}>FOR EVERY FAMILY</span>
             </h1>
-            <p className="max-w-md text-base text-white/60 md:text-lg">
+            <p className="max-w-md text-base text-slate-500 md:text-lg">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -72,10 +72,10 @@ const Index = () => {
               </Button>
             </div>
             <div className="flex flex-wrap gap-3 pt-2 text-sm">
-              <div className="neon-glass flex items-center gap-2 px-4 py-2 text-white">
+              <div className="neon-glass flex items-center gap-2 px-4 py-2 text-slate-900">
                 <Award className="h-4 w-4 neon-accent" /> IRDAI certified
               </div>
-              <div className="neon-glass neon-glass-cyan flex items-center gap-2 px-4 py-2 text-white">
+              <div className="neon-glass neon-glass-cyan flex items-center gap-2 px-4 py-2 text-slate-900">
                 <Clock className="h-4 w-4 neon-cyan" /> 24×7 claim support
               </div>
             </div>
@@ -83,13 +83,13 @@ const Index = () => {
 
           <div className="relative">
             <div className="absolute -inset-6 -z-10 rounded-3xl"
-                 style={{ background: "radial-gradient(circle at 50% 50%, rgba(57,255,20,0.25), transparent 60%)", filter: "blur(40px)" }} />
+                 style={{ background: "radial-gradient(circle at 50% 50%, rgba(255,123,0,0.20), transparent 60%)", filter: "blur(40px)" }} />
             <img
               src={heroImage.url}
               alt="Indian family protected by a neon insurance shield around their home and car"
               width={1920}
               height={1080}
-              className="w-full rounded-2xl border border-white/10 shadow-[0_0_60px_rgba(57,255,20,0.18)]"
+              className="w-full rounded-2xl border border-slate-200/60 shadow-[0_0_60px_rgba(255,123,0,0.12)]"
             />
           </div>
         </div>
@@ -99,7 +99,7 @@ const Index = () => {
       <section id="enquiry" className="container py-20">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 01 — Enquiry</p>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
             Tell us what you need
           </h2>
         </div>
@@ -112,26 +112,26 @@ const Index = () => {
       <section id="services" className="container py-20">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 02 — Services</p>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white" style={{ fontSize: "clamp(2.25rem, 6vw, 4.5rem)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900" style={{ fontSize: "clamp(2.25rem, 6vw, 4.5rem)" }}>
             Three pillars of <span className="neon-text-glow">protection</span>
           </h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {[
-            { icon: Heart, title: "Life Insurance", desc: "Secure your family's future with term & endowment plans starting from ₹500/month.", color: "#39ff14" },
+            { icon: Heart, title: "Life Insurance", desc: "Secure your family's future with term & endowment plans starting from ₹500/month.", color: "#ff7b00" },
             { icon: Stethoscope, title: "Health Insurance", desc: "Cashless treatment at 7,000+ hospitals. Cover up to ₹1 crore for the entire family.", color: "#00d4ff" },
-            { icon: Car, title: "Motor Insurance", desc: "Comprehensive 2-wheeler & 4-wheeler cover. Instant policy, zero-depreciation add-on.", color: "#39ff14" },
+            { icon: Car, title: "Motor Insurance", desc: "Comprehensive 2-wheeler & 4-wheeler cover. Instant policy, zero-depreciation add-on.", color: "#ff7b00" },
           ].map((s, i) => (
             <Card key={s.title} className="neon-glass neon-shine border-0">
               <CardContent className="p-8">
                 <div className="mb-5 flex items-center justify-between">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl"
-                       style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${s.color}`, color: s.color, boxShadow: `0 0 18px ${s.color}55` }}>
+                       style={{ background: "rgba(15,23,42,0.04)", border: `1px solid ${s.color}`, color: s.color, boxShadow: `0 0 18px ${s.color}55` }}>
                     <s.icon className="h-7 w-7" />
                   </div>
-                  <span className="text-xs font-mono text-white/30">0{i + 1}</span>
+                  <span className="text-xs font-mono text-slate-400">0{i + 1}</span>
                 </div>
-                <h3 className="mb-2 text-2xl font-bold text-white">{s.title}</h3>
+                <h3 className="mb-2 text-2xl font-bold text-slate-900">{s.title}</h3>
                 <p className="neon-muted">{s.desc}</p>
               </CardContent>
             </Card>
@@ -140,7 +140,7 @@ const Index = () => {
       </section>
 
       {/* Stats */}
-      <section id="why" className="py-20" style={{ background: "linear-gradient(180deg, #06121f 0%, #04101a 100%)" }}>
+      <section id="why" className="py-20" style={{ background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)" }}>
         <div className="container">
           <p className="mb-10 text-center text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 03 — By the numbers</p>
           <div className="grid gap-8 md:grid-cols-3">
@@ -161,8 +161,8 @@ const Index = () => {
       {/* CTA */}
       <section className="container py-20">
         <div className="rounded-3xl p-10 text-center md:p-16"
-             style={{ background: "linear-gradient(135deg, #06121f 0%, #052e10 100%)", border: "1px solid rgba(57,255,20,0.4)", boxShadow: "0 0 40px rgba(57,255,20,0.15)" }}>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white neon-text-glow" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
+             style={{ background: "linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)", border: "1px solid rgba(255,123,0,0.25)", boxShadow: "0 0 40px rgba(255,123,0,0.10)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900 neon-text-glow" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
             Ready to protect your family?
           </h2>
           <p className="mx-auto mt-4 max-w-xl neon-muted">Talk to a certified advisor today. No spam, no pressure — just honest guidance.</p>
@@ -179,9 +179,9 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="border-t border-white/5 bg-[#04101a] py-8">
+      <footer className="border-t border-slate-200/60 bg-white py-8">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="[&_span:last-child]:text-white">
+          <div className="[&_span:last-child]:text-slate-900">
             <Logo />
           </div>
           <p className="text-xs uppercase tracking-[0.2em] neon-muted">© {new Date().getFullYear()} Rocket Services — All rights reserved</p>
@@ -190,7 +190,7 @@ const Index = () => {
 
       {/* Premium Calculator Modal */}
       <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
-        <DialogContent className="neon-root max-w-4xl max-h-[90vh] overflow-y-auto border border-white/10 bg-[#06121f] p-6 text-white">
+        <DialogContent className="neon-root max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-200/60 bg-[#f8fafc] p-6 text-slate-900">
           <DialogHeader>
             <DialogTitle className="font-black uppercase tracking-tight neon-text-glow" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}>
               Premium Calculator
