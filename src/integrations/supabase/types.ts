@@ -330,6 +330,45 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          company_id: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          new_data: Json | null
+          old_data: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          new_data?: Json | null
+          old_data?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       branches: {
         Row: {
           address: string | null
@@ -1180,6 +1219,113 @@ export type Database = {
           },
         ]
       }
+      complaints: {
+        Row: {
+          assigned_to: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          id: string
+          opened_at: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          severity: string
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          opened_at?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          opened_at?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          severity?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "complaints_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_tracker: {
+        Row: {
+          agent_id: string | null
+          agent_name: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expiry_date: string
+          id: string
+          issue_date: string | null
+          license_no: string | null
+          license_type: string | null
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          agent_name: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string | null
+          license_no?: string | null
+          license_type?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          agent_name?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string | null
+          license_no?: string | null
+          license_type?: string | null
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       crm_fields: {
         Row: {
           created_at: string
@@ -1474,6 +1620,62 @@ export type Database = {
           vehicle_number?: string | null
         }
         Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          branch_id: string | null
+          category: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expense_date: string
+          id: string
+          notes: string | null
+          paid_to: string | null
+          payment_mode: string | null
+          reference_no: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          branch_id?: string | null
+          category: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          paid_to?: string | null
+          payment_mode?: string | null
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          branch_id?: string | null
+          category?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expense_date?: string
+          id?: string
+          notes?: string | null
+          paid_to?: string | null
+          payment_mode?: string | null
+          reference_no?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       fitness_certificates: {
         Row: {
@@ -2745,6 +2947,71 @@ export type Database = {
           },
         ]
       }
+      premium_remittance: {
+        Row: {
+          broker_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_name: string | null
+          discrepancy: boolean | null
+          expected_amount: number
+          id: string
+          notes: string | null
+          policy_number: string | null
+          policy_type: string | null
+          remittance_date: string | null
+          remitted_amount: number
+          status: string
+          updated_at: string
+          utr_no: string | null
+        }
+        Insert: {
+          broker_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          discrepancy?: boolean | null
+          expected_amount?: number
+          id?: string
+          notes?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          remittance_date?: string | null
+          remitted_amount?: number
+          status?: string
+          updated_at?: string
+          utr_no?: string | null
+        }
+        Update: {
+          broker_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          discrepancy?: boolean | null
+          expected_amount?: number
+          id?: string
+          notes?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          remittance_date?: string | null
+          remitted_amount?: number
+          status?: string
+          updated_at?: string
+          utr_no?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "premium_remittance_broker_id_fkey"
+            columns: ["broker_id"]
+            isOneToOne: false
+            referencedRelation: "brokers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           approved_at: string | null
@@ -3222,6 +3489,65 @@ export type Database = {
           },
         ]
       }
+      service_requests: {
+        Row: {
+          assigned_to: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          description: string | null
+          id: string
+          opened_at: string
+          priority: string
+          request_type: string
+          resolved_at: string | null
+          status: string
+          tat_hours: number | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          opened_at?: string
+          priority?: string
+          request_type: string
+          resolved_at?: string | null
+          status?: string
+          tat_hours?: number | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          description?: string | null
+          id?: string
+          opened_at?: string
+          priority?: string
+          request_type?: string
+          resolved_at?: string | null
+          status?: string
+          tat_hours?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sms_logs: {
         Row: {
           created_at: string
@@ -3252,6 +3578,60 @@ export type Database = {
           phone_number?: string
           sent_by?: string | null
           status?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          assigned_to: string | null
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          due_date: string | null
+          due_time: string | null
+          id: string
+          priority: string
+          related_id: string | null
+          related_type: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          due_time?: string | null
+          id?: string
+          priority?: string
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          due_date?: string | null
+          due_time?: string | null
+          id?: string
+          priority?: string
+          related_id?: string | null
+          related_type?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
