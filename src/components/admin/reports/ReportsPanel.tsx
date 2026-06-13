@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BarChart3, TrendingUp, Users, IndianRupee, Download, PieChart as PieIcon, Activity } from "lucide-react";
+import { BarChart3, TrendingUp, Users, IndianRupee, Download, PieChart as PieIcon, Activity, Building2 } from "lucide-react";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import { BranchPnL } from "./BranchPnL";
 
 type Range = "7d" | "30d" | "90d" | "ytd";
 const COLORS = ["hsl(var(--primary))", "hsl(var(--accent))", "hsl(142 71% 45%)", "hsl(45 93% 55%)", "hsl(217 91% 60%)", "hsl(280 70% 55%)"];
@@ -148,10 +149,11 @@ export const ReportsPanel = () => {
       </div>
 
       <Tabs defaultValue="premium">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-5">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-6">
           <TabsTrigger value="premium"><BarChart3 className="mr-1 h-4 w-4" /> Premium</TabsTrigger>
           <TabsTrigger value="conversion"><TrendingUp className="mr-1 h-4 w-4" /> Conversion</TabsTrigger>
           <TabsTrigger value="pnl"><Activity className="mr-1 h-4 w-4" /> P&L</TabsTrigger>
+          <TabsTrigger value="branch"><Building2 className="mr-1 h-4 w-4" /> Branch</TabsTrigger>
           <TabsTrigger value="claims"><PieIcon className="mr-1 h-4 w-4" /> Claims</TabsTrigger>
           <TabsTrigger value="expenses"><IndianRupee className="mr-1 h-4 w-4" /> Expenses</TabsTrigger>
         </TabsList>
@@ -235,6 +237,10 @@ export const ReportsPanel = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="branch" className="mt-4">
+          <BranchPnL />
         </TabsContent>
 
         <TabsContent value="claims" className="mt-4">
