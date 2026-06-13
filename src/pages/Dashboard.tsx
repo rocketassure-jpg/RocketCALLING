@@ -9,6 +9,7 @@ const Dashboard = () => {
   if (role === "admin") return <Navigate to="/admin" replace />;
   if (role === "manager") return <Navigate to="/manager" replace />;
   if (role === "telecaller") return <Navigate to="/telecaller" replace />;
+  if (role === "sub_agent") return <Navigate to="/sub-agent" replace />;
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-3 p-6 text-center">
       <h1 className="text-2xl font-bold">No role assigned yet</h1>

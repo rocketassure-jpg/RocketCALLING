@@ -11,6 +11,7 @@ const ROLES: { key: RoleKey; label: string; locked?: boolean }[] = [
   { key: "manager",    label: "Manager" },
   { key: "telecaller", label: "Telecaller" },
   { key: "agent",      label: "Agent" },
+  { key: "sub_agent",  label: "Sub-Agent (limited access)" },
 ];
 
 export const MaskingPolicyPanel = () => {
