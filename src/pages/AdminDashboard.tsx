@@ -137,16 +137,18 @@ const AdminDashboard = () => {
   const [editMember, setEditMember] = useState<{ profile: any; role: "admin" | "manager" | "telecaller" | "sub_agent" } | null>(null);
 
   const load = async () => {
-    const [a, p, r, ta, l, cl] = await Promise.all([
+    const [a, p, r, ta, l, cl, br] = await Promise.all([
       supabase.from("areas").select("*").order("name"),
-      supabase.from("profiles").select("id,full_name,manager_id"),
+      supabase.from("profiles").select("id,full_name,manager_id,branch_id"),
       supabase.from("user_roles").select("user_id,role"),
       supabase.from("telecaller_areas").select("*"),
       supabase.from("leads").select("id,customer_name,phone_number,area_id,policy_type,status,call_date,premium_amount,assigned_telecaller, areas(name)").order("created_at", { ascending: false }),
       supabase.from("call_logs").select("id,lead_id,telecaller_id,status,called_at").order("called_at", { ascending: false }),
+      supabase.from("branches").select("id,name").eq("is_active", true).order("name"),
     ]);
     setAreas(a.data ?? []); setProfiles(p.data ?? []); setRoles((r.data ?? []) as any);
     setAssignments(ta.data ?? []); setLeads((l.data ?? []) as any); setCallLogs((cl.data ?? []) as any);
+    setBranchList((br.data ?? []) as any);
   };
   useEffect(() => { load(); }, []);
 
