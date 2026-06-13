@@ -26,6 +26,16 @@ const Auth = () => {
   const [companyName, setCompanyName] = useState("");
   const [companyPreview, setCompanyPreview] = useState<{ name: string } | null>(null);
   const [codeChecking, setCodeChecking] = useState(false);
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteRequired, setInviteRequired] = useState(false);
+
+  // Check whether an invite code is required for signup
+  useState(() => {
+    (supabase as any).rpc("invite_code_required").then(({ data }: any) => {
+      if (data === true) setInviteRequired(true);
+    });
+    return undefined as any;
+  });
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +59,14 @@ const Auth = () => {
     e.preventDefault();
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
+
+    // Enforce invite code when configured by admin
+    if (inviteRequired) {
+      if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
+      const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
+      if (!valid) return toast({ title: "Invalid invite code", variant: "destructive" });
+    }
+
     setLoading(true);
     const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole };
     if (signupMode === "join") meta.company_code = companyCode;
