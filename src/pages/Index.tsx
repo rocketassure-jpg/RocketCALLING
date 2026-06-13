@@ -140,7 +140,7 @@ const Index = () => {
       </section>
 
       {/* Stats */}
-      <section id="why" className="py-20" style={{ background: "linear-gradient(180deg, #06121f 0%, #04101a 100%)" }}>
+      <section id="why" className="py-20" style={{ background: "linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)" }}>
         <div className="container">
           <p className="mb-10 text-center text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 03 — By the numbers</p>
           <div className="grid gap-8 md:grid-cols-3">
