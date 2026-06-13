@@ -312,7 +312,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader><CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Invite User</CardTitle></CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-4">
-              <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(e.target.value)} /></div>
+              <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(sanitizeName(e.target.value))} placeholder="No emoji / special chars" /></div>
               <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
               <div className="space-y-1.5"><Label>Role</Label>
                 <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
@@ -337,9 +337,14 @@ const AdminDashboard = () => {
             <CardHeader><CardTitle>Managers ({managers.length})</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {managers.length === 0 ? <p className="text-sm text-muted-foreground">No managers.</p> : managers.map((m) => (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 transition-all hover:shadow-md">
                   <div className="font-medium">{m.full_name || "(no name)"}</div>
-                  <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: m, role: "manager" })}>
+                      <Edit3 className="h-4 w-4" /> Edit
+                    </Button>
+                    <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+                  </div>
                 </div>
               ))}
             </CardContent>
@@ -362,6 +367,9 @@ const AdminDashboard = () => {
                           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Set manager" /></SelectTrigger>
                           <SelectContent><SelectItem value="none">No manager</SelectItem>{managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>)}</SelectContent>
                         </Select>
+                        <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: t, role: "telecaller" })}>
+                          <Edit3 className="h-4 w-4" /> Edit
+                        </Button>
                         <RemoveTeamButton name={t.full_name} onConfirm={() => removeFromTeam(t.id, "telecaller")} />
                       </div>
                     </div>
