@@ -124,6 +124,38 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "query_table") {
+      const table = String(body.table || "");
+      const limit = Math.min(Number(body.limit || 1000), 50000);
+      const companyId = body.company_id as string | undefined;
+      const ALLOWED = new Set([
+        "companies","profiles","user_roles","leads","customers","enquiries","call_logs","dial_logs",
+        "policy_transactions","motor_policies","health_policies","life_policies","claims","brokers",
+        "broker_payouts","broker_targets","broker_slabs","broker_achievements","broker_company_mapping",
+        "agent_payouts","commission_rates","insurers","branches","areas","tasks","expenses","complaints",
+        "service_requests","rto_cases","vehicles","rc_register","permits","fitness_certificates","puc_records",
+        "compliance_tracker","sms_logs","whatsapp_logs","webhook_events","audit_logs","super_admin_audit_log",
+        "impersonation_sessions","announcements","feature_flags","global_settings","plan_templates",
+        "modules","company_subscriptions","app_settings","training_materials","message_templates",
+        "lead_notes","lead_statuses","crm_fields","customer_documents","claim_documents","break_logs",
+        "ai_suggestions","premium_remittance","health_policy_members","life_nominees","life_premium_schedule",
+        "telecaller_areas","role_permissions","agents_profile"
+      ]);
+      if (!ALLOWED.has(table)) {
+        return new Response(JSON.stringify({ error: "Table not allowed" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      let q = admin.from(table).select("*", { count: "exact" }).limit(limit);
+      if (companyId && companyId !== "__all") q = q.eq("company_id", companyId);
+      const { data, error, count } = await q;
+      if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      await admin.from("super_admin_audit_log").insert({
+        super_admin_id: callerId, action_type: "data_export",
+        target_company_id: companyId && companyId !== "__all" ? companyId : null,
+        description: `Queried ${table} (${data?.length ?? 0} rows)`,
+      });
+      return new Response(JSON.stringify({ rows: data ?? [], count }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     return new Response(JSON.stringify({ error: "Unknown action" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   } catch (e: any) {
     return new Response(JSON.stringify({ error: e?.message ?? String(e) }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });

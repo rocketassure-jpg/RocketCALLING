@@ -61,7 +61,15 @@ const Index = () => {
           </div>
           <div className="relative">
             <div className="absolute -inset-4 rounded-3xl bg-gradient-hero opacity-20 blur-3xl" />
-            <img src={heroImg} alt="Rocket Services protects families" width={1536} height={1024} className="relative rounded-2xl shadow-elegant" />
+            <div className="relative aspect-video overflow-hidden rounded-2xl shadow-elegant">
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/Igjxvu7NOKw?autoplay=1&mute=1&loop=1&playlist=Igjxvu7NOKw&controls=1&rel=0&modestbranding=1"
+                title="Rocket Services Insurance"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
           </div>
         </div>
       </section>
