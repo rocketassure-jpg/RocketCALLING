@@ -190,7 +190,7 @@ const Index = () => {
 
       {/* Premium Calculator Modal */}
       <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
-        <DialogContent className="neon-root max-w-4xl max-h-[90vh] overflow-y-auto border border-white/10 bg-[#06121f] p-6 text-white">
+        <DialogContent className="neon-root max-w-4xl max-h-[90vh] overflow-y-auto border border-slate-200/60 bg-[#f8fafc] p-6 text-slate-900">
           <DialogHeader>
             <DialogTitle className="font-black uppercase tracking-tight neon-text-glow" style={{ fontSize: "clamp(1.5rem, 3vw, 2.25rem)" }}>
               Premium Calculator
