@@ -204,6 +204,7 @@ const AdminDashboard = () => {
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
       case "customers": return <CustomersPanel />;
+      case "customer360": return <Customer360Panel />;
       case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
