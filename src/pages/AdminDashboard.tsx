@@ -41,6 +41,7 @@ import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
 import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
 import { ReportsPanel } from "@/components/admin/reports/ReportsPanel";
+import { AuditLogViewer } from "@/components/admin/audit/AuditLogViewer";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -104,6 +105,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
   { id: "fields", label: "CRM Fields", icon: Tags, group: "Settings" },
   { id: "statuses", label: "Statuses", icon: ListChecks, group: "Settings" },
+  { id: "audit", label: "Audit Logs", icon: Shield, group: "Settings" },
   { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Settings" },
 ];
 
@@ -236,6 +238,7 @@ const AdminDashboard = () => {
       case "secrets": return <SecretsManager />;
       case "training": return <TrainingModule canManage={true} />;
       case "settings": return <GeneralSettings />;
+      case "audit": return <AuditLogViewer />;
       case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "approvals": return <PendingApprovalsPanel />;
