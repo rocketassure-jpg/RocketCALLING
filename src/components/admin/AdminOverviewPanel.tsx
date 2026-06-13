@@ -232,7 +232,7 @@ export const AdminOverviewPanel = () => {
       {/* Row 3 — Pipeline */}
       <div>
         <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Pipeline</div>
-        <div className="grid grid-cols-3 gap-2 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {pipelineCards.map((p) => (
             <StatCard key={p.key} icon={p.icon} label={p.key} value={pipeline[p.key] ?? 0} accent={p.accent} />
           ))}
