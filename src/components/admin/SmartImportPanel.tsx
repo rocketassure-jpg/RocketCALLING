@@ -319,16 +319,18 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
             <Select value={singleTelecaller} onValueChange={setSingleTelecaller}>
               <SelectTrigger><SelectValue placeholder="Choose telecaller" /></SelectTrigger>
               <SelectContent>
-                {telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
+                {branchTelecallers.length === 0 ? (
+                  <div className="px-2 py-3 text-xs text-muted-foreground">No telecaller in this branch</div>
+                ) : branchTelecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
               </SelectContent>
             </Select>
           )}
 
           {assignMode === "roundrobin" && (
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Leads in tabhi {rrSelected.size || 0} telecallers ke beech evenly distribute honge.</p>
+              <p className="text-xs text-muted-foreground">Leads {rrSelected.size || 0} telecallers ke beech evenly distribute honge {branchId !== "all" ? `(branch: ${branches.find(b=>b.id===branchId)?.name})` : ""}.</p>
               <div className="grid max-h-40 grid-cols-2 gap-2 overflow-y-auto md:grid-cols-3">
-                {telecallers.map((t) => (
+                {branchTelecallers.map((t) => (
                   <label key={t.id} className="flex items-center gap-2 rounded border p-2 text-xs cursor-pointer hover:bg-muted">
                     <Checkbox checked={rrSelected.has(t.id)} onCheckedChange={() => toggleRr(t.id)} />
                     <span className="truncate">{t.full_name || t.id.slice(0, 8)}</span>
