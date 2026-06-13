@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
-type Role = "admin" | "manager" | "telecaller" | null;
+type Role = "admin" | "manager" | "telecaller" | "sub_agent" | null;
 
 type ProfileStatus = {
   is_approved: boolean;
@@ -11,7 +11,11 @@ type ProfileStatus = {
 } | null;
 
 const pickRole = (roles: string[]): Role =>
-  roles.includes("admin") ? "admin" : roles.includes("manager") ? "manager" : roles.includes("telecaller") ? "telecaller" : null;
+  roles.includes("admin") ? "admin"
+  : roles.includes("manager") ? "manager"
+  : roles.includes("telecaller") ? "telecaller"
+  : roles.includes("sub_agent") ? "sub_agent"
+  : null;
 
 interface AuthCtx {
   user: User | null;
