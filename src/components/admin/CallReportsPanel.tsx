@@ -52,17 +52,24 @@ export const CallReportsPanel = () => {
       const since = startOf(range).toISOString();
       const { data } = await supabase
         .from("call_logs")
-        .select("id,called_at,status,notes,telecaller_id,lead_id,leads(customer_name,phone_number,policy_type,areas(name)),profiles!call_logs_telecaller_id_fkey(full_name)")
+        .select("id,called_at,status,notes,telecaller_id,lead_id,leads(customer_name,phone_number,policy_type,areas(name))")
         .gte("called_at", since)
         .order("called_at", { ascending: false })
         .limit(2000);
       if (!mounted) return;
-      const mapped: Row[] = ((data ?? []) as any[]).map((r) => ({
+      const raw = (data ?? []) as any[];
+      const tcIds = Array.from(new Set(raw.map((r) => r.telecaller_id).filter(Boolean)));
+      let nameMap: Record<string, string> = {};
+      if (tcIds.length) {
+        const { data: profs } = await supabase.from("profiles").select("id,full_name").in("id", tcIds);
+        nameMap = Object.fromEntries(((profs ?? []) as any[]).map((p) => [p.id, p.full_name ?? "—"]));
+      }
+      const mapped: Row[] = raw.map((r) => ({
         id: r.id,
         called_at: r.called_at,
         status: r.status,
         notes: r.notes,
-        telecaller_name: r.profiles?.full_name ?? "—",
+        telecaller_name: nameMap[r.telecaller_id] ?? "—",
         customer_name: r.leads?.customer_name ?? "—",
         phone: r.leads?.phone_number ?? "—",
         area: r.leads?.areas?.name ?? "—",
