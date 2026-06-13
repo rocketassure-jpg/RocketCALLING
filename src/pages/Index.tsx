@@ -16,7 +16,7 @@ const Index = () => {
   const [calcOpen, setCalcOpen] = useState(false);
 
   return (
-    <div className="neon-root min-h-screen relative" style={{ background: "#06121f" }}>
+    <div className="neon-root min-h-screen relative" style={{ background: "#f8fafc" }}>
       <div className="neon-particles" aria-hidden="true" />
 
       {/* Nav — Martian-style minimal */}
