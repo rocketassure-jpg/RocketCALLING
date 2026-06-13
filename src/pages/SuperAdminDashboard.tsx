@@ -190,7 +190,7 @@ const SuperAdminDashboard = () => {
         </aside>
 
         <main className="space-y-4 min-w-0">
-          <div className="rounded-xl bg-background p-4 text-foreground">
+          <div className="rounded-xl bg-background p-3 sm:p-4 text-foreground overflow-x-auto">
             {section === "dashboard" && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
