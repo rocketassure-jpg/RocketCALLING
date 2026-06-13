@@ -34,13 +34,27 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const autoMap = (header: string): string => {
   const h = norm(header);
   for (const t of TARGETS) if (norm(t.key) === h || norm(t.label) === h) return t.key;
-  if (h.includes("name") && !h.includes("area")) return "customer_name";
-  if (h.includes("phone") || h.includes("mobile") || h.includes("contact")) return "phone_number";
-  if (h.includes("area") || h.includes("city")) return "area_name";
-  if (h.includes("policy") || h.includes("type")) return "policy_type";
+  if (h.includes("name") && !h.includes("area") && !h.includes("company") && !h.includes("nominee")) return "customer_name";
+  if (h.includes("phone") || h.includes("mobile") || h.includes("contact") || h === "no" || h === "number") return "phone_number";
+  if (h.includes("area") || h.includes("city") || h.includes("location")) return "area_name";
+  if (
+    h.includes("policy") || h.includes("type") || h.includes("product") || h.includes("category") ||
+    h.includes("mediclaim") || h.includes("health") || h.includes("motor") || h.includes("vehicle") ||
+    h.includes("twowheeler") || h.includes("fourwheeler") || h.includes("car") || h.includes("bike") ||
+    h.includes("life") || h.includes("term")
+  ) return "policy_type";
   if (h.includes("date")) return "call_date";
-  if (h.includes("premium") || h.includes("amount")) return "premium_amount";
+  if (h.includes("premium") || h.includes("amount") || h.includes("sumassured") || h.includes("price")) return "premium_amount";
   return SKIP;
+};
+
+// Smart policy detection from raw value or header
+const detectPolicy = (v: string, header?: string): string | null => {
+  const s = (v + " " + (header ?? "")).toLowerCase();
+  if (/(health|mediclaim|family\s*floater|individual\s*health)/.test(s)) return "Health";
+  if (/(motor|vehicle|car|bike|two[-\s]*wheeler|four[-\s]*wheeler|comm.*vehicle|cv|tw|fw)/.test(s)) return "Motor";
+  if (/(life|term|ulip|endowment|whole\s*life|annuity)/.test(s)) return "Life";
+  return null;
 };
 
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
@@ -57,20 +71,37 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
   const [areaTelecallerMap, setAreaTelecallerMap] = useState<Record<string, string[]>>({});
   const [importing, setImporting] = useState(false);
 
-  // NEW: Campaign / deadline / priority / manager
+  // NEW: Campaign / deadline / priority / manager / branch
   const [managers, setManagers] = useState<Manager[]>([]);
+  const [branches, setBranches] = useState<{ id: string; name: string }[]>([]);
+  const [branchId, setBranchId] = useState<string>("all");
+  const [tcBranchMap, setTcBranchMap] = useState<Record<string, string | null>>({});
   const [managerId, setManagerId] = useState<string>("none");
   const [campaignName, setCampaignName] = useState("");
   const [deadline, setDeadline] = useState("");
   const [priority, setPriority] = useState<"normal" | "high" | "urgent">("normal");
 
-  // Load managers
+  // Load managers + branches + tc→branch map
   useEffect(() => {
     supabase.from("user_roles").select("user_id, profiles(id,full_name)").eq("role", "manager").then(({ data }) => {
       const list = (data ?? []).map((r: any) => r.profiles).filter(Boolean) as Manager[];
       setManagers(list);
     });
+    supabase.from("branches").select("id,name").eq("is_active", true).order("name").then(({ data }) => {
+      setBranches((data ?? []) as any);
+    });
+    supabase.from("profiles").select("id,branch_id").then(({ data }) => {
+      const m: Record<string, string | null> = {};
+      ((data ?? []) as any[]).forEach((p) => { m[p.id] = p.branch_id ?? null; });
+      setTcBranchMap(m);
+    });
   }, []);
+
+  // Telecallers filtered by branch
+  const branchTelecallers = useMemo(() => {
+    if (branchId === "all") return telecallers;
+    return telecallers.filter((t) => tcBranchMap[t.id] === branchId);
+  }, [telecallers, tcBranchMap, branchId]);
 
   // Load telecaller_areas for byarea mode
   useEffect(() => {
@@ -161,7 +192,8 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
           const id = areaMap.get(String(v).toLowerCase());
           if (id) o.area_id = id;
         } else if (target === "policy_type") {
-          o.policy_type = POLICIES.includes(String(v)) ? v : "Motor";
+          const detected = detectPolicy(String(v), col);
+          o.policy_type = detected ?? (POLICIES.includes(String(v)) ? v : "Motor");
         } else if (target === "premium_amount") {
           o.premium_amount = Number(String(v).replace(/[^\d.-]/g, "")) || 0;
         } else if (target === "phone_number") {
@@ -229,6 +261,16 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
               <Input value={campaignName} onChange={(e) => setCampaignName(e.target.value)} placeholder="e.g. June Renewals" />
             </div>
             <div className="space-y-1.5">
+              <Label className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" /> Branch (filter telecallers)</Label>
+              <Select value={branchId} onValueChange={(v) => { setBranchId(v); setSingleTelecaller(""); setRrSelected(new Set()); }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All branches</SelectItem>
+                  {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
               <Label>Assign Manager</Label>
               <Select value={managerId} onValueChange={setManagerId}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
@@ -287,16 +329,18 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
             <Select value={singleTelecaller} onValueChange={setSingleTelecaller}>
               <SelectTrigger><SelectValue placeholder="Choose telecaller" /></SelectTrigger>
               <SelectContent>
-                {telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
+                {branchTelecallers.length === 0 ? (
+                  <div className="px-2 py-3 text-xs text-muted-foreground">No telecaller in this branch</div>
+                ) : branchTelecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}
               </SelectContent>
             </Select>
           )}
 
           {assignMode === "roundrobin" && (
             <div className="space-y-2">
-              <p className="text-xs text-muted-foreground">Leads in tabhi {rrSelected.size || 0} telecallers ke beech evenly distribute honge.</p>
+              <p className="text-xs text-muted-foreground">Leads {rrSelected.size || 0} telecallers ke beech evenly distribute honge {branchId !== "all" ? `(branch: ${branches.find(b=>b.id===branchId)?.name})` : ""}.</p>
               <div className="grid max-h-40 grid-cols-2 gap-2 overflow-y-auto md:grid-cols-3">
-                {telecallers.map((t) => (
+                {branchTelecallers.map((t) => (
                   <label key={t.id} className="flex items-center gap-2 rounded border p-2 text-xs cursor-pointer hover:bg-muted">
                     <Checkbox checked={rrSelected.has(t.id)} onCheckedChange={() => toggleRr(t.id)} />
                     <span className="truncate">{t.full_name || t.id.slice(0, 8)}</span>

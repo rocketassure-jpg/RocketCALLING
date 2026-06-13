@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3 } from "lucide-react";
+import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
 import { MotorPanel } from "@/components/admin/motor/MotorPanel";
 import { HealthPanel } from "@/components/admin/health/HealthPanel";
@@ -131,18 +132,23 @@ const AdminDashboard = () => {
   const [inviteName, setInviteName] = useState("");
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState<"manager" | "telecaller">("telecaller");
+  // Team edit state
+  const [branchList, setBranchList] = useState<{ id: string; name: string }[]>([]);
+  const [editMember, setEditMember] = useState<{ profile: any; role: "admin" | "manager" | "telecaller" | "sub_agent" } | null>(null);
 
   const load = async () => {
-    const [a, p, r, ta, l, cl] = await Promise.all([
+    const [a, p, r, ta, l, cl, br] = await Promise.all([
       supabase.from("areas").select("*").order("name"),
-      supabase.from("profiles").select("id,full_name,manager_id"),
+      supabase.from("profiles").select("id,full_name,manager_id,branch_id"),
       supabase.from("user_roles").select("user_id,role"),
       supabase.from("telecaller_areas").select("*"),
       supabase.from("leads").select("id,customer_name,phone_number,area_id,policy_type,status,call_date,premium_amount,assigned_telecaller, areas(name)").order("created_at", { ascending: false }),
       supabase.from("call_logs").select("id,lead_id,telecaller_id,status,called_at").order("called_at", { ascending: false }),
+      supabase.from("branches").select("id,name").eq("is_active", true).order("name"),
     ]);
     setAreas(a.data ?? []); setProfiles(p.data ?? []); setRoles((r.data ?? []) as any);
     setAssignments(ta.data ?? []); setLeads((l.data ?? []) as any); setCallLogs((cl.data ?? []) as any);
+    setBranchList((br.data ?? []) as any);
   };
   useEffect(() => { load(); }, []);
 
@@ -306,7 +312,7 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader><CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Invite User</CardTitle></CardHeader>
             <CardContent className="grid gap-3 md:grid-cols-4">
-              <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(e.target.value)} /></div>
+              <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(sanitizeName(e.target.value))} placeholder="No emoji / special chars" /></div>
               <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
               <div className="space-y-1.5"><Label>Role</Label>
                 <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
@@ -331,9 +337,14 @@ const AdminDashboard = () => {
             <CardHeader><CardTitle>Managers ({managers.length})</CardTitle></CardHeader>
             <CardContent className="space-y-2">
               {managers.length === 0 ? <p className="text-sm text-muted-foreground">No managers.</p> : managers.map((m) => (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 transition-all hover:shadow-md">
                   <div className="font-medium">{m.full_name || "(no name)"}</div>
-                  <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: m, role: "manager" })}>
+                      <Edit3 className="h-4 w-4" /> Edit
+                    </Button>
+                    <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+                  </div>
                 </div>
               ))}
             </CardContent>
@@ -356,6 +367,9 @@ const AdminDashboard = () => {
                           <SelectTrigger className="w-[180px]"><SelectValue placeholder="Set manager" /></SelectTrigger>
                           <SelectContent><SelectItem value="none">No manager</SelectItem>{managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>)}</SelectContent>
                         </Select>
+                        <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: t, role: "telecaller" })}>
+                          <Edit3 className="h-4 w-4" /> Edit
+                        </Button>
                         <RemoveTeamButton name={t.full_name} onConfirm={() => removeFromTeam(t.id, "telecaller")} />
                       </div>
                     </div>
@@ -421,6 +435,14 @@ const AdminDashboard = () => {
           onAssign={bulkAssign}
         />
       )}
+      <EditMemberDialog
+        open={!!editMember}
+        onOpenChange={(v) => !v && setEditMember(null)}
+        member={editMember?.profile ?? null}
+        branches={branchList}
+        currentRole={editMember?.role ?? "telecaller"}
+        onSaved={load}
+      />
     </div>
   );
 };
