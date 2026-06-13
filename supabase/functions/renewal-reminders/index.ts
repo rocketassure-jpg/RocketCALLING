@@ -13,6 +13,21 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
+    // Auth: require a shared CRON_SECRET (set in edge function secrets +
+    // passed by pg_cron as the x-cron-secret header) OR a valid service-role JWT.
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+    const providedSecret = req.headers.get("x-cron-secret") ?? "";
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const isCron = cronSecret.length > 0 && providedSecret === cronSecret;
+    const isService =
+      authHeader === `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`;
+    if (!isCron && !isService) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
