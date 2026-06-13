@@ -35,6 +35,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
+import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -70,7 +71,8 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
-  { id: "customers", label: "Customers", icon: Trophy },
+  { id: "customer360", label: "Customer 360", icon: UserPlus },
+  { id: "customers", label: "Customers (Won)", icon: Trophy },
   { id: "performance", label: "Performance", icon: BarChart3 },
   { id: "team", label: "Team", icon: Shield },
   { id: "approvals", label: "Pending Approvals", icon: UserPlus },
@@ -202,6 +204,7 @@ const AdminDashboard = () => {
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
       case "customers": return <CustomersPanel />;
+      case "customer360": return <Customer360Panel />;
       case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
