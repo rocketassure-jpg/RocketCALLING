@@ -36,6 +36,7 @@ import { BulkActionBar } from "@/components/BulkActionBar";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
+import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -70,6 +71,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
   { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
   { id: "areas", label: "Areas", icon: MapPin },
+  { id: "branches", label: "Branches", icon: Building2 },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
   { id: "customer360", label: "Customer 360", icon: UserPlus },
   { id: "customers", label: "Customers (Won)", icon: Trophy },
@@ -205,6 +207,7 @@ const AdminDashboard = () => {
       case "renewals": return <RenewalsPanel />;
       case "customers": return <CustomersPanel />;
       case "customer360": return <Customer360Panel />;
+      case "branches": return <BranchesPanel />;
       case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
