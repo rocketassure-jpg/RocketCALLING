@@ -11,7 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet } from "lucide-react";
+import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
+import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
 import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
