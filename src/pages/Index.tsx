@@ -179,9 +179,9 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="border-t border-white/5 bg-[#04101a] py-8">
+      <footer className="border-t border-slate-200/60 bg-white py-8">
         <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-          <div className="[&_span:last-child]:text-white">
+          <div className="[&_span:last-child]:text-slate-900">
             <Logo />
           </div>
           <p className="text-xs uppercase tracking-[0.2em] neon-muted">© {new Date().getFullYear()} Rocket Services — All rights reserved</p>
