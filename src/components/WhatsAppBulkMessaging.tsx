@@ -9,29 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { RefreshCw, Send, Smartphone, QrCode, Loader2, AlertTriangle } from "lucide-react";
 
-const BRIDGE_URL = (import.meta.env.VITE_BRIDGE_URL as string) || "";
-const BRIDGE_API_KEY = (import.meta.env.VITE_BRIDGE_API_KEY as string) || "";
-const BRIDGE_CONFIGURED = !!BRIDGE_URL && !!BRIDGE_API_KEY;
-
-const headers: HeadersInit = {
-  "x-api-key": BRIDGE_API_KEY,
-  "Content-Type": "application/json",
-  Accept: "application/json, image/*;q=0.9, */*;q=0.8",
-};
-
 type Lead = { id: string; customer_name: string; phone_number: string };
 type Status = "loading" | "connected" | "disconnected" | "error";
 
-const safeFetch = async (path: string, init?: RequestInit) => {
+const callBridge = async (action: "status" | "qr" | "send", payload: Record<string, unknown> = {}) => {
   try {
-    const r = await fetch(`${BRIDGE_URL}${path}`, {
-      ...init,
-      headers: { ...headers, ...(init?.headers || {}) },
-      mode: "cors",
+    const { data, error } = await supabase.functions.invoke("whatsapp-bridge", {
+      body: { action, ...payload },
     });
-    return { ok: r.ok, res: r, error: null as string | null };
+    if (error) return { ok: false, data: null as any, error: error.message };
+    return { ok: true, data, error: null as string | null };
   } catch (e: any) {
-    return { ok: false, res: null, error: e?.message || "Network/CORS error" };
+    return { ok: false, data: null, error: e?.message || "Network error" };
   }
 };
 
@@ -51,25 +40,17 @@ export const WhatsAppBulkMessaging = () => {
   const qrTimerRef = useRef<number | null>(null);
 
   const fetchStatus = async () => {
-    const { ok, res, error } = await safeFetch("/status");
-    if (!ok || !res) {
+    const { ok, data, error } = await callBridge("status");
+    if (!ok) {
       setStatus("error");
-      setStatusMsg(error || "Bridge reachable nahi hai (CORS/network)");
+      setStatusMsg(error || "Bridge reachable nahi hai");
       return;
     }
-    try {
-      const j = await res.json();
-      const connected = j.connected || j.status === "connected" || j.ready === true;
-      setStatus(connected ? "connected" : "disconnected");
-      setStatusMsg(j.message || j.status || (connected ? "Connected ✓" : "WhatsApp connect nahi hai — QR scan karo"));
-      if (connected) {
-        setQr(null);
-        setQrError(null);
-      }
-    } catch {
-      setStatus("error");
-      setStatusMsg("Status response parse nahi ho saka");
-    }
+    const j: any = data || {};
+    const connected = j.connected || j.status === "connected" || j.ready === true;
+    setStatus(connected ? "connected" : "disconnected");
+    setStatusMsg(j.message || j.status || (connected ? "Connected ✓" : "WhatsApp connect nahi hai — QR scan karo"));
+    if (connected) { setQr(null); setQrError(null); }
   };
 
   const fetchQR = async () => {
@@ -79,36 +60,14 @@ export const WhatsAppBulkMessaging = () => {
     if (qrTimerRef.current) window.clearInterval(qrTimerRef.current);
     qrTimerRef.current = window.setInterval(() => setQrElapsed((s) => s + 1), 1000);
 
-    const { ok, res, error } = await safeFetch("/qr");
-    if (qrTimerRef.current) {
-      window.clearInterval(qrTimerRef.current);
-      qrTimerRef.current = null;
-    }
+    const { ok, data, error } = await callBridge("qr");
+    if (qrTimerRef.current) { window.clearInterval(qrTimerRef.current); qrTimerRef.current = null; }
     setQrLoading(false);
-
-    if (!ok || !res) {
-      setQr(null);
-      setQrError(error || "QR fetch fail — bridge ya CORS check karo");
-      return;
-    }
-    try {
-      const ct = res.headers.get("content-type") || "";
-      if (ct.includes("application/json")) {
-        const j = await res.json();
-        const val = j.qr || j.qrCode || j.dataUrl || j.image || null;
-        if (!val) setQrError(j.message || "QR abhi ready nahi hai, thodi der baad try karo");
-        setQr(val);
-      } else if (ct.includes("image")) {
-        const blob = await res.blob();
-        setQr(URL.createObjectURL(blob));
-      } else {
-        const txt = await res.text();
-        if (txt.startsWith("data:") || txt.startsWith("http")) setQr(txt);
-        else setQrError("Unknown QR response format");
-      }
-    } catch (e: any) {
-      setQrError(e?.message || "QR parse fail");
-    }
+    if (!ok) { setQr(null); setQrError(error || "QR fetch fail"); return; }
+    const j: any = data || {};
+    const val = j.qr || j.qrCode || j.dataUrl || j.image || null;
+    if (!val) setQrError(j.message || "QR abhi ready nahi hai, thodi der baad try karo");
+    setQr(val);
   };
 
   const loadLeads = async () => {
@@ -156,10 +115,7 @@ export const WhatsAppBulkMessaging = () => {
     for (const l of targets) {
       const text = message.replace(/\{name\}/gi, l.customer_name || "");
       const phone = (l.phone_number || "").replace(/\D/g, "");
-      const r = await safeFetch("/send", {
-        method: "POST",
-        body: JSON.stringify({ phone, number: phone, message: text, text }),
-      });
+      const r = await callBridge("send", { phone, message: text });
       if (r.ok) ok++; else fail++;
       await new Promise((res) => setTimeout(res, 500));
     }
@@ -175,26 +131,6 @@ export const WhatsAppBulkMessaging = () => {
     : "bg-muted text-muted-foreground";
 
   const isImageQr = qr && (qr.startsWith("data:image") || qr.startsWith("blob:") || qr.startsWith("http"));
-
-  if (!BRIDGE_CONFIGURED) {
-    return (
-      <div className="space-y-4 pb-24">
-        <div className="flex items-center gap-2">
-          <Smartphone className="h-6 w-6 text-primary" />
-          <h2 className="text-xl font-bold">WhatsApp Bulk Messaging</h2>
-        </div>
-        <Card>
-          <CardContent className="flex items-start gap-3 p-4 text-sm">
-            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
-            <div>
-              <p className="font-semibold">WhatsApp Bridge not configured</p>
-              <p className="mt-1 text-muted-foreground">Set <code className="rounded bg-muted px-1">VITE_BRIDGE_URL</code> and <code className="rounded bg-muted px-1">VITE_BRIDGE_API_KEY</code> environment variables and redeploy. The bridge API key must never be hardcoded in the client bundle.</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-4 pb-24">
@@ -212,15 +148,13 @@ export const WhatsAppBulkMessaging = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
-            <p className="break-all text-muted-foreground">{BRIDGE_URL}</p>
+            <p className="text-muted-foreground">Bridge requests proxied via secure edge function.</p>
             <p>{statusMsg}</p>
             {status === "error" && (
               <div className="flex items-start gap-2 rounded border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
-                  Browser bridge tak nahi pahonch raha. Ye CORS issue ho sakta hai — bridge server par
-                  <code className="mx-1 rounded bg-background px-1">Access-Control-Allow-Origin</code>
-                  enable karna padega (current origin allow karo).
+                  Edge function reachable nahi hai. Admin se BRIDGE_URL + BRIDGE_API_KEY secrets configure karwao.
                 </span>
               </div>
             )}
