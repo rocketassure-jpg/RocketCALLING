@@ -46,14 +46,14 @@ const Index = () => {
              style={{ background: "radial-gradient(900px 500px at 80% 30%, rgba(255,123,0,0.06), transparent 60%), radial-gradient(700px 400px at 10% 80%, rgba(0,212,255,0.05), transparent 60%), #f8fafc" }} />
         <div className="container grid items-center gap-10 py-16 md:py-24 lg:grid-cols-2 lg:py-32">
           <div className="space-y-7">
-            <span className="inline-flex items-center gap-2 rounded-full neon-glass px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-white">
+            <span className="inline-flex items-center gap-2 rounded-full neon-glass px-4 py-1.5 text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-900">
               <ShieldCheck className="h-3.5 w-3.5 neon-accent" /> Trusted by 10,000+ families
             </span>
-            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-white"
+            <h1 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900"
                 style={{ fontSize: "clamp(2.75rem, 8vw, 6.5rem)", fontStretch: "condensed", letterSpacing: "-0.02em" }}>
               <span className="block">INSURANCE</span>
               <span className="block neon-text-glow">EXPERT</span>
-              <span className="block text-white/40" style={{ fontSize: "0.55em" }}>FOR EVERY FAMILY</span>
+              <span className="block text-slate-400" style={{ fontSize: "0.55em" }}>FOR EVERY FAMILY</span>
             </h1>
             <p className="max-w-md text-base text-white/60 md:text-lg">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
