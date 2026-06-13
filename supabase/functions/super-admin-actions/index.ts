@@ -356,9 +356,9 @@ Deno.serve(async (req) => {
       if (cErr3) log.push(`claims ERR: ${cErr3.message}`); else log.push(`${claimRows.length} claims`);
 
       await admin.from("announcements").insert({
-        company_id: cid, title: `Welcome to ${companyName}`,
+        title: `Welcome to ${companyName}`,
         message: `Your demo workspace is ready. Login with admin@${emailDomain} / ${password}`,
-        severity: "info", is_active: true, audience: "all", created_by: callerId,
+        type: "info", target: "specific_companies", target_company_ids: [cid], created_by: callerId,
       });
 
       await admin.from("super_admin_audit_log").insert({
