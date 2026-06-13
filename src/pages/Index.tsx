@@ -99,7 +99,7 @@ const Index = () => {
       <section id="enquiry" className="container py-20">
         <div className="mx-auto mb-8 max-w-2xl text-center">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 01 — Enquiry</p>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
             Tell us what you need
           </h2>
         </div>
