@@ -75,6 +75,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
   { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services" },
   { id: "claims", label: "Claims", icon: ShieldCheck },
+  { id: "operations", label: "Operations", icon: Wrench },
   { id: "areas", label: "Areas", icon: MapPin },
   { id: "branches", label: "Branches", icon: Building2 },
   { id: "renewals", label: "Renewals", icon: AlarmClock },
