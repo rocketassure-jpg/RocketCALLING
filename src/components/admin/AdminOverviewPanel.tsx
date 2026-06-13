@@ -27,11 +27,15 @@ const startOfRange = (r: Range) => {
 const StatCard = ({ icon: Icon, label, value, accent = "border-l-primary" }: {
   icon: any; label: string; value: number | string; accent?: string;
 }) => (
-  <div className={`flex items-center gap-3 rounded-lg border-l-[3px] ${accent} bg-card p-3 shadow-card-pop`}>
-    <Icon className="h-5 w-5 text-muted-foreground" />
+  <div
+    className={`group flex items-center gap-2 sm:gap-3 rounded-lg border border-border/40 border-l-[3px] ${accent} bg-card p-2.5 sm:p-3 shadow-card-pop cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:border-l-[6px] hover:bg-accent/5`}
+  >
+    <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground transition-transform duration-200 group-hover:scale-110 group-hover:text-primary" />
     <div className="min-w-0 flex-1">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="text-lg font-extrabold tabular-nums">{typeof value === "number" ? value.toLocaleString("en-IN") : value}</div>
+      <div className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide text-muted-foreground truncate">{label}</div>
+      <div className="text-base sm:text-lg md:text-xl font-extrabold tabular-nums transition-colors group-hover:text-primary">
+        {typeof value === "number" ? value.toLocaleString("en-IN") : value}
+      </div>
     </div>
   </div>
 );
@@ -228,7 +232,7 @@ export const AdminOverviewPanel = () => {
       {/* Row 3 — Pipeline */}
       <div>
         <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Pipeline</div>
-        <div className="grid grid-cols-3 gap-2 md:grid-cols-5">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {pipelineCards.map((p) => (
             <StatCard key={p.key} icon={p.icon} label={p.key} value={pipeline[p.key] ?? 0} accent={p.accent} />
           ))}

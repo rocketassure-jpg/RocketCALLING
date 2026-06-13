@@ -20,7 +20,10 @@ import { RtoPanel } from "@/components/admin/rto/RtoPanel";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { CallingList } from "@/components/CallingList";
 import { EnquiriesPanel } from "@/components/EnquiriesPanel";
-import { WavelengthDashboard } from "@/components/admin/WavelengthDashboard";
+import { CallReportsPanel } from "@/components/admin/CallReportsPanel";
+import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
+import { ApiAndWebhooksPanel } from "@/components/admin/ApiAndWebhooksPanel";
+import { ReportsAndPerformancePanel } from "@/components/admin/ReportsAndPerformancePanel";
 import { SmartImportPanel } from "@/components/admin/SmartImportPanel";
 import { ApiKeysManager } from "@/components/admin/ApiKeysManager";
 import { SecretsManager } from "@/components/admin/SecretsManager";
@@ -68,9 +71,8 @@ const today = () => new Date().toISOString().slice(0, 10);
 const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: string }[] = [
   // Dashboards
   { id: "overview", label: "Overview", icon: BarChart3, group: "Dashboards" },
-  { id: "dashboard", label: "Wavelength", icon: LayoutDashboard, group: "Dashboards" },
-  { id: "reports", label: "Reports", icon: BarChart3, group: "Dashboards" },
-  { id: "performance", label: "Performance", icon: BarChart3, group: "Dashboards" },
+  { id: "dashboard", label: "Call Reports", icon: Phone, group: "Dashboards" },
+  { id: "reports", label: "Reports & Performance", icon: BarChart3, group: "Dashboards" },
   // Sales
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
   { id: "enquiries", label: "Enquiries", icon: Inbox, group: "Sales" },
@@ -100,12 +102,10 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
   // Settings
   { id: "api", label: "API & Webhooks", icon: Webhook, group: "Settings" },
-  { id: "secrets", label: "API Keys", icon: Lock, group: "Settings" },
   { id: "account", label: "Account Settings", icon: User, group: "Settings" },
   { id: "settings", label: "General", icon: Settings, group: "Settings" },
   { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
-  { id: "fields", label: "CRM Fields", icon: Tags, group: "Settings" },
-  { id: "statuses", label: "Statuses", icon: ListChecks, group: "Settings" },
+  { id: "fields", label: "Fields & Statuses", icon: Tags, group: "Settings" },
   { id: "audit", label: "Audit Logs", icon: Shield, group: "Settings" },
   { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Settings" },
 ];
@@ -223,28 +223,25 @@ const AdminDashboard = () => {
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
       case "operations": return <OperationsPanel />;
-      case "reports": return <ReportsPanel />;
-      case "dashboard": return <WavelengthDashboard />;
+      case "reports": return <ReportsAndPerformancePanel />;
+      case "dashboard": return <CallReportsPanel />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
       case "customers": return <CustomersPanel />;
       case "customer360": return <Customer360Panel />;
       case "branches": return <BranchesPanel />;
-      case "performance": return <PerformancePanel />;
       case "enquiries": return <EnquiriesPanel />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
      case "messaging": return <WhatsAppBulkMessaging />;
      case "calculator": return <PremiumCalculator />;
-      case "api": return <ApiKeysManager />;
-      case "secrets": return <SecretsManager />;
+      case "api": return <ApiAndWebhooksPanel />;
       case "training": return <TrainingModule canManage={true} />;
       case "settings": return <GeneralSettings />;
       case "audit": return <AuditLogViewer />;
       case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
       case "approvals": return <PendingApprovalsPanel />;
-      case "fields": return <CRMFieldsManager />;
-      case "statuses": return <StatusConfigurator />;
+      case "fields": return <FieldsAndStatusesPanel />;
       case "leads": return (
         <div className="space-y-6 pb-20">
           <AddCustomerForm areas={areas} telecallers={telecallers} onDone={load} />
