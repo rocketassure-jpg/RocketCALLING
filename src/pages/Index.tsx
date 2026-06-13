@@ -33,19 +33,33 @@ const Index = () => {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-soft">
-        <div className="container grid gap-12 py-12 md:grid-cols-2 md:items-center md:py-20">
-          <div className="space-y-6">
-            <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+      <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+        {/* Background video */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <iframe
+            className="absolute left-1/2 top-1/2 h-[300%] w-[300%] -translate-x-1/2 -translate-y-1/2"
+            src="https://www.youtube.com/embed/Igjxvu7NOKw?autoplay=1&mute=1&loop=1&playlist=Igjxvu7NOKw&controls=0&rel=0&modestbranding=1&iv_load_policy=3"
+            title="Rocket Services Insurance"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+        {/* Overlay */}
+        <div className="absolute inset-0 z-10 bg-black/60" />
+
+        {/* Content */}
+        <div className="relative z-20 container py-20">
+          <div className="mx-auto max-w-3xl space-y-6 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
               <ShieldCheck className="h-3.5 w-3.5" /> Trusted by 10,000+ families
             </span>
-            <h1 className="font-bold leading-tight tracking-tight md:text-6xl shadow-inner rounded-full text-center text-2xl font-serif border-double border-2 bg-warning text-destructive border-destructive opacity-85">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight text-white md:text-6xl">
               insurance expert
             </h1>
-            <p className="max-w-xl text-lg text-muted-foreground">
+            <p className="mx-auto max-w-xl text-lg text-white/80">
               Life, health & motor insurance — tailored for Indian families. Get a free quote in 2 minutes from your local Rocket Services advisor.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap justify-center gap-3">
               <Button asChild variant="hero" size="lg"><a href="#enquiry">Get a free quote</a></Button>
               <Button asChild variant="outline" size="lg"><a href="#calculator"><Calculator className="h-4 w-4" /> Premium Calculator</a></Button>
               <Button asChild variant="success" size="lg">
@@ -54,21 +68,9 @@ const Index = () => {
                 </a>
               </Button>
             </div>
-            <div className="flex flex-wrap gap-6 pt-4 text-sm text-muted-foreground">
+            <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-white/70">
               <div className="flex items-center gap-2"><Award className="h-4 w-4 text-primary" /> IRDAI certified</div>
               <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> 24×7 claim support</div>
-            </div>
-          </div>
-          <div className="relative">
-            <div className="absolute -inset-4 rounded-3xl bg-gradient-hero opacity-20 blur-3xl" />
-            <div className="relative aspect-video overflow-hidden rounded-2xl shadow-elegant">
-              <iframe
-                className="h-full w-full"
-                src="https://www.youtube.com/embed/Igjxvu7NOKw?autoplay=1&mute=1&loop=1&playlist=Igjxvu7NOKw&controls=1&rel=0&modestbranding=1"
-                title="Rocket Services Insurance"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
             </div>
           </div>
         </div>
