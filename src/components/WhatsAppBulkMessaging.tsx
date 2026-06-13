@@ -176,6 +176,26 @@ export const WhatsAppBulkMessaging = () => {
 
   const isImageQr = qr && (qr.startsWith("data:image") || qr.startsWith("blob:") || qr.startsWith("http"));
 
+  if (!BRIDGE_CONFIGURED) {
+    return (
+      <div className="space-y-4 pb-24">
+        <div className="flex items-center gap-2">
+          <Smartphone className="h-6 w-6 text-primary" />
+          <h2 className="text-xl font-bold">WhatsApp Bulk Messaging</h2>
+        </div>
+        <Card>
+          <CardContent className="flex items-start gap-3 p-4 text-sm">
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+            <div>
+              <p className="font-semibold">WhatsApp Bridge not configured</p>
+              <p className="mt-1 text-muted-foreground">Set <code className="rounded bg-muted px-1">VITE_BRIDGE_URL</code> and <code className="rounded bg-muted px-1">VITE_BRIDGE_API_KEY</code> environment variables and redeploy. The bridge API key must never be hardcoded in the client bundle.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 pb-24">
       <div className="flex items-center gap-2">
