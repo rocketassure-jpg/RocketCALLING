@@ -598,6 +598,186 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          customer_id: string
+          doc_type: string
+          id: string
+          label: string | null
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          customer_id: string
+          doc_type: string
+          id?: string
+          label?: string | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          customer_id?: string
+          doc_type?: string
+          id?: string
+          label?: string | null
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          aadhaar_last4: string | null
+          address_line1: string | null
+          address_line2: string | null
+          agent_id: string | null
+          alt_mobile: string | null
+          branch_id: string | null
+          city: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          dob: string | null
+          email: string | null
+          family_head_id: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          kyc_status: string
+          mobile: string
+          notes: string | null
+          occupation: string | null
+          pan: string | null
+          pincode: string | null
+          relation_to_head: string | null
+          source_lead_id: string | null
+          state: string | null
+          tags: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          aadhaar_last4?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          agent_id?: string | null
+          alt_mobile?: string | null
+          branch_id?: string | null
+          city?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          dob?: string | null
+          email?: string | null
+          family_head_id?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          kyc_status?: string
+          mobile: string
+          notes?: string | null
+          occupation?: string | null
+          pan?: string | null
+          pincode?: string | null
+          relation_to_head?: string | null
+          source_lead_id?: string | null
+          state?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          aadhaar_last4?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          agent_id?: string | null
+          alt_mobile?: string | null
+          branch_id?: string | null
+          city?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          dob?: string | null
+          email?: string | null
+          family_head_id?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          kyc_status?: string
+          mobile?: string
+          notes?: string | null
+          occupation?: string | null
+          pan?: string | null
+          pincode?: string | null
+          relation_to_head?: string | null
+          source_lead_id?: string | null
+          state?: string | null
+          tags?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_family_head_id_fkey"
+            columns: ["family_head_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_source_lead_id_fkey"
+            columns: ["source_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_source_lead_id_fkey"
+            columns: ["source_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_source_lead_id_fkey"
+            columns: ["source_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dial_logs: {
         Row: {
           call_type: string
@@ -1072,6 +1252,7 @@ export type Database = {
           company_id: string
           created_at: string
           current_address: string | null
+          customer_id: string | null
           customer_name: string
           deadline: string | null
           delivery_address: string | null
@@ -1127,6 +1308,7 @@ export type Database = {
           company_id: string
           created_at?: string
           current_address?: string | null
+          customer_id?: string | null
           customer_name: string
           deadline?: string | null
           delivery_address?: string | null
@@ -1182,6 +1364,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           current_address?: string | null
+          customer_id?: string | null
           customer_name?: string
           deadline?: string | null
           delivery_address?: string | null
@@ -1237,6 +1420,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
             referencedColumns: ["id"]
           },
         ]
