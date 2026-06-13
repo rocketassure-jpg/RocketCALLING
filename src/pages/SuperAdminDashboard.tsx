@@ -161,11 +161,19 @@ const SuperAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
       <header className="sticky top-0 z-30 border-b border-slate-800 bg-slate-900">
-        <div className="container flex h-14 items-center justify-between px-3">
-          <div className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-primary" /><Logo /><Badge variant="destructive">Super Admin</Badge></div>
+        <div className="container flex h-auto min-h-14 flex-wrap items-center justify-between gap-2 px-3 py-2">
+          <div className="flex min-w-0 items-center gap-2">
+            <ShieldCheck className="h-5 w-5 shrink-0 text-primary" />
+            <Logo />
+            <Badge variant="destructive" className="hidden sm:inline-flex">Super Admin</Badge>
+          </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={resetUserPwd} className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700"><KeyRound className="h-4 w-4" /> Reset User</Button>
-            <Button variant="outline" size="sm" onClick={signOut} className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700"><LogOut className="h-4 w-4" /> Sign out</Button>
+            <Button variant="outline" size="sm" onClick={resetUserPwd} className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
+              <KeyRound className="h-4 w-4" /><span className="hidden sm:inline ml-1">Reset User</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={signOut} className="border-slate-700 bg-slate-800 text-slate-100 hover:bg-slate-700">
+              <LogOut className="h-4 w-4" /><span className="hidden sm:inline ml-1">Sign out</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -182,7 +190,7 @@ const SuperAdminDashboard = () => {
         </aside>
 
         <main className="space-y-4 min-w-0">
-          <div className="rounded-xl bg-background p-4 text-foreground">
+          <div className="rounded-xl bg-background p-3 sm:p-4 text-foreground overflow-x-auto">
             {section === "dashboard" && (
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -231,10 +239,12 @@ const SuperAdminDashboard = () => {
                             <TableCell><Badge variant="outline">{co.plan}</Badge></TableCell>
                             <TableCell>{subsFor(co.id).length}/{modules.length}</TableCell>
                             <TableCell>{co.is_active ? <Badge>Active</Badge> : <Badge variant="destructive">Suspended</Badge>}</TableCell>
-                            <TableCell className="text-right space-x-1">
-                              <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
-                              <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
-                              <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                            <TableCell className="text-right">
+                              <div className="flex flex-wrap justify-end gap-1">
+                                <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
+                                <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
+                                <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}

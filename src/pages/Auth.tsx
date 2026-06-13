@@ -194,7 +194,7 @@ const Auth = () => {
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground">First signup automatically becomes super admin.</p>
+                    <p className="text-center text-xs text-muted-foreground">Staff signup — admin approval ke baad access milega.</p>
                   </form>
                 </TabsContent>
               </Tabs>
