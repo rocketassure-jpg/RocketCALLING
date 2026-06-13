@@ -112,26 +112,26 @@ const Index = () => {
       <section id="services" className="container py-20">
         <div className="mx-auto mb-12 max-w-3xl text-center">
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.3em] neon-accent">/ 02 — Services</p>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white" style={{ fontSize: "clamp(2.25rem, 6vw, 4.5rem)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900" style={{ fontSize: "clamp(2.25rem, 6vw, 4.5rem)" }}>
             Three pillars of <span className="neon-text-glow">protection</span>
           </h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {[
-            { icon: Heart, title: "Life Insurance", desc: "Secure your family's future with term & endowment plans starting from ₹500/month.", color: "#39ff14" },
+            { icon: Heart, title: "Life Insurance", desc: "Secure your family's future with term & endowment plans starting from ₹500/month.", color: "#ff7b00" },
             { icon: Stethoscope, title: "Health Insurance", desc: "Cashless treatment at 7,000+ hospitals. Cover up to ₹1 crore for the entire family.", color: "#00d4ff" },
-            { icon: Car, title: "Motor Insurance", desc: "Comprehensive 2-wheeler & 4-wheeler cover. Instant policy, zero-depreciation add-on.", color: "#39ff14" },
+            { icon: Car, title: "Motor Insurance", desc: "Comprehensive 2-wheeler & 4-wheeler cover. Instant policy, zero-depreciation add-on.", color: "#ff7b00" },
           ].map((s, i) => (
             <Card key={s.title} className="neon-glass neon-shine border-0">
               <CardContent className="p-8">
                 <div className="mb-5 flex items-center justify-between">
                   <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl"
-                       style={{ background: "rgba(255,255,255,0.04)", border: `1px solid ${s.color}`, color: s.color, boxShadow: `0 0 18px ${s.color}55` }}>
+                       style={{ background: "rgba(15,23,42,0.04)", border: `1px solid ${s.color}`, color: s.color, boxShadow: `0 0 18px ${s.color}55` }}>
                     <s.icon className="h-7 w-7" />
                   </div>
-                  <span className="text-xs font-mono text-white/30">0{i + 1}</span>
+                  <span className="text-xs font-mono text-slate-400">0{i + 1}</span>
                 </div>
-                <h3 className="mb-2 text-2xl font-bold text-white">{s.title}</h3>
+                <h3 className="mb-2 text-2xl font-bold text-slate-900">{s.title}</h3>
                 <p className="neon-muted">{s.desc}</p>
               </CardContent>
             </Card>
