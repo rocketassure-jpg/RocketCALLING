@@ -34,13 +34,27 @@ const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
 const autoMap = (header: string): string => {
   const h = norm(header);
   for (const t of TARGETS) if (norm(t.key) === h || norm(t.label) === h) return t.key;
-  if (h.includes("name") && !h.includes("area")) return "customer_name";
-  if (h.includes("phone") || h.includes("mobile") || h.includes("contact")) return "phone_number";
-  if (h.includes("area") || h.includes("city")) return "area_name";
-  if (h.includes("policy") || h.includes("type")) return "policy_type";
+  if (h.includes("name") && !h.includes("area") && !h.includes("company") && !h.includes("nominee")) return "customer_name";
+  if (h.includes("phone") || h.includes("mobile") || h.includes("contact") || h === "no" || h === "number") return "phone_number";
+  if (h.includes("area") || h.includes("city") || h.includes("location")) return "area_name";
+  if (
+    h.includes("policy") || h.includes("type") || h.includes("product") || h.includes("category") ||
+    h.includes("mediclaim") || h.includes("health") || h.includes("motor") || h.includes("vehicle") ||
+    h.includes("twowheeler") || h.includes("fourwheeler") || h.includes("car") || h.includes("bike") ||
+    h.includes("life") || h.includes("term")
+  ) return "policy_type";
   if (h.includes("date")) return "call_date";
-  if (h.includes("premium") || h.includes("amount")) return "premium_amount";
+  if (h.includes("premium") || h.includes("amount") || h.includes("sumassured") || h.includes("price")) return "premium_amount";
   return SKIP;
+};
+
+// Smart policy detection from raw value or header
+const detectPolicy = (v: string, header?: string): string | null => {
+  const s = (v + " " + (header ?? "")).toLowerCase();
+  if (/(health|mediclaim|family\s*floater|individual\s*health)/.test(s)) return "Health";
+  if (/(motor|vehicle|car|bike|two[-\s]*wheeler|four[-\s]*wheeler|comm.*vehicle|cv|tw|fw)/.test(s)) return "Motor";
+  if (/(life|term|ulip|endowment|whole\s*life|annuity)/.test(s)) return "Life";
+  return null;
 };
 
 type AssignMode = "none" | "single" | "roundrobin" | "byarea";
