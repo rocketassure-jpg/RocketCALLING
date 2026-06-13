@@ -2707,6 +2707,7 @@ export type Database = {
         Row: {
           body: string
           category: string
+          company_id: string | null
           created_at: string
           id: string
           owner_id: string
@@ -2717,6 +2718,7 @@ export type Database = {
         Insert: {
           body: string
           category?: string
+          company_id?: string | null
           created_at?: string
           id?: string
           owner_id: string
@@ -2727,6 +2729,7 @@ export type Database = {
         Update: {
           body?: string
           category?: string
+          company_id?: string | null
           created_at?: string
           id?: string
           owner_id?: string
