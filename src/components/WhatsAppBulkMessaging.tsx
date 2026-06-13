@@ -9,11 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { RefreshCw, Send, Smartphone, QrCode, Loader2, AlertTriangle } from "lucide-react";
 
-const BRIDGE_URL =
-  (import.meta.env.VITE_BRIDGE_URL as string) ||
-  "https://repository-name-rocket-whatsapp-bridge-production.up.railway.app";
-const BRIDGE_API_KEY =
-  (import.meta.env.VITE_BRIDGE_API_KEY as string) || "rocket-bridge-2024-secret";
+const BRIDGE_URL = (import.meta.env.VITE_BRIDGE_URL as string) || "";
+const BRIDGE_API_KEY = (import.meta.env.VITE_BRIDGE_API_KEY as string) || "";
+const BRIDGE_CONFIGURED = !!BRIDGE_URL && !!BRIDGE_API_KEY;
 
 const headers: HeadersInit = {
   "x-api-key": BRIDGE_API_KEY,
