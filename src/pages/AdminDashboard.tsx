@@ -39,6 +39,7 @@ import { Customer360Panel } from "@/components/admin/customers360/Customer360Pan
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
+import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
