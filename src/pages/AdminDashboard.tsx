@@ -40,6 +40,7 @@ import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
 import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
+import { ReportsPanel } from "@/components/admin/reports/ReportsPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
