@@ -37,6 +37,7 @@ import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
 import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
+import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
@@ -66,6 +67,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string }[] = [
   { id: "enquiries", label: "Enquiries", icon: Inbox },
   { id: "leads", label: "Leads", icon: Users },
   { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts" },
+  { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts" },
   { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance" },
   { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance" },
   { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance" },
@@ -198,6 +200,7 @@ const AdminDashboard = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
       case "accounts": return <AccountsPanel />;
+      case "brokers": return <BrokerPanel />;
       case "motor": return <MotorPanel />;
       case "health": return <HealthPanel />;
       case "life": return <LifePanel />;
