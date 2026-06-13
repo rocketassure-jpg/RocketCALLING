@@ -1019,6 +1019,8 @@ export type Database = {
           policy_type: string
           remarks: string | null
           settled_amount: number | null
+          sla_breached: boolean
+          sla_due_at: string | null
           status: string
           surveyor_contact: string | null
           surveyor_name: string | null
@@ -1046,6 +1048,8 @@ export type Database = {
           policy_type: string
           remarks?: string | null
           settled_amount?: number | null
+          sla_breached?: boolean
+          sla_due_at?: string | null
           status?: string
           surveyor_contact?: string | null
           surveyor_name?: string | null
@@ -1073,6 +1077,8 @@ export type Database = {
           policy_type?: string
           remarks?: string | null
           settled_amount?: number | null
+          sla_breached?: boolean
+          sla_due_at?: string | null
           status?: string
           surveyor_contact?: string | null
           surveyor_name?: string | null
