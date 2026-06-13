@@ -192,7 +192,8 @@ export const SmartImportPanel = ({ areas, telecallers, onDone }: { areas: Area[]
           const id = areaMap.get(String(v).toLowerCase());
           if (id) o.area_id = id;
         } else if (target === "policy_type") {
-          o.policy_type = POLICIES.includes(String(v)) ? v : "Motor";
+          const detected = detectPolicy(String(v), col);
+          o.policy_type = detected ?? (POLICIES.includes(String(v)) ? v : "Motor");
         } else if (target === "premium_amount") {
           o.premium_amount = Number(String(v).replace(/[^\d.-]/g, "")) || 0;
         } else if (target === "phone_number") {
