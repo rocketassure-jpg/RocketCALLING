@@ -683,6 +683,59 @@ export type Database = {
         }
         Relationships: []
       }
+      fitness_certificates: {
+        Row: {
+          certificate_number: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          expiry_date: string
+          id: string
+          issue_date: string | null
+          notes: string | null
+          rto_office: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          certificate_number?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          rto_office?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          certificate_number?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          rto_office?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fitness_certificates_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insurers: {
         Row: {
           category: string | null
@@ -1051,6 +1104,222 @@ export type Database = {
         }
         Relationships: []
       }
+      motor_policies: {
+        Row: {
+          addon_premium: number | null
+          addons: Json | null
+          agent_id: string | null
+          client_lead_id: string | null
+          company_id: string
+          cover_type: string | null
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          end_date: string | null
+          gross_premium: number | null
+          gst_amount: number | null
+          id: string
+          idv: number | null
+          insurer_id: string | null
+          issue_date: string | null
+          ncb_percent: number | null
+          net_premium: number | null
+          notes: string | null
+          od_end: string | null
+          od_premium: number | null
+          od_start: string | null
+          payment_mode: string | null
+          payment_status: string | null
+          policy_number: string | null
+          policy_type: string | null
+          previous_insurer: string | null
+          previous_policy_no: string | null
+          start_date: string | null
+          status: string | null
+          tp_end: string | null
+          tp_premium: number | null
+          tp_start: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          addon_premium?: number | null
+          addons?: Json | null
+          agent_id?: string | null
+          client_lead_id?: string | null
+          company_id: string
+          cover_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          end_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          idv?: number | null
+          insurer_id?: string | null
+          issue_date?: string | null
+          ncb_percent?: number | null
+          net_premium?: number | null
+          notes?: string | null
+          od_end?: string | null
+          od_premium?: number | null
+          od_start?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          previous_insurer?: string | null
+          previous_policy_no?: string | null
+          start_date?: string | null
+          status?: string | null
+          tp_end?: string | null
+          tp_premium?: number | null
+          tp_start?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          addon_premium?: number | null
+          addons?: Json | null
+          agent_id?: string | null
+          client_lead_id?: string | null
+          company_id?: string
+          cover_type?: string | null
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          end_date?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          idv?: number | null
+          insurer_id?: string | null
+          issue_date?: string | null
+          ncb_percent?: number | null
+          net_premium?: number | null
+          notes?: string | null
+          od_end?: string | null
+          od_premium?: number | null
+          od_start?: string | null
+          payment_mode?: string | null
+          payment_status?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          previous_insurer?: string | null
+          previous_policy_no?: string | null
+          start_date?: string | null
+          status?: string | null
+          tp_end?: string | null
+          tp_premium?: number | null
+          tp_start?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "motor_policies_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_policies_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_policies_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_policies_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permits: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          expiry_date: string
+          id: string
+          issue_date: string | null
+          issuing_authority: string | null
+          notes: string | null
+          permit_number: string | null
+          permit_type: string | null
+          states_covered: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string | null
+          issuing_authority?: string | null
+          notes?: string | null
+          permit_number?: string | null
+          permit_type?: string | null
+          states_covered?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string | null
+          issuing_authority?: string | null
+          notes?: string | null
+          permit_number?: string | null
+          permit_type?: string | null
+          states_covered?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permits_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       policy_transactions: {
         Row: {
           agent_id: string | null
@@ -1265,6 +1534,124 @@ export type Database = {
           },
         ]
       }
+      puc_records: {
+        Row: {
+          certificate_number: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          expiry_date: string
+          id: string
+          issue_date: string | null
+          notes: string | null
+          reading: string | null
+          test_center: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          certificate_number?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date: string
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          reading?: string | null
+          test_center?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          certificate_number?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          expiry_date?: string
+          id?: string
+          issue_date?: string | null
+          notes?: string | null
+          reading?: string | null
+          test_center?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "puc_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rc_register: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          document_url: string | null
+          id: string
+          notes: string | null
+          owner_address: string | null
+          owner_name: string | null
+          rc_expiry_date: string | null
+          rc_issue_date: string | null
+          rc_number: string | null
+          rc_status: string | null
+          rto_office: string | null
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          owner_address?: string | null
+          owner_name?: string | null
+          rc_expiry_date?: string | null
+          rc_issue_date?: string | null
+          rc_number?: string | null
+          rc_status?: string | null
+          rto_office?: string | null
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          document_url?: string | null
+          id?: string
+          notes?: string | null
+          owner_address?: string | null
+          owner_name?: string | null
+          rc_expiry_date?: string | null
+          rc_issue_date?: string | null
+          rc_number?: string | null
+          rc_status?: string | null
+          rto_office?: string | null
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rc_register_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           id: string
@@ -1413,6 +1800,109 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vehicles: {
+        Row: {
+          chassis_number: string | null
+          client_lead_id: string | null
+          color: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          cubic_capacity: number | null
+          engine_number: string | null
+          fuel_type: string | null
+          hypothecation: string | null
+          id: string
+          make: string | null
+          manufacturing_year: number | null
+          model: string | null
+          notes: string | null
+          owner_name: string | null
+          owner_phone: string | null
+          registration_date: string | null
+          registration_number: string
+          rto_code: string | null
+          seating_capacity: number | null
+          updated_at: string
+          variant: string | null
+          vehicle_type: string | null
+        }
+        Insert: {
+          chassis_number?: string | null
+          client_lead_id?: string | null
+          color?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          cubic_capacity?: number | null
+          engine_number?: string | null
+          fuel_type?: string | null
+          hypothecation?: string | null
+          id?: string
+          make?: string | null
+          manufacturing_year?: number | null
+          model?: string | null
+          notes?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          registration_date?: string | null
+          registration_number: string
+          rto_code?: string | null
+          seating_capacity?: number | null
+          updated_at?: string
+          variant?: string | null
+          vehicle_type?: string | null
+        }
+        Update: {
+          chassis_number?: string | null
+          client_lead_id?: string | null
+          color?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          cubic_capacity?: number | null
+          engine_number?: string | null
+          fuel_type?: string | null
+          hypothecation?: string | null
+          id?: string
+          make?: string | null
+          manufacturing_year?: number | null
+          model?: string | null
+          notes?: string | null
+          owner_name?: string | null
+          owner_phone?: string | null
+          registration_date?: string | null
+          registration_number?: string
+          rto_code?: string | null
+          seating_capacity?: number | null
+          updated_at?: string
+          variant?: string | null
+          vehicle_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicles_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       webhook_events: {
         Row: {
