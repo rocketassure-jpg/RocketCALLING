@@ -161,8 +161,8 @@ const Index = () => {
       {/* CTA */}
       <section className="container py-20">
         <div className="rounded-3xl p-10 text-center md:p-16"
-             style={{ background: "linear-gradient(135deg, #06121f 0%, #052e10 100%)", border: "1px solid rgba(57,255,20,0.4)", boxShadow: "0 0 40px rgba(57,255,20,0.15)" }}>
-          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-white neon-text-glow" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
+             style={{ background: "linear-gradient(135deg, #ffffff 0%, #fff7ed 100%)", border: "1px solid rgba(255,123,0,0.25)", boxShadow: "0 0 40px rgba(255,123,0,0.10)" }}>
+          <h2 className="font-black uppercase leading-[0.9] tracking-tight text-slate-900 neon-text-glow" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
             Ready to protect your family?
           </h2>
           <p className="mx-auto mt-4 max-w-xl neon-muted">Talk to a certified advisor today. No spam, no pressure — just honest guidance.</p>
