@@ -239,10 +239,12 @@ const SuperAdminDashboard = () => {
                             <TableCell><Badge variant="outline">{co.plan}</Badge></TableCell>
                             <TableCell>{subsFor(co.id).length}/{modules.length}</TableCell>
                             <TableCell>{co.is_active ? <Badge>Active</Badge> : <Badge variant="destructive">Suspended</Badge>}</TableCell>
-                            <TableCell className="text-right space-x-1">
-                              <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
-                              <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
-                              <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                            <TableCell className="text-right">
+                              <div className="flex flex-wrap justify-end gap-1">
+                                <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
+                                <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
+                                <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                              </div>
                             </TableCell>
                           </TableRow>
                         ))}
