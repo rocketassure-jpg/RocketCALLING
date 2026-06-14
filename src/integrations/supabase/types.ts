@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_renewal_settings: {
+        Row: {
+          alert_days: number[]
+          auto_assign_logic: string
+          auto_send_enabled: boolean
+          company_id: string
+          created_at: string
+          default_channel: string
+          default_telecaller_id: string | null
+          default_template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          alert_days?: number[]
+          auto_assign_logic?: string
+          auto_send_enabled?: boolean
+          company_id: string
+          created_at?: string
+          default_channel?: string
+          default_telecaller_id?: string | null
+          default_template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alert_days?: number[]
+          auto_assign_logic?: string
+          auto_send_enabled?: boolean
+          company_id?: string
+          created_at?: string
+          default_channel?: string
+          default_telecaller_id?: string | null
+          default_template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_renewal_settings_default_template_id_fkey"
+            columns: ["default_template_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_payouts: {
         Row: {
           agent_id: string
@@ -904,6 +948,69 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_logs: {
+        Row: {
+          campaign_id: string | null
+          channel: string
+          company_id: string
+          created_at: string
+          customer_id: string | null
+          error: string | null
+          id: string
+          phone_number: string | null
+          provider_message_id: string | null
+          renewal_id: string | null
+          response_at: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_id?: string | null
+          channel: string
+          company_id: string
+          created_at?: string
+          customer_id?: string | null
+          error?: string | null
+          id?: string
+          phone_number?: string | null
+          provider_message_id?: string | null
+          renewal_id?: string | null
+          response_at?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          campaign_id?: string | null
+          channel?: string
+          company_id?: string
+          created_at?: string
+          customer_id?: string | null
+          error?: string | null
+          id?: string
+          phone_number?: string | null
+          provider_message_id?: string | null
+          renewal_id?: string | null
+          response_at?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_logs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_renewal_id_fkey"
+            columns: ["renewal_id"]
+            isOneToOne: false
+            referencedRelation: "renewals"
             referencedColumns: ["id"]
           },
         ]
@@ -3446,6 +3553,187 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      renewal_campaigns: {
+        Row: {
+          channel: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          filter: Json
+          id: string
+          name: string
+          response_count: number
+          sent_count: number
+          status: string
+          template_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          filter?: Json
+          id?: string
+          name: string
+          response_count?: number
+          sent_count?: number
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          filter?: Json
+          id?: string
+          name?: string
+          response_count?: number
+          sent_count?: number
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renewal_campaigns_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      renewal_templates: {
+        Row: {
+          body_text: string
+          channel: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+          variables: Json
+        }
+        Insert: {
+          body_text: string
+          channel: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+          variables?: Json
+        }
+        Update: {
+          body_text?: string
+          channel?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+          variables?: Json
+        }
+        Relationships: []
+      }
+      renewals: {
+        Row: {
+          assigned_telecaller_id: string | null
+          company_id: string
+          created_at: string
+          customer_id: string | null
+          customer_name: string | null
+          expiry_date: string
+          id: string
+          last_contact_at: string | null
+          lead_id: string | null
+          notes: string | null
+          original_telecaller_id: string | null
+          phone_number: string | null
+          policy_number: string | null
+          policy_type: string | null
+          premium_amount: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_telecaller_id?: string | null
+          company_id: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          expiry_date: string
+          id?: string
+          last_contact_at?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          original_telecaller_id?: string | null
+          phone_number?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          premium_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_telecaller_id?: string | null
+          company_id?: string
+          created_at?: string
+          customer_id?: string | null
+          customer_name?: string | null
+          expiry_date?: string
+          id?: string
+          last_contact_at?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          original_telecaller_id?: string | null
+          phone_number?: string | null
+          policy_number?: string | null
+          policy_type?: string | null
+          premium_amount?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renewals_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renewals_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renewals_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renewals_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
         ]
