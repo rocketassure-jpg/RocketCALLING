@@ -98,6 +98,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
+  { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
   // Settings
