@@ -38,8 +38,9 @@ import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
-import { CustomersPanel } from "@/components/admin/CustomersPanel";
-import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
+import { CustomersHubPanel } from "@/components/admin/CustomersHubPanel";
+import { ReportsHubPanel } from "@/components/admin/ReportsHubPanel";
+import { LeadsEnquiriesPanel } from "@/components/admin/LeadsEnquiriesPanel";
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
@@ -72,14 +73,11 @@ const today = () => new Date().toISOString().slice(0, 10);
 const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: string }[] = [
   // Dashboards
   { id: "overview", label: "Overview", icon: BarChart3, group: "Dashboards" },
-  { id: "dashboard", label: "Call Reports", icon: Phone, group: "Dashboards" },
-  { id: "reports", label: "Reports & Performance", icon: BarChart3, group: "Dashboards" },
+  { id: "reports_hub", label: "Reports Hub", icon: BarChart3, group: "Dashboards" },
   // Sales
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
-  { id: "enquiries", label: "Enquiries", icon: Inbox, group: "Sales" },
-  { id: "leads", label: "Leads", icon: Users, group: "Sales" },
-  { id: "customers", label: "Customers (Won)", icon: Trophy, group: "Sales" },
-  { id: "customer360", label: "Customer 360", icon: UserPlus, group: "Sales" },
+  { id: "leads_hub", label: "Leads & Enquiries", icon: Users, group: "Sales" },
+  { id: "customers_hub", label: "Customers", icon: Trophy, group: "Sales" },
   // Policies
   { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance", group: "Policies" },
   { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance", group: "Policies" },
