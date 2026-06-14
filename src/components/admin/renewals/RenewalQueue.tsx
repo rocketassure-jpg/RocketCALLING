@@ -86,12 +86,33 @@ export const RenewalQueue = () => {
     toast({ title: "Telecaller assigned" }); load();
   };
 
-  const sendMessage = async (r: Renewal, channel: "whatsapp" | "sms") => {
+  const sendMessage = async (r: Renewal, channel: "whatsapp" | "sms" | "rcs") => {
     const { error } = await supabase.functions.invoke("send-renewal-message", {
       body: { renewal_id: r.id, channel },
     });
     if (error) return toast({ title: "Send failed", description: error.message, variant: "destructive" });
     toast({ title: `${channel.toUpperCase()} queued`, description: r.customer_name });
+    load();
+  };
+
+  const toggleAll = (checked: boolean) => {
+    if (!rows) return;
+    setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
+  };
+  const toggleOne = (id: string, checked: boolean) => {
+    setSelected((prev) => { const n = new Set(prev); if (checked) n.add(id); else n.delete(id); return n; });
+  };
+
+  const runBulk = async () => {
+    setBulkSending(true);
+    const ids = Array.from(selected);
+    let ok = 0, fail = 0;
+    for (const id of ids) {
+      const { error } = await supabase.functions.invoke("send-renewal-message", { body: { renewal_id: id, channel: bulkChannel } });
+      if (error) fail++; else ok++;
+    }
+    setBulkSending(false); setBulkOpen(false); setSelected(new Set());
+    toast({ title: `Bulk ${bulkChannel.toUpperCase()} done`, description: `${ok} sent, ${fail} failed` });
     load();
   };
 
