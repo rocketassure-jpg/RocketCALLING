@@ -112,6 +112,7 @@ Deno.serve(async (req) => {
       }
 
       case "trigger-voice": {
+        if (params.integration_id) await assertCompany("marketing_integrations", params.integration_id);
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         if (!integration) return jsonErr("Integration missing", 400);
