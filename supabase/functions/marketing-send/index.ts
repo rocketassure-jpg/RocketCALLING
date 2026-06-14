@@ -36,11 +36,29 @@ Deno.serve(async (req) => {
     }
 
     const supabase = adminClient();
+    const userId = claimsData.claims.sub as string;
+    const { data: callerProfile } = await supabase
+      .from("profiles").select("company_id").eq("id", userId).single();
+    const callerCompanyId = callerProfile?.company_id;
+    if (!callerCompanyId) return jsonErr("Caller has no company", 403);
+
     const body = await req.json();
     const { action, ...params } = body;
 
+    // Helper: assert a resource belongs to caller's company
+    const assertCompany = async (table: string, id: string) => {
+      const { data } = await supabase.from(table).select("company_id").eq("id", id).maybeSingle();
+      if (!data || data.company_id !== callerCompanyId) {
+        throw new Error("Forbidden: resource not in your company");
+      }
+    };
+
     switch (action) {
       case "send-whatsapp": {
+        if (params.integration_id) await assertCompany("marketing_integrations", params.integration_id);
+        if (params.template_id) await assertCompany("marketing_templates", params.template_id);
+        if (params.campaign_log_id) await assertCompany("campaign_logs", params.campaign_log_id);
+
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         const { data: template } = await supabase
@@ -67,6 +85,9 @@ Deno.serve(async (req) => {
       }
 
       case "send-sms": {
+        if (params.integration_id) await assertCompany("marketing_integrations", params.integration_id);
+        if (params.template_id) await assertCompany("marketing_templates", params.template_id);
+        if (params.campaign_log_id) await assertCompany("campaign_logs", params.campaign_log_id);
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         const { data: template } = await supabase
@@ -91,6 +112,7 @@ Deno.serve(async (req) => {
       }
 
       case "trigger-voice": {
+        if (params.integration_id) await assertCompany("marketing_integrations", params.integration_id);
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         if (!integration) return jsonErr("Integration missing", 400);
@@ -109,6 +131,7 @@ Deno.serve(async (req) => {
         const { data: campaign } = await supabase
           .from("renewal_campaigns").select("*").eq("id", params.campaign_id).single();
         if (!campaign) return jsonErr("Campaign missing", 404);
+        if (campaign.company_id !== callerCompanyId) return jsonErr("Forbidden", 403);
 
         let query = supabase.from("leads")
           .select("id,customer_name,phone_number,policy_type,policy_expiry_date,premium_amount,assigned_telecaller,city_village")
@@ -149,6 +172,7 @@ Deno.serve(async (req) => {
       }
 
       case "test-connection": {
+        await assertCompany("marketing_integrations", params.integration_id);
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         if (!integration) return jsonErr("Integration missing", 404);

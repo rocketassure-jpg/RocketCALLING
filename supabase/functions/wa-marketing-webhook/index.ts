@@ -17,8 +17,32 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Verify Meta HMAC signature (X-Hub-Signature-256: sha256=<hex>)
+    const appSecret = Deno.env.get("META_APP_SECRET");
+    const sigHeader = req.headers.get("x-hub-signature-256") ?? req.headers.get("X-Hub-Signature-256");
+    const rawBody = await req.text();
+
+    if (appSecret) {
+      if (!sigHeader || !sigHeader.startsWith("sha256=")) {
+        return new Response("forbidden", { status: 403 });
+      }
+      const expectedHex = sigHeader.slice("sha256=".length).toLowerCase();
+      const key = await crypto.subtle.importKey(
+        "raw", new TextEncoder().encode(appSecret),
+        { name: "HMAC", hash: "SHA-256" }, false, ["sign"],
+      );
+      const sigBuf = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(rawBody));
+      const actualHex = Array.from(new Uint8Array(sigBuf)).map(b => b.toString(16).padStart(2, "0")).join("");
+      if (actualHex !== expectedHex) {
+        return new Response("forbidden", { status: 403 });
+      }
+    } else {
+      console.warn("META_APP_SECRET not set — webhook signature verification disabled");
+    }
+
     const supabase = adminClient();
-    const payload = await req.json().catch(() => ({}));
+    const payload = JSON.parse(rawBody || "{}");
+
 
     const entries = payload?.entry ?? [];
     for (const entry of entries) {
