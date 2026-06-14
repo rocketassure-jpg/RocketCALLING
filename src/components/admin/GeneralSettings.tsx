@@ -47,6 +47,8 @@ export const GeneralSettings = () => {
   const [s, setS] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [telecallers, setTelecallers] = useState<Tele[]>([]);
+  const [templates, setTemplates] = useState<Tpl[]>([]);
 
   const syncSheet = async () => {
     if (!s?.master_sheet_url) return toast({ title: "Add a Sheet URL first", variant: "destructive" });
@@ -59,6 +61,16 @@ export const GeneralSettings = () => {
 
   useEffect(() => {
     supabase.from("app_settings").select("*").limit(1).single().then(({ data }) => setS(data as any));
+    (async () => {
+      const [p, tr, tpl] = await Promise.all([
+        supabase.from("profiles").select("id,full_name"),
+        supabase.from("user_roles").select("user_id,role").eq("role", "telecaller"),
+        (supabase as any).from("renewal_templates").select("id,name").eq("is_active", true),
+      ]);
+      const tids = new Set((tr.data ?? []).map((x: any) => x.user_id));
+      setTelecallers(((p.data ?? []) as any[]).filter((x) => tids.has(x.id)));
+      setTemplates((tpl.data ?? []) as any);
+    })();
   }, []);
 
   if (!s) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
