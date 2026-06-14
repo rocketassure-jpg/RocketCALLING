@@ -42,6 +42,10 @@ export const RenewalQueue = () => {
   const [fTele, setFTele] = useState("all");
   const [fFrom, setFFrom] = useState(today());
   const [fTo, setFTo] = useState(() => { const d = new Date(); d.setDate(d.getDate() + 60); return d.toISOString().slice(0,10); });
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkChannel, setBulkChannel] = useState<"whatsapp" | "sms" | "rcs">("whatsapp");
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkSending, setBulkSending] = useState(false);
 
   const load = async () => {
     let q = supabase.from("renewals").select("id,customer_name,phone_number,policy_type,expiry_date,assigned_telecaller_id,status,premium_amount,last_contact_at")
