@@ -2,3 +2,12 @@ project_id = "lgqgnsngxhqdzpstiddj"
 
 [functions.whatsapp-webhook]
 verify_jwt = false
+
+[functions.wa-marketing-webhook]
+verify_jwt = false
+
+[functions.sync-renewal-audiences]
+verify_jwt = false
+
+[functions.social-publish-scheduled]
+verify_jwt = false
