@@ -22,7 +22,16 @@ type Settings = {
   allow_logout_mobile: boolean;
   allow_logout_web: boolean;
   master_sheet_url: string | null;
+  renewal_default_telecaller_id: string | null;
+  renewal_alert_days: string | null;
+  renewal_default_channel: string | null;
+  renewal_auto_assign_logic: string | null;
+  renewal_auto_send: boolean;
+  renewal_default_template_id: string | null;
 };
+
+type Tele = { id: string; full_name: string };
+type Tpl = { id: string; name: string };
 
 const Row = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
   <div className="flex items-start justify-between gap-4 border-b py-4 last:border-0">
