@@ -37,14 +37,20 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
     const keyHash = await sha256Hex(apiKey);
-    const { data: keyRow } = await admin.from("api_keys").select("id, revoked").eq("key_hash", keyHash).maybeSingle();
+    const { data: keyRow } = await admin.from("api_keys").select("id, revoked, company_id").eq("key_hash", keyHash).maybeSingle();
     if (!keyRow || keyRow.revoked) {
       return new Response(JSON.stringify({ error: "Invalid api_key" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     await admin.from("api_keys").update({ last_used_at: new Date().toISOString() }).eq("id", keyRow.id);
 
+    const keyCompanyId = keyRow.company_id;
+
     const payload = await req.json().catch(() => ({}));
-    const { data: ev } = await admin.from("webhook_events").insert({ source: pick(payload, ["source"]) ?? "whatsapp", payload }).select("id").single();
+    const { data: ev } = await admin.from("webhook_events").insert({
+      source: pick(payload, ["source"]) ?? "whatsapp",
+      payload,
+      company_id: keyCompanyId,
+    }).select("id").single();
 
     const name = pick(payload, ["customer_name", "name", "full_name", "contact.name", "contacts.0.profile.name"]);
     const phone = normPhone(pick(payload, ["phone_number", "phone", "mobile", "contact.phone", "from", "contacts.0.wa_id"]));
@@ -56,10 +62,12 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ ok: true, event_id: ev?.id, lead_created: false, reason: "Missing name/phone" }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Pick first available area as fallback
-    const { data: area } = await admin.from("areas").select("id").limit(1).maybeSingle();
+    // Pick an area scoped to the API key's company
+    let areaQuery = admin.from("areas").select("id").limit(1);
+    if (keyCompanyId) areaQuery = areaQuery.eq("company_id", keyCompanyId);
+    const { data: area } = await areaQuery.maybeSingle();
     if (!area) {
-      return new Response(JSON.stringify({ ok: false, error: "No area configured" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ok: false, error: "No area configured for company" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const { data: lead, error: leadErr } = await admin.from("leads").insert({
@@ -67,9 +75,11 @@ Deno.serve(async (req) => {
       phone_number: phone,
       policy_type: ["Life", "Health", "Motor"].includes(policy) ? policy : "Motor",
       area_id: area.id,
+      company_id: keyCompanyId,
       lead_source: "WhatsApp API",
       notes: message ? String(message) : null,
     }).select("id").single();
+
 
     if (leadErr) {
       await admin.from("webhook_events").update({ error: leadErr.message }).eq("id", ev?.id);
