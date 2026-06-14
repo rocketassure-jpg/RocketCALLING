@@ -216,6 +216,50 @@ const AdminDashboard = () => {
   // Reset selection when filter changes
   useEffect(() => { setSelectedIds(new Set()); }, [section, search]);
 
+  const leadsView = (
+    <div className="space-y-6 pb-20">
+      <AddCustomerForm areas={areas} telecallers={telecallers} onDone={load} />
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle>Customers ({filteredLeads.length})</CardTitle>
+            <Input className="max-w-xs" placeholder="Search by name or phone…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+        </CardHeader>
+        <CardContent className="overflow-x-auto p-0">
+          <Table>
+            <TableHeader><TableRow>
+              <TableHead className="w-10"><Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
+              <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
+              <TableHead>Policy</TableHead><TableHead>Status</TableHead>
+              <TableHead>Assigned To</TableHead><TableHead>Last Disposition</TableHead>
+              <TableHead></TableHead>
+            </TableRow></TableHeader>
+            <TableBody>{filteredLeads.map((l) => {
+              const dispo = lastDispoMap.get(l.id);
+              const dispoBy = dispo ? profileById.get(dispo.telecaller_id)?.full_name : null;
+              return (
+                <TableRow key={l.id} data-state={selectedIds.has(l.id) ? "selected" : undefined}>
+                  <TableCell><Checkbox checked={selectedIds.has(l.id)} onCheckedChange={() => toggle(l.id)} /></TableCell>
+                  <TableCell className="font-medium">{l.customer_name}</TableCell>
+                  <TableCell className="font-mono text-xs">{l.phone_number}</TableCell>
+                  <TableCell>{l.areas?.name}</TableCell>
+                  <TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
+                  <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
+                  <TableCell className="text-xs">{l.assigned_telecaller ? (profileById.get(l.assigned_telecaller)?.full_name ?? "—") : <span className="text-muted-foreground">unassigned</span>}</TableCell>
+                  <TableCell className="text-xs">
+                    {dispo ? (<div><Badge variant="outline" className="mr-1">{dispo.status}</Badge><span className="text-muted-foreground">by {dispoBy ?? "—"} · {new Date(dispo.called_at).toLocaleDateString()}</span></div>) : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell><Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                </TableRow>
+              );
+            })}</TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
