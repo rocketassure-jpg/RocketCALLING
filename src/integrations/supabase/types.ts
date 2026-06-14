@@ -222,6 +222,7 @@ export type Database = {
       }
       ai_suggestions: {
         Row: {
+          company_id: string | null
           created_at: string
           created_by: string | null
           id: string
@@ -230,6 +231,7 @@ export type Database = {
           suggestion: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -238,6 +240,7 @@ export type Database = {
           suggestion: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           created_by?: string | null
           id?: string
@@ -245,7 +248,15 @@ export type Database = {
           model?: string
           suggestion?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ai_suggestions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       announcements: {
         Row: {
@@ -294,6 +305,7 @@ export type Database = {
       }
       api_keys: {
         Row: {
+          company_id: string | null
           created_at: string
           created_by: string
           id: string
@@ -304,6 +316,7 @@ export type Database = {
           revoked: boolean
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           created_by: string
           id?: string
@@ -314,6 +327,7 @@ export type Database = {
           revoked?: boolean
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           created_by?: string
           id?: string
@@ -323,7 +337,15 @@ export type Database = {
           prefix?: string
           revoked?: boolean
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "api_keys_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       app_settings: {
         Row: {
@@ -4104,6 +4126,7 @@ export type Database = {
       }
       role_permissions: {
         Row: {
+          company_id: string | null
           id: string
           manage_ivr: boolean
           mask_phone: boolean
@@ -4113,6 +4136,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          company_id?: string | null
           id?: string
           manage_ivr?: boolean
           mask_phone?: boolean
@@ -4122,6 +4146,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          company_id?: string | null
           id?: string
           manage_ivr?: boolean
           mask_phone?: boolean
@@ -4130,7 +4155,15 @@ export type Database = {
           track_personal_calls?: boolean
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rto_case_documents: {
         Row: {
@@ -4956,6 +4989,7 @@ export type Database = {
       }
       webhook_events: {
         Row: {
+          company_id: string | null
           created_at: string
           error: string | null
           id: string
@@ -4965,6 +4999,7 @@ export type Database = {
           source: string
         }
         Insert: {
+          company_id?: string | null
           created_at?: string
           error?: string | null
           id?: string
@@ -4974,6 +5009,7 @@ export type Database = {
           source?: string
         }
         Update: {
+          company_id?: string | null
           created_at?: string
           error?: string | null
           id?: string
@@ -4983,6 +5019,13 @@ export type Database = {
           source?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "webhook_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "webhook_events_lead_id_fkey"
             columns: ["lead_id"]
