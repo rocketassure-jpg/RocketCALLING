@@ -90,7 +90,13 @@ export const GeneralSettings = () => {
       allow_logout_mobile: s.allow_logout_mobile,
       allow_logout_web: s.allow_logout_web,
       master_sheet_url: s.master_sheet_url,
-    }).eq("id", s.id);
+      renewal_default_telecaller_id: s.renewal_default_telecaller_id,
+      renewal_alert_days: s.renewal_alert_days,
+      renewal_default_channel: s.renewal_default_channel,
+      renewal_auto_assign_logic: s.renewal_auto_assign_logic,
+      renewal_auto_send: s.renewal_auto_send,
+      renewal_default_template_id: s.renewal_default_template_id,
+    } as any).eq("id", s.id);
     setSaving(false);
     if (error) return toast({ title: "Save failed", description: error.message, variant: "destructive" });
     toast({ title: "Settings saved" });
