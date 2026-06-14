@@ -148,19 +148,39 @@ export const RenewalQueue = () => {
       </Card>
 
       <Card>
-        <CardHeader className="pb-3"><CardTitle>Renewal Queue ({rows.length})</CardTitle></CardHeader>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <CardTitle>Renewal Queue ({rows.length})</CardTitle>
+          {selected.size > 0 && role !== "telecaller" && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{selected.size} selected</span>
+              <Select value={bulkChannel} onValueChange={(v: any) => setBulkChannel(v)}>
+                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="sms">SMS</SelectItem>
+                  <SelectItem value="rcs">RCS</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={() => setBulkOpen(true)}>
+                <Radio className="h-4 w-4 mr-1" /> Bulk Send
+              </Button>
+            </div>
+          )}
+        </CardHeader>
         <CardContent className="overflow-x-auto p-0">
           {rows.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">Koi renewal nahi mila is filter mein.</div>
           ) : (
             <Table>
               <TableHeader><TableRow>
+                <TableHead className="w-10"><Checkbox checked={selected.size === rows.length && rows.length > 0} onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Customer</TableHead><TableHead>Mobile</TableHead><TableHead>Policy</TableHead>
                 <TableHead>Expiry</TableHead><TableHead>Days</TableHead><TableHead>Telecaller</TableHead>
                 <TableHead>Status</TableHead><TableHead>Actions</TableHead>
               </TableRow></TableHeader>
               <TableBody>{rows.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r.id} data-state={selected.has(r.id) ? "selected" : undefined}>
+                  <TableCell><Checkbox checked={selected.has(r.id)} onCheckedChange={(v) => toggleOne(r.id, !!v)} /></TableCell>
                   <TableCell className="font-medium">{r.customer_name}</TableCell>
                   <TableCell className="font-mono text-xs">{r.phone_number}</TableCell>
                   <TableCell><Badge variant="outline">{r.policy_type}</Badge></TableCell>
