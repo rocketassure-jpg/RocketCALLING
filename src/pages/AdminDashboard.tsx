@@ -227,14 +227,12 @@ const AdminDashboard = () => {
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
       case "operations": return <OperationsPanel />;
-      case "reports": return <ReportsAndPerformancePanel />;
-      case "dashboard": return <CallReportsPanel />;
+      case "reports_hub": return <ReportsHubPanel />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
-      case "customers": return <CustomersPanel />;
-      case "customer360": return <Customer360Panel />;
+      case "customers_hub": return <CustomersHubPanel areas={areas} telecallers={telecallers} onDone={load} />;
       case "branches": return <BranchesPanel />;
-      case "enquiries": return <EnquiriesPanel />;
+      case "leads_hub": return <LeadsEnquiriesPanel leadsView={leadsView} />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
      case "messaging": return <WhatsAppBulkMessaging />;
      case "calculator": return <PremiumCalculator />;
@@ -246,7 +244,7 @@ const AdminDashboard = () => {
       case "permissions": return <PermissionsMatrix />;
       case "approvals": return <PendingApprovalsPanel />;
       case "fields": return <FieldsAndStatusesPanel />;
-      case "leads": return (
+      case "leads": return leadsView;
         <div className="space-y-6 pb-20">
           <AddCustomerForm areas={areas} telecallers={telecallers} onDone={load} />
           <Card>
