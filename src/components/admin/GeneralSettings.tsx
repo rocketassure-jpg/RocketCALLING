@@ -22,7 +22,16 @@ type Settings = {
   allow_logout_mobile: boolean;
   allow_logout_web: boolean;
   master_sheet_url: string | null;
+  renewal_default_telecaller_id: string | null;
+  renewal_alert_days: string | null;
+  renewal_default_channel: string | null;
+  renewal_auto_assign_logic: string | null;
+  renewal_auto_send: boolean;
+  renewal_default_template_id: string | null;
 };
+
+type Tele = { id: string; full_name: string };
+type Tpl = { id: string; name: string };
 
 const Row = ({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) => (
   <div className="flex items-start justify-between gap-4 border-b py-4 last:border-0">
@@ -38,6 +47,8 @@ export const GeneralSettings = () => {
   const [s, setS] = useState<Settings | null>(null);
   const [saving, setSaving] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [telecallers, setTelecallers] = useState<Tele[]>([]);
+  const [templates, setTemplates] = useState<Tpl[]>([]);
 
   const syncSheet = async () => {
     if (!s?.master_sheet_url) return toast({ title: "Add a Sheet URL first", variant: "destructive" });
@@ -50,6 +61,16 @@ export const GeneralSettings = () => {
 
   useEffect(() => {
     supabase.from("app_settings").select("*").limit(1).single().then(({ data }) => setS(data as any));
+    (async () => {
+      const [p, tr, tpl] = await Promise.all([
+        supabase.from("profiles").select("id,full_name"),
+        supabase.from("user_roles").select("user_id,role").eq("role", "telecaller"),
+        (supabase as any).from("renewal_templates").select("id,name").eq("is_active", true),
+      ]);
+      const tids = new Set((tr.data ?? []).map((x: any) => x.user_id));
+      setTelecallers(((p.data ?? []) as any[]).filter((x) => tids.has(x.id)));
+      setTemplates((tpl.data ?? []) as any);
+    })();
   }, []);
 
   if (!s) return <div className="flex justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>;
@@ -69,7 +90,13 @@ export const GeneralSettings = () => {
       allow_logout_mobile: s.allow_logout_mobile,
       allow_logout_web: s.allow_logout_web,
       master_sheet_url: s.master_sheet_url,
-    }).eq("id", s.id);
+      renewal_default_telecaller_id: s.renewal_default_telecaller_id,
+      renewal_alert_days: s.renewal_alert_days,
+      renewal_default_channel: s.renewal_default_channel,
+      renewal_auto_assign_logic: s.renewal_auto_assign_logic,
+      renewal_auto_send: s.renewal_auto_send,
+      renewal_default_template_id: s.renewal_default_template_id,
+    } as any).eq("id", s.id);
     setSaving(false);
     if (error) return toast({ title: "Save failed", description: error.message, variant: "destructive" });
     toast({ title: "Settings saved" });
@@ -151,6 +178,52 @@ export const GeneralSettings = () => {
           </Row>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Renewal Automation</CardTitle></CardHeader>
+        <CardContent className="pt-0">
+          <Row title="Auto-send Renewal Reminders" desc="Cron will dispatch reminders on configured alert days">
+            <Switch checked={!!s.renewal_auto_send} onCheckedChange={(v) => update({ renewal_auto_send: v })} />
+          </Row>
+          <div className="grid gap-4 pt-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Alert Days Before Expiry (comma-sep)</Label>
+              <Input placeholder="30,15,7,1" value={s.renewal_alert_days ?? ""} onChange={(e) => update({ renewal_alert_days: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Default Channel</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_channel ?? "whatsapp"} onChange={(e) => update({ renewal_default_channel: e.target.value })}>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="sms">SMS</option>
+                <option value="rcs">RCS</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Auto-assign Logic</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_auto_assign_logic ?? "original_then_default"} onChange={(e) => update({ renewal_auto_assign_logic: e.target.value })}>
+                <option value="original_then_default">Original telecaller → Default</option>
+                <option value="original_only">Original telecaller only</option>
+                <option value="default_only">Default telecaller only</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Default Telecaller</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_telecaller_id ?? ""} onChange={(e) => update({ renewal_default_telecaller_id: e.target.value || null })}>
+                <option value="">— None —</option>
+                {telecallers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Default Renewal Template</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_template_id ?? ""} onChange={(e) => update({ renewal_default_template_id: e.target.value || null })}>
+                <option value="">— None —</option>
+                {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
 
       <BrandingPanel />
       <MaskingPolicyPanel />

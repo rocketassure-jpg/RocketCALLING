@@ -8,8 +8,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { MoreVertical, MessageCircle, Phone, Send, UserCog, CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { MoreVertical, MessageCircle, Phone, Send, UserCog, CheckCircle2, XCircle, Loader2, Radio } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Renewal = {
@@ -40,6 +42,10 @@ export const RenewalQueue = () => {
   const [fTele, setFTele] = useState("all");
   const [fFrom, setFFrom] = useState(today());
   const [fTo, setFTo] = useState(() => { const d = new Date(); d.setDate(d.getDate() + 60); return d.toISOString().slice(0,10); });
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkChannel, setBulkChannel] = useState<"whatsapp" | "sms" | "rcs">("whatsapp");
+  const [bulkOpen, setBulkOpen] = useState(false);
+  const [bulkSending, setBulkSending] = useState(false);
 
   const load = async () => {
     let q = supabase.from("renewals").select("id,customer_name,phone_number,policy_type,expiry_date,assigned_telecaller_id,status,premium_amount,last_contact_at")
@@ -80,12 +86,33 @@ export const RenewalQueue = () => {
     toast({ title: "Telecaller assigned" }); load();
   };
 
-  const sendMessage = async (r: Renewal, channel: "whatsapp" | "sms") => {
+  const sendMessage = async (r: Renewal, channel: "whatsapp" | "sms" | "rcs") => {
     const { error } = await supabase.functions.invoke("send-renewal-message", {
       body: { renewal_id: r.id, channel },
     });
     if (error) return toast({ title: "Send failed", description: error.message, variant: "destructive" });
     toast({ title: `${channel.toUpperCase()} queued`, description: r.customer_name });
+    load();
+  };
+
+  const toggleAll = (checked: boolean) => {
+    if (!rows) return;
+    setSelected(checked ? new Set(rows.map((r) => r.id)) : new Set());
+  };
+  const toggleOne = (id: string, checked: boolean) => {
+    setSelected((prev) => { const n = new Set(prev); if (checked) n.add(id); else n.delete(id); return n; });
+  };
+
+  const runBulk = async () => {
+    setBulkSending(true);
+    const ids = Array.from(selected);
+    let ok = 0, fail = 0;
+    for (const id of ids) {
+      const { error } = await supabase.functions.invoke("send-renewal-message", { body: { renewal_id: id, channel: bulkChannel } });
+      if (error) fail++; else ok++;
+    }
+    setBulkSending(false); setBulkOpen(false); setSelected(new Set());
+    toast({ title: `Bulk ${bulkChannel.toUpperCase()} done`, description: `${ok} sent, ${fail} failed` });
     load();
   };
 
@@ -121,19 +148,39 @@ export const RenewalQueue = () => {
       </Card>
 
       <Card>
-        <CardHeader className="pb-3"><CardTitle>Renewal Queue ({rows.length})</CardTitle></CardHeader>
+        <CardHeader className="pb-3 flex flex-row items-center justify-between space-y-0">
+          <CardTitle>Renewal Queue ({rows.length})</CardTitle>
+          {selected.size > 0 && role !== "telecaller" && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">{selected.size} selected</span>
+              <Select value={bulkChannel} onValueChange={(v: any) => setBulkChannel(v)}>
+                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="sms">SMS</SelectItem>
+                  <SelectItem value="rcs">RCS</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button size="sm" onClick={() => setBulkOpen(true)}>
+                <Radio className="h-4 w-4 mr-1" /> Bulk Send
+              </Button>
+            </div>
+          )}
+        </CardHeader>
         <CardContent className="overflow-x-auto p-0">
           {rows.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">Koi renewal nahi mila is filter mein.</div>
           ) : (
             <Table>
               <TableHeader><TableRow>
+                <TableHead className="w-10"><Checkbox checked={selected.size === rows.length && rows.length > 0} onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
                 <TableHead>Customer</TableHead><TableHead>Mobile</TableHead><TableHead>Policy</TableHead>
                 <TableHead>Expiry</TableHead><TableHead>Days</TableHead><TableHead>Telecaller</TableHead>
                 <TableHead>Status</TableHead><TableHead>Actions</TableHead>
               </TableRow></TableHeader>
               <TableBody>{rows.map((r) => (
-                <TableRow key={r.id}>
+                <TableRow key={r.id} data-state={selected.has(r.id) ? "selected" : undefined}>
+                  <TableCell><Checkbox checked={selected.has(r.id)} onCheckedChange={(v) => toggleOne(r.id, !!v)} /></TableCell>
                   <TableCell className="font-medium">{r.customer_name}</TableCell>
                   <TableCell className="font-mono text-xs">{r.phone_number}</TableCell>
                   <TableCell><Badge variant="outline">{r.policy_type}</Badge></TableCell>
@@ -151,6 +198,7 @@ export const RenewalQueue = () => {
                           <DropdownMenuLabel>Channels</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => sendMessage(r, "whatsapp")}><MessageCircle className="h-4 w-4 mr-2" /> Send WhatsApp</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => sendMessage(r, "sms")}><Send className="h-4 w-4 mr-2" /> Send SMS</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => sendMessage(r, "rcs")}><Radio className="h-4 w-4 mr-2" /> Send RCS</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuLabel>Assign</DropdownMenuLabel>
                           {telecallers.map(t => (
@@ -170,6 +218,23 @@ export const RenewalQueue = () => {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={bulkOpen} onOpenChange={setBulkOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send {bulkChannel.toUpperCase()} to {selected.size} customers?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will queue {bulkChannel.toUpperCase()} reminders to all selected renewals using the active default template. Make sure templates and provider integrations are configured.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkSending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={runBulk} disabled={bulkSending}>
+              {bulkSending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Radio className="h-4 w-4 mr-1" />} Send Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
