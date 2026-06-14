@@ -3,7 +3,7 @@ import { CustomersPanel } from "@/components/admin/CustomersPanel";
 import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
 import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { MobileNumberSearch } from "@/components/MobileNumberSearch";
-import { Trophy, UserPlus, Users, Card as CardIcon } from "lucide-react";
+import { Trophy, UserPlus, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const CustomersHubPanel = ({ areas, telecallers, onDone }: { areas: any[]; telecallers: any[]; onDone: () => void }) => (
