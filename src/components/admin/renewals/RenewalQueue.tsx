@@ -218,6 +218,23 @@ export const RenewalQueue = () => {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={bulkOpen} onOpenChange={setBulkOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Send {bulkChannel.toUpperCase()} to {selected.size} customers?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will queue {bulkChannel.toUpperCase()} reminders to all selected renewals using the active default template. Make sure templates and provider integrations are configured.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={bulkSending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={runBulk} disabled={bulkSending}>
+              {bulkSending ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Radio className="h-4 w-4 mr-1" />} Send Now
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
