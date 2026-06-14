@@ -131,6 +131,7 @@ Deno.serve(async (req) => {
         const { data: campaign } = await supabase
           .from("renewal_campaigns").select("*").eq("id", params.campaign_id).single();
         if (!campaign) return jsonErr("Campaign missing", 404);
+        if (campaign.company_id !== callerCompanyId) return jsonErr("Forbidden", 403);
 
         let query = supabase.from("leads")
           .select("id,customer_name,phone_number,policy_type,policy_expiry_date,premium_amount,assigned_telecaller,city_village")
