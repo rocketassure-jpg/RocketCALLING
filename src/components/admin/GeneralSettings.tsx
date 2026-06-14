@@ -179,6 +179,52 @@ export const GeneralSettings = () => {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader><CardTitle>Renewal Automation</CardTitle></CardHeader>
+        <CardContent className="pt-0">
+          <Row title="Auto-send Renewal Reminders" desc="Cron will dispatch reminders on configured alert days">
+            <Switch checked={!!s.renewal_auto_send} onCheckedChange={(v) => update({ renewal_auto_send: v })} />
+          </Row>
+          <div className="grid gap-4 pt-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label>Alert Days Before Expiry (comma-sep)</Label>
+              <Input placeholder="30,15,7,1" value={s.renewal_alert_days ?? ""} onChange={(e) => update({ renewal_alert_days: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Default Channel</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_channel ?? "whatsapp"} onChange={(e) => update({ renewal_default_channel: e.target.value })}>
+                <option value="whatsapp">WhatsApp</option>
+                <option value="sms">SMS</option>
+                <option value="rcs">RCS</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Auto-assign Logic</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_auto_assign_logic ?? "original_then_default"} onChange={(e) => update({ renewal_auto_assign_logic: e.target.value })}>
+                <option value="original_then_default">Original telecaller → Default</option>
+                <option value="original_only">Original telecaller only</option>
+                <option value="default_only">Default telecaller only</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>Default Telecaller</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_telecaller_id ?? ""} onChange={(e) => update({ renewal_default_telecaller_id: e.target.value || null })}>
+                <option value="">— None —</option>
+                {telecallers.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+              </select>
+            </div>
+            <div className="space-y-2 md:col-span-2">
+              <Label>Default Renewal Template</Label>
+              <select className="w-full h-10 rounded-md border bg-background px-3 text-sm" value={s.renewal_default_template_id ?? ""} onChange={(e) => update({ renewal_default_template_id: e.target.value || null })}>
+                <option value="">— None —</option>
+                {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+
       <BrandingPanel />
       <MaskingPolicyPanel />
     </div>
