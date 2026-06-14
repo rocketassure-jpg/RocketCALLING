@@ -11,7 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3 } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3, Megaphone } from "lucide-react";
+import { MarketingAutomationPanel } from "@/components/admin/marketing/MarketingAutomationPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
 import { MotorPanel } from "@/components/admin/motor/MotorPanel";
@@ -97,6 +98,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
+  { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
   // Settings
@@ -279,6 +281,7 @@ const AdminDashboard = () => {
       case "leads_hub": return <LeadsEnquiriesPanel leadsView={leadsView} />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
      case "messaging": return <WhatsAppBulkMessaging />;
+      case "marketing": return <MarketingAutomationPanel />;
      case "calculator": return <PremiumCalculator />;
       case "api": return <ApiAndWebhooksPanel />;
       case "training": return <TrainingModule canManage={true} />;

@@ -337,6 +337,12 @@ export type Database = {
           masking_config: Json
           master_sheet_url: string | null
           post_interaction_actions: boolean
+          renewal_alert_days: string | null
+          renewal_auto_assign_logic: string | null
+          renewal_auto_send: boolean
+          renewal_default_channel: string | null
+          renewal_default_telecaller_id: string | null
+          renewal_default_template_id: string | null
           retry_1_hours: number
           retry_2_hours: number
           updated_at: string
@@ -355,6 +361,12 @@ export type Database = {
           masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
+          renewal_alert_days?: string | null
+          renewal_auto_assign_logic?: string | null
+          renewal_auto_send?: boolean
+          renewal_default_channel?: string | null
+          renewal_default_telecaller_id?: string | null
+          renewal_default_template_id?: string | null
           retry_1_hours?: number
           retry_2_hours?: number
           updated_at?: string
@@ -373,6 +385,12 @@ export type Database = {
           masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
+          renewal_alert_days?: string | null
+          renewal_auto_assign_logic?: string | null
+          renewal_auto_send?: boolean
+          renewal_default_channel?: string | null
+          renewal_default_telecaller_id?: string | null
+          renewal_default_template_id?: string | null
           retry_1_hours?: number
           retry_2_hours?: number
           updated_at?: string
@@ -386,6 +404,20 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_settings_renewal_default_telecaller_id_fkey"
+            columns: ["renewal_default_telecaller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_settings_renewal_default_template_id_fkey"
+            columns: ["renewal_default_template_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_templates"
             referencedColumns: ["id"]
           },
         ]
@@ -415,6 +447,108 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audience_sync_configs: {
+        Row: {
+          audience_name: string
+          category: string
+          company_id: string
+          created_at: string
+          days_after_expiry: number
+          days_before_expiry: number
+          enabled: boolean
+          id: string
+          integration_id: string | null
+          meta_audience_id: string | null
+        }
+        Insert: {
+          audience_name: string
+          category?: string
+          company_id: string
+          created_at?: string
+          days_after_expiry?: number
+          days_before_expiry?: number
+          enabled?: boolean
+          id?: string
+          integration_id?: string | null
+          meta_audience_id?: string | null
+        }
+        Update: {
+          audience_name?: string
+          category?: string
+          company_id?: string
+          created_at?: string
+          days_after_expiry?: number
+          days_before_expiry?: number
+          enabled?: boolean
+          id?: string
+          integration_id?: string | null
+          meta_audience_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_sync_configs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audience_sync_configs_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audience_sync_logs: {
+        Row: {
+          company_id: string
+          config_id: string | null
+          id: string
+          message: string | null
+          records_matched: number
+          records_sent: number
+          run_at: string
+          status: string | null
+        }
+        Insert: {
+          company_id: string
+          config_id?: string | null
+          id?: string
+          message?: string | null
+          records_matched?: number
+          records_sent?: number
+          run_at?: string
+          status?: string | null
+        }
+        Update: {
+          company_id?: string
+          config_id?: string | null
+          id?: string
+          message?: string | null
+          records_matched?: number
+          records_sent?: number
+          run_at?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_sync_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "audience_sync_logs_config_id_fkey"
+            columns: ["config_id"]
+            isOneToOne: false
+            referencedRelation: "audience_sync_configs"
             referencedColumns: ["id"]
           },
         ]
@@ -959,11 +1093,15 @@ export type Database = {
           company_id: string
           created_at: string
           customer_id: string | null
+          customer_name: string | null
+          delivered_at: string | null
           error: string | null
           id: string
+          lead_id: string | null
           phone_number: string | null
           provider_message_id: string | null
           renewal_id: string | null
+          replied_at: string | null
           response_at: string | null
           sent_at: string | null
           status: string
@@ -974,11 +1112,15 @@ export type Database = {
           company_id: string
           created_at?: string
           customer_id?: string | null
+          customer_name?: string | null
+          delivered_at?: string | null
           error?: string | null
           id?: string
+          lead_id?: string | null
           phone_number?: string | null
           provider_message_id?: string | null
           renewal_id?: string | null
+          replied_at?: string | null
           response_at?: string | null
           sent_at?: string | null
           status?: string
@@ -989,11 +1131,15 @@ export type Database = {
           company_id?: string
           created_at?: string
           customer_id?: string | null
+          customer_name?: string | null
+          delivered_at?: string | null
           error?: string | null
           id?: string
+          lead_id?: string | null
           phone_number?: string | null
           provider_message_id?: string | null
           renewal_id?: string | null
+          replied_at?: string | null
           response_at?: string | null
           sent_at?: string | null
           status?: string
@@ -1004,6 +1150,27 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "renewal_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
           {
@@ -2810,6 +2977,166 @@ export type Database = {
           },
         ]
       }
+      marketing_integrations: {
+        Row: {
+          access_token: string | null
+          ad_account_id: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string
+          last_error: string | null
+          page_id: string | null
+          platform: string
+          rcs_enabled: boolean | null
+          sms_api_key: string | null
+          sms_provider: string | null
+          sms_sender_id: string | null
+          status: string | null
+          updated_at: string
+          voice_api_key: string | null
+          voice_caller_id: string | null
+          voice_provider: string | null
+          voice_tts_engine: string | null
+          wa_api_key: string | null
+          wa_phone_number_id: string | null
+          wa_waba_id: string | null
+          wa_webhook_secret: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          ad_account_id?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label: string
+          last_error?: string | null
+          page_id?: string | null
+          platform: string
+          rcs_enabled?: boolean | null
+          sms_api_key?: string | null
+          sms_provider?: string | null
+          sms_sender_id?: string | null
+          status?: string | null
+          updated_at?: string
+          voice_api_key?: string | null
+          voice_caller_id?: string | null
+          voice_provider?: string | null
+          voice_tts_engine?: string | null
+          wa_api_key?: string | null
+          wa_phone_number_id?: string | null
+          wa_waba_id?: string | null
+          wa_webhook_secret?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          ad_account_id?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string
+          last_error?: string | null
+          page_id?: string | null
+          platform?: string
+          rcs_enabled?: boolean | null
+          sms_api_key?: string | null
+          sms_provider?: string | null
+          sms_sender_id?: string | null
+          status?: string | null
+          updated_at?: string
+          voice_api_key?: string | null
+          voice_caller_id?: string | null
+          voice_provider?: string | null
+          voice_tts_engine?: string | null
+          wa_api_key?: string | null
+          wa_phone_number_id?: string | null
+          wa_waba_id?: string | null
+          wa_webhook_secret?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_integrations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_templates: {
+        Row: {
+          body_text: string
+          category: string | null
+          channel: string
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          rcs_rich_card: Json | null
+          rcs_suggestions: Json | null
+          updated_at: string
+          variables: Json
+          voice_language: string | null
+          voice_script: string | null
+          wa_header_content: string | null
+          wa_header_type: string | null
+          wa_template_language: string | null
+          wa_template_name: string | null
+        }
+        Insert: {
+          body_text: string
+          category?: string | null
+          channel: string
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          rcs_rich_card?: Json | null
+          rcs_suggestions?: Json | null
+          updated_at?: string
+          variables?: Json
+          voice_language?: string | null
+          voice_script?: string | null
+          wa_header_content?: string | null
+          wa_header_type?: string | null
+          wa_template_language?: string | null
+          wa_template_name?: string | null
+        }
+        Update: {
+          body_text?: string
+          category?: string | null
+          channel?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          rcs_rich_card?: Json | null
+          rcs_suggestions?: Json | null
+          updated_at?: string
+          variables?: Json
+          voice_language?: string | null
+          voice_script?: string | null
+          wa_header_content?: string | null
+          wa_header_type?: string | null
+          wa_template_language?: string | null
+          wa_template_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       message_templates: {
         Row: {
           body: string
@@ -3561,46 +3888,83 @@ export type Database = {
         Row: {
           channel: string
           company_id: string
+          converted_count: number
           created_at: string
           created_by: string | null
+          delivered_count: number
           filter: Json
+          filter_city: string | null
+          filter_expiry_from: string | null
+          filter_expiry_to: string | null
+          filter_policy_type: string | null
+          filter_telecaller_id: string | null
           id: string
           name: string
+          replied_count: number
           response_count: number
+          scheduled_at: string | null
           sent_count: number
           status: string
           template_id: string | null
+          total_targets: number
           updated_at: string
         }
         Insert: {
           channel: string
           company_id: string
+          converted_count?: number
           created_at?: string
           created_by?: string | null
+          delivered_count?: number
           filter?: Json
+          filter_city?: string | null
+          filter_expiry_from?: string | null
+          filter_expiry_to?: string | null
+          filter_policy_type?: string | null
+          filter_telecaller_id?: string | null
           id?: string
           name: string
+          replied_count?: number
           response_count?: number
+          scheduled_at?: string | null
           sent_count?: number
           status?: string
           template_id?: string | null
+          total_targets?: number
           updated_at?: string
         }
         Update: {
           channel?: string
           company_id?: string
+          converted_count?: number
           created_at?: string
           created_by?: string | null
+          delivered_count?: number
           filter?: Json
+          filter_city?: string | null
+          filter_expiry_from?: string | null
+          filter_expiry_to?: string | null
+          filter_policy_type?: string | null
+          filter_telecaller_id?: string | null
           id?: string
           name?: string
+          replied_count?: number
           response_count?: number
+          scheduled_at?: string | null
           sent_count?: number
           status?: string
           template_id?: string | null
+          total_targets?: number
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "renewal_campaigns_filter_telecaller_id_fkey"
+            columns: ["filter_telecaller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "renewal_campaigns_template_id_fkey"
             columns: ["template_id"]
@@ -4021,6 +4385,59 @@ export type Database = {
           },
         ]
       }
+      scheduled_posts: {
+        Row: {
+          category: string
+          company_id: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          media_url: string | null
+          platforms: string[]
+          scheduled_at: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          company_id: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_url?: string | null
+          platforms: string[]
+          scheduled_at: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_url?: string | null
+          platforms?: string[]
+          scheduled_at?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       service_requests: {
         Row: {
           assigned_to: string | null
@@ -4112,6 +4529,51 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      social_post_logs: {
+        Row: {
+          company_id: string
+          id: string
+          platform: string
+          post_id: string | null
+          posted_at: string
+          response: Json | null
+          status: string | null
+        }
+        Insert: {
+          company_id: string
+          id?: string
+          platform: string
+          post_id?: string | null
+          posted_at?: string
+          response?: Json | null
+          status?: string | null
+        }
+        Update: {
+          company_id?: string
+          id?: string
+          platform?: string
+          post_id?: string | null
+          posted_at?: string
+          response?: Json | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_post_logs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "social_post_logs_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "scheduled_posts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       super_admin_audit_log: {
         Row: {
@@ -4408,6 +4870,84 @@ export type Database = {
           {
             foreignKeyName: "vehicles_client_lead_id_fkey"
             columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wa_webhook_messages: {
+        Row: {
+          campaign_log_id: string | null
+          company_id: string | null
+          direction: string
+          from_number: string | null
+          id: string
+          lead_id: string | null
+          media_url: string | null
+          message_text: string | null
+          message_type: string | null
+          received_at: string
+          wa_message_id: string | null
+        }
+        Insert: {
+          campaign_log_id?: string | null
+          company_id?: string | null
+          direction?: string
+          from_number?: string | null
+          id?: string
+          lead_id?: string | null
+          media_url?: string | null
+          message_text?: string | null
+          message_type?: string | null
+          received_at?: string
+          wa_message_id?: string | null
+        }
+        Update: {
+          campaign_log_id?: string | null
+          company_id?: string | null
+          direction?: string
+          from_number?: string | null
+          id?: string
+          lead_id?: string | null
+          media_url?: string | null
+          message_text?: string | null
+          message_type?: string | null
+          received_at?: string
+          wa_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wa_webhook_messages_campaign_log_id_fkey"
+            columns: ["campaign_log_id"]
+            isOneToOne: false
+            referencedRelation: "campaign_logs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wa_webhook_messages_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wa_webhook_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wa_webhook_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wa_webhook_messages_lead_id_fkey"
+            columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
