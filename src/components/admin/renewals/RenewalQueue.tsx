@@ -198,6 +198,7 @@ export const RenewalQueue = () => {
                           <DropdownMenuLabel>Channels</DropdownMenuLabel>
                           <DropdownMenuItem onClick={() => sendMessage(r, "whatsapp")}><MessageCircle className="h-4 w-4 mr-2" /> Send WhatsApp</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => sendMessage(r, "sms")}><Send className="h-4 w-4 mr-2" /> Send SMS</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => sendMessage(r, "rcs")}><Radio className="h-4 w-4 mr-2" /> Send RCS</DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuLabel>Assign</DropdownMenuLabel>
                           {telecallers.map(t => (
