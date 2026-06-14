@@ -85,6 +85,9 @@ Deno.serve(async (req) => {
       }
 
       case "send-sms": {
+        if (params.integration_id) await assertCompany("marketing_integrations", params.integration_id);
+        if (params.template_id) await assertCompany("marketing_templates", params.template_id);
+        if (params.campaign_log_id) await assertCompany("campaign_logs", params.campaign_log_id);
         const { data: integration } = await supabase
           .from("marketing_integrations").select("*").eq("id", params.integration_id).single();
         const { data: template } = await supabase
