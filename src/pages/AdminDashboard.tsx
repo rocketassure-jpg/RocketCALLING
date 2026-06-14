@@ -281,6 +281,7 @@ const AdminDashboard = () => {
       case "leads_hub": return <LeadsEnquiriesPanel leadsView={leadsView} />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
      case "messaging": return <WhatsAppBulkMessaging />;
+      case "marketing": return <MarketingAutomationPanel />;
      case "calculator": return <PremiumCalculator />;
       case "api": return <ApiAndWebhooksPanel />;
       case "training": return <TrainingModule canManage={true} />;
