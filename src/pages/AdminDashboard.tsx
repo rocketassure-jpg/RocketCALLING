@@ -38,8 +38,9 @@ import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
-import { CustomersPanel } from "@/components/admin/CustomersPanel";
-import { Customer360Panel } from "@/components/admin/customers360/Customer360Panel";
+import { CustomersHubPanel } from "@/components/admin/CustomersHubPanel";
+import { ReportsHubPanel } from "@/components/admin/ReportsHubPanel";
+import { LeadsEnquiriesPanel } from "@/components/admin/LeadsEnquiriesPanel";
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
@@ -72,14 +73,11 @@ const today = () => new Date().toISOString().slice(0, 10);
 const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: string }[] = [
   // Dashboards
   { id: "overview", label: "Overview", icon: BarChart3, group: "Dashboards" },
-  { id: "dashboard", label: "Call Reports", icon: Phone, group: "Dashboards" },
-  { id: "reports", label: "Reports & Performance", icon: BarChart3, group: "Dashboards" },
+  { id: "reports_hub", label: "Reports Hub", icon: BarChart3, group: "Dashboards" },
   // Sales
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
-  { id: "enquiries", label: "Enquiries", icon: Inbox, group: "Sales" },
-  { id: "leads", label: "Leads", icon: Users, group: "Sales" },
-  { id: "customers", label: "Customers (Won)", icon: Trophy, group: "Sales" },
-  { id: "customer360", label: "Customer 360", icon: UserPlus, group: "Sales" },
+  { id: "leads_hub", label: "Leads & Enquiries", icon: Users, group: "Sales" },
+  { id: "customers_hub", label: "Customers", icon: Trophy, group: "Sales" },
   // Policies
   { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance", group: "Policies" },
   { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance", group: "Policies" },
@@ -218,6 +216,50 @@ const AdminDashboard = () => {
   // Reset selection when filter changes
   useEffect(() => { setSelectedIds(new Set()); }, [section, search]);
 
+  const leadsView = (
+    <div className="space-y-6 pb-20">
+      <AddCustomerForm areas={areas} telecallers={telecallers} onDone={load} />
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <CardTitle>Customers ({filteredLeads.length})</CardTitle>
+            <Input className="max-w-xs" placeholder="Search by name or phone…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          </div>
+        </CardHeader>
+        <CardContent className="overflow-x-auto p-0">
+          <Table>
+            <TableHeader><TableRow>
+              <TableHead className="w-10"><Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
+              <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
+              <TableHead>Policy</TableHead><TableHead>Status</TableHead>
+              <TableHead>Assigned To</TableHead><TableHead>Last Disposition</TableHead>
+              <TableHead></TableHead>
+            </TableRow></TableHeader>
+            <TableBody>{filteredLeads.map((l) => {
+              const dispo = lastDispoMap.get(l.id);
+              const dispoBy = dispo ? profileById.get(dispo.telecaller_id)?.full_name : null;
+              return (
+                <TableRow key={l.id} data-state={selectedIds.has(l.id) ? "selected" : undefined}>
+                  <TableCell><Checkbox checked={selectedIds.has(l.id)} onCheckedChange={() => toggle(l.id)} /></TableCell>
+                  <TableCell className="font-medium">{l.customer_name}</TableCell>
+                  <TableCell className="font-mono text-xs">{l.phone_number}</TableCell>
+                  <TableCell>{l.areas?.name}</TableCell>
+                  <TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
+                  <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
+                  <TableCell className="text-xs">{l.assigned_telecaller ? (profileById.get(l.assigned_telecaller)?.full_name ?? "—") : <span className="text-muted-foreground">unassigned</span>}</TableCell>
+                  <TableCell className="text-xs">
+                    {dispo ? (<div><Badge variant="outline" className="mr-1">{dispo.status}</Badge><span className="text-muted-foreground">by {dispoBy ?? "—"} · {new Date(dispo.called_at).toLocaleDateString()}</span></div>) : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell><Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
+                </TableRow>
+              );
+            })}</TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
@@ -229,14 +271,12 @@ const AdminDashboard = () => {
       case "rto": return <RtoPanel />;
       case "claims": return <ClaimsPanel />;
       case "operations": return <OperationsPanel />;
-      case "reports": return <ReportsAndPerformancePanel />;
-      case "dashboard": return <CallReportsPanel />;
+      case "reports_hub": return <ReportsHubPanel />;
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
-      case "customers": return <CustomersPanel />;
-      case "customer360": return <Customer360Panel />;
+      case "customers_hub": return <CustomersHubPanel areas={areas} telecallers={telecallers} onDone={load} />;
       case "branches": return <BranchesPanel />;
-      case "enquiries": return <EnquiriesPanel />;
+      case "leads_hub": return <LeadsEnquiriesPanel leadsView={leadsView} />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
      case "messaging": return <WhatsAppBulkMessaging />;
      case "calculator": return <PremiumCalculator />;
@@ -248,54 +288,7 @@ const AdminDashboard = () => {
       case "permissions": return <PermissionsMatrix />;
       case "approvals": return <PendingApprovalsPanel />;
       case "fields": return <FieldsAndStatusesPanel />;
-      case "leads": return (
-        <div className="space-y-6 pb-20">
-          <AddCustomerForm areas={areas} telecallers={telecallers} onDone={load} />
-          <Card>
-            <CardHeader>
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <CardTitle>Customers ({filteredLeads.length})</CardTitle>
-                <Input className="max-w-xs" placeholder="Search by name or phone…" value={search} onChange={(e) => setSearch(e.target.value)} />
-              </div>
-            </CardHeader>
-            <CardContent className="overflow-x-auto p-0">
-              <Table>
-                <TableHeader><TableRow>
-                  <TableHead className="w-10"><Checkbox checked={allSelected} onCheckedChange={(v) => toggleAll(!!v)} /></TableHead>
-                  <TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead>
-                  <TableHead>Policy</TableHead><TableHead>Status</TableHead>
-                  <TableHead>Assigned To</TableHead><TableHead>Last Disposition</TableHead>
-                  <TableHead></TableHead>
-                </TableRow></TableHeader>
-                <TableBody>{filteredLeads.map((l) => {
-                  const dispo = lastDispoMap.get(l.id);
-                  const dispoBy = dispo ? profileById.get(dispo.telecaller_id)?.full_name : null;
-                  return (
-                    <TableRow key={l.id} data-state={selectedIds.has(l.id) ? "selected" : undefined}>
-                      <TableCell><Checkbox checked={selectedIds.has(l.id)} onCheckedChange={() => toggle(l.id)} /></TableCell>
-                      <TableCell className="font-medium">{l.customer_name}</TableCell>
-                      <TableCell className="font-mono text-xs">{l.phone_number}</TableCell>
-                      <TableCell>{l.areas?.name}</TableCell>
-                      <TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
-                      <TableCell><Badge variant="secondary">{l.status}</Badge></TableCell>
-                      <TableCell className="text-xs">{l.assigned_telecaller ? (profileById.get(l.assigned_telecaller)?.full_name ?? "—") : <span className="text-muted-foreground">unassigned</span>}</TableCell>
-                      <TableCell className="text-xs">
-                        {dispo ? (
-                          <div>
-                            <Badge variant="outline" className="mr-1">{dispo.status}</Badge>
-                            <span className="text-muted-foreground">by {dispoBy ?? "—"} · {new Date(dispo.called_at).toLocaleDateString()}</span>
-                          </div>
-                        ) : <span className="text-muted-foreground">—</span>}
-                      </TableCell>
-                      <TableCell><Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button></TableCell>
-                    </TableRow>
-                  );
-                })}</TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </div>
-      );
+      case "leads": return leadsView;
       case "areas": return (
         <Card>
           <CardHeader><CardTitle>Manage areas</CardTitle></CardHeader>
