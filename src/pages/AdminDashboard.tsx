@@ -54,6 +54,7 @@ import { PerformancePanel } from "@/components/admin/PerformancePanel";
 import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
+import PayoutSetupEngine from "@/components/admin/payout/PayoutSetupEngine";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 import { useAuth } from "@/contexts/AuthContext";
@@ -397,6 +398,7 @@ const AdminDashboard = () => {
               <TabsTrigger value="account"><User className="h-4 w-4 mr-1" /> Account</TabsTrigger>
               <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
               <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
+              <TabsTrigger value="payout"><Wallet className="h-4 w-4 mr-1" /> Master Payout</TabsTrigger>
               <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
               <TabsTrigger value="permissions"><KeyRound className="h-4 w-4 mr-1" /> Permissions</TabsTrigger>
               <TabsTrigger value="fields"><Tags className="h-4 w-4 mr-1" /> Fields & Statuses</TabsTrigger>
@@ -405,9 +407,11 @@ const AdminDashboard = () => {
             <TabsContent value="account"><AccountSettings /></TabsContent>
             <TabsContent value="general"><GeneralSettings /></TabsContent>
             <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
+            <TabsContent value="payout"><PayoutSetupEngine /></TabsContent>
             <TabsContent value="audit"><AuditLogViewer /></TabsContent>
             <TabsContent value="permissions"><PermissionsMatrix /></TabsContent>
             <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
+
             <TabsContent value="trash">
               <Card>
                 <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>

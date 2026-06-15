@@ -3391,6 +3391,353 @@ export type Database = {
           },
         ]
       }
+      payout_agent_split_rules: {
+        Row: {
+          admin_pct: number
+          agent_pct: number
+          branch_pct: number
+          commission_pct: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          id: string
+          is_active: boolean
+          is_default: boolean
+          referral_pct: number
+          rule_name: string
+          updated_at: string
+        }
+        Insert: {
+          admin_pct?: number
+          agent_pct?: number
+          branch_pct?: number
+          commission_pct?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          referral_pct?: number
+          rule_name: string
+          updated_at?: string
+        }
+        Update: {
+          admin_pct?: number
+          agent_pct?: number
+          branch_pct?: number
+          commission_pct?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          is_default?: boolean
+          referral_pct?: number
+          rule_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payout_finance_rules: {
+        Row: {
+          agent_share_pct: number
+          bank: string
+          commission_pct: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          id: string
+          is_active: boolean
+          processing_fee: number | null
+          product: string
+          updated_at: string
+        }
+        Insert: {
+          agent_share_pct?: number
+          bank: string
+          commission_pct?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          processing_fee?: number | null
+          product: string
+          updated_at?: string
+        }
+        Update: {
+          agent_share_pct?: number
+          bank?: string
+          commission_pct?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          processing_fee?: number | null
+          product?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payout_insurance_rules: {
+        Row: {
+          commission_pct: number | null
+          commission_type: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          flat_amount: number | null
+          id: string
+          insurer_id: string | null
+          insurer_name: string | null
+          is_active: boolean
+          notes: string | null
+          product_category: string
+          sub_category: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_pct?: number | null
+          commission_type?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          flat_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          insurer_name?: string | null
+          is_active?: boolean
+          notes?: string | null
+          product_category: string
+          sub_category?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_pct?: number | null
+          commission_type?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          flat_amount?: number | null
+          id?: string
+          insurer_id?: string | null
+          insurer_name?: string | null
+          is_active?: boolean
+          notes?: string | null
+          product_category?: string
+          sub_category?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payout_insurance_rules_insurer_id_fkey"
+            columns: ["insurer_id"]
+            isOneToOne: false
+            referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payout_rto_rules: {
+        Row: {
+          agent_payout: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_price: number
+          effective_month: string
+          govt_fee: number
+          id: string
+          is_active: boolean
+          processing_days: number | null
+          service_name: string
+          updated_at: string
+        }
+        Insert: {
+          agent_payout?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_price?: number
+          effective_month?: string
+          govt_fee?: number
+          id?: string
+          is_active?: boolean
+          processing_days?: number | null
+          service_name: string
+          updated_at?: string
+        }
+        Update: {
+          agent_payout?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_price?: number
+          effective_month?: string
+          govt_fee?: number
+          id?: string
+          is_active?: boolean
+          processing_days?: number | null
+          service_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payout_state_rules: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          id: string
+          is_active: boolean
+          rto_charges: number | null
+          special_tax: number | null
+          stamp_duty: number | null
+          state: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          rto_charges?: number | null
+          special_tax?: number | null
+          stamp_duty?: number | null
+          state: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          id?: string
+          is_active?: boolean
+          rto_charges?: number | null
+          special_tax?: number | null
+          stamp_duty?: number | null
+          state?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payout_tax_rules: {
+        Row: {
+          auto_gst: boolean
+          auto_invoice: boolean
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          gst_pct: number
+          id: string
+          invoice_format: string | null
+          invoice_prefix: string | null
+          is_active: boolean
+          service_tax_pct: number | null
+          tds_pct: number
+          updated_at: string
+        }
+        Insert: {
+          auto_gst?: boolean
+          auto_invoice?: boolean
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          gst_pct?: number
+          id?: string
+          invoice_format?: string | null
+          invoice_prefix?: string | null
+          is_active?: boolean
+          service_tax_pct?: number | null
+          tds_pct?: number
+          updated_at?: string
+        }
+        Update: {
+          auto_gst?: boolean
+          auto_invoice?: boolean
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          gst_pct?: number
+          id?: string
+          invoice_format?: string | null
+          invoice_prefix?: string | null
+          is_active?: boolean
+          service_tax_pct?: number | null
+          tds_pct?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payout_vendor_rules: {
+        Row: {
+          commission_pct: number | null
+          commission_rule_ref: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          effective_month: string
+          flat_amount: number | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          product_type: string | null
+          updated_at: string
+          vendor_name: string
+          vendor_type: string
+        }
+        Insert: {
+          commission_pct?: number | null
+          commission_rule_ref?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          flat_amount?: number | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          product_type?: string | null
+          updated_at?: string
+          vendor_name: string
+          vendor_type: string
+        }
+        Update: {
+          commission_pct?: number | null
+          commission_rule_ref?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          effective_month?: string
+          flat_amount?: number | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          product_type?: string | null
+          updated_at?: string
+          vendor_name?: string
+          vendor_type?: string
+        }
+        Relationships: []
+      }
       permits: {
         Row: {
           company_id: string
