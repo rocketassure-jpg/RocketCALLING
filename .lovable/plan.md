@@ -1,108 +1,72 @@
-## Part A — Admin Sidebar: Compact + Reorganize
+# Payout Setup Engine — Plan
 
-### A1. HamburgerMenu.tsx — sizing pass
-- Container: `p-3 → p-2`, `space-y-3 → space-y-1.5` between groups
-- Group heading: `pb-1 → pb-0.5`, keep `text-[10px] uppercase` (already compact)
-- Each nav button: `min-h-[40px] → min-h-[30px]`, `py-2 → py-1`, `text-sm → text-xs`, `gap-3 → gap-2`
-- Icon: `h-4 w-4 → h-3.5 w-3.5`
-- Add support for a per-item `badge?: number` (small rounded chip on the right) — used for Team & Pending Approvals count
-- Add support for `collapsibleGroups?: string[]` (default closed). Render those groups with an Accordion-style toggle (chevron). Non-collapsible groups stay always expanded.
-- Add optional `subText?: ReactNode` on items (small muted line under label) — used for company name under Customers.
+**Location:** Admin Dashboard → Settings → "Master Payout Setup Engine" (new tab inside Settings, matching existing tab styling — same theme/colors as other Settings tabs like API Keys, Branding, etc.)
 
-### A2. AdminDashboard.tsx — BASE_NAV restructure
-New order + groups:
+## Header
+- Title: **Payout Setup Engine**
+- Subtitle: *Configure all commission, payout, margin and pricing rules from one central location.*
+- Right-side **Effective Month** selector (`YYYY-MM`) — every tab reads/writes scoped to selected month. Default = current month. Toggle "Apply to future months" when saving.
 
-```text
-DASHBOARDS    : overview, reports_hub
-SALES         : calling, leads_hub, customers_hub (subText = company name)
-POLICIES      : motor, health, life, rto, renewals, claims
-FINANCE       : accounts, brokers, operations, branches, areas, team_approvals (merged)
-TOOLS         : import, messaging, marketing, calculator, training
-SETTINGS (collapsible, default closed):
-   account, general_advance (combined), permissions, fields
-CALL SETTINGS (collapsible, default closed):
-   trash
-```
+## 8 Sub-Tabs (same compact tab style as Settings)
 
-- Remove standalone `team`, `approvals`, `api`, `settings`, `audit` ids.
-- Add new id `team_approvals` → renders a 2-tab panel: existing Team UI (already inline in AdminDashboard for `team`) + `<PendingApprovalsPanel />`. Pending count badge fetched once (`select count from profiles where is_approved=false and company_id=user_company`).
-- Add new id `general_advance` → renders Tabs: "General" (`<GeneralSettings/>`) | "API & Webhooks" (`<ApiAndWebhooksPanel/>`) | "Audit Logs" (`<AuditLogViewer/>`).
-- Update the `section === "team"` / `"approvals"` / `"api"` / `"settings"` / `"audit"` render branches to point to the new merged sections (and remove the old branches).
-- Company name fetch: reuse the same query AdminOverviewPanel uses (companies row by `companyId`). Lift to AdminDashboard or do a small `useEffect` and pass to HamburgerMenu via the `customers_hub` item's `subText`.
+1. **Insurance Commission Rules** — table: Insurer, Product Category, Sub Category, Commission Type (% / Flat / Slab), Commission %, Status, Last Updated, Actions. Add / Edit / Delete / Bulk Excel Upload (with downloadable demo template) / Search / Filter by Company / Filter by Product.
+2. **Agent Split Rules** — Rule Name, Commission %, Agent %, Branch %, Admin %, Referral %, Status. Validation: splits sum = 100%. Live Calculator: enter premium → shows Commission + split breakdown.
+3. **RTO Pricing Rules** — Service, Govt Fee, Customer Price, Agent Payout, Auto-calculated Margin (Customer − Govt − Agent), Processing Days, Status. Add / Edit / Bulk Upload.
+4. **Finance Commission Rules** — Bank, Product, Commission %, Processing Fee, Agent Share %, Status. Live calculator: Loan Amount × Commission %.
+5. **Vendor Rules** — Vendor Name, Vendor Type (Broker / POS / DSA / Insurance Company / Aggregator), Product Type, Commission Rule (link to rule), Status. Full CRUD + bulk import.
+6. **State Wise Rules** — State, RTO Charges, Stamp Duty, Special Tax, Status.
+7. **Tax & GST Rules** — GST %, TDS %, Service Tax rules, Invoice numbering prefix/format. Auto-GST + auto-invoice toggles.
+8. **Audit Logs** — User, Module, Action, Date, Old Value, New Value (read from existing `audit_logs` table, filtered to payout tables).
 
-### A3. HamburgerMenu rendering changes
-- Accept `collapsibleGroups: ["Settings", "Call Settings"]`.
-- For each group, if collapsible: render a button row (group label + chevron) that toggles a local `openGroups` state Set; default both closed.
-- Render `badge` as `<span className="ml-auto rounded-full bg-primary/15 text-primary text-[10px] px-1.5">{n}</span>`.
+## Month-wise Versioning (key requirement)
+Every rule row has `effective_month` (date, first-of-month). When the admin changes a value for a new month, a **new row** is inserted instead of updating the old one — so:
+- Current policies/RTO/finance entries use the **latest rule for current month**.
+- Historical entries already stored with their snapshot values (commission_amount, agent_payout, etc. on `policy_transactions`, `rto_cases`, etc.) remain untouched — they reflect the rate that was active when the entry was created.
+- A `get_active_rule(_month, _key…)` SQL helper returns the row with the greatest `effective_month <= _month`.
 
----
+## Bulk Import
+Each tab with a table has:
+- **Download Demo Excel** button (pre-filled template with sample rows).
+- **Import Excel** button → parses with SheetJS in browser → preview diff → bulk insert with selected effective month.
 
-## Part B — Reports Hub: 5 Categories
+## Database (new migration)
+New tables, all `company_id` scoped, RLS to company admins + super admin, GRANT to authenticated + service_role:
+- `payout_insurance_rules` (insurer_id, product_category, sub_category, commission_type, commission_pct, flat_amount, effective_month, is_active)
+- `payout_agent_split_rules` (rule_name, commission_pct, agent_pct, branch_pct, admin_pct, referral_pct, effective_month, is_active)
+- `payout_rto_rules` (service_name, govt_fee, customer_price, agent_payout, processing_days, effective_month, is_active) — margin computed on read
+- `payout_finance_rules` (bank, product, commission_pct, processing_fee, agent_share_pct, effective_month, is_active)
+- `payout_vendor_rules` (vendor_name, vendor_type, product_type, commission_rule_ref, effective_month, is_active)
+- `payout_state_rules` (state, rto_charges, stamp_duty, special_tax, effective_month, is_active)
+- `payout_tax_rules` (gst_pct, tds_pct, service_tax_pct, invoice_prefix, invoice_format, effective_month, is_active)
 
-### B1. New file: `src/components/admin/reports/ReportsHubPanel.tsx`
-(separate from existing `ReportsHubPanel` at `src/components/admin/ReportsHubPanel.tsx` — we'll replace that one's body to delegate here, or just rewrite it in place. **Decision: rewrite `src/components/admin/ReportsHubPanel.tsx` in place** since `AdminDashboard` already imports it for the `reports_hub` nav id.)
+SQL helper `public.get_active_payout_rule(table_name, company_id, lookup_keys jsonb, on_month date)` — returns latest row ≤ month.
 
-Top of panel:
-- Global date-range selector: `7d / 30d / 90d / Custom` (Custom = two date inputs). State lifted, passed to every category as a prop.
-- 5 top-level Tabs (shadcn `Tabs`):
-  1. **Lead & Calling** (default)
-  2. **Productivity & Agent**
-  3. **Renewal & Pipeline**
-  4. **Policy & Product**
-  5. **Financial & Payouts**
+Existing `policy_transactions`, `rto_cases`, `agent_payouts` etc. already snapshot amounts → no change to historical math.
 
-Each tab body renders its report cards stacked, each card has: title, one-line description, chart (recharts), table, CSV export button (reuse `downloadCSV` helper from existing `ReportsPanel.tsx`, extract to `src/components/admin/reports/utils.ts`).
+## Frontend Files
+- `src/components/admin/payout/PayoutSetupEngine.tsx` — shell + month selector + 8 tabs
+- `src/components/admin/payout/tabs/InsuranceCommissionTab.tsx`
+- `src/components/admin/payout/tabs/AgentSplitTab.tsx` (with live calculator)
+- `src/components/admin/payout/tabs/RtoPricingTab.tsx`
+- `src/components/admin/payout/tabs/FinanceCommissionTab.tsx` (with live calculator)
+- `src/components/admin/payout/tabs/VendorRulesTab.tsx`
+- `src/components/admin/payout/tabs/StateWiseTab.tsx`
+- `src/components/admin/payout/tabs/TaxGstTab.tsx`
+- `src/components/admin/payout/tabs/AuditLogsTab.tsx`
+- `src/components/admin/payout/shared/BulkImportButton.tsx` (SheetJS — `xlsx` package)
+- `src/components/admin/payout/shared/MonthPicker.tsx`
+- Add new sub-tab "Master Payout" inside existing Settings tabs list in `AdminDashboard.tsx`.
 
-### B2. Reports → data sources
-| # | Report | Tab | Source |
-|---|---|---|---|
-| 1 | Call Volume | Lead&Calling | `dial_logs` join `profiles` |
-| 2 | Talk Time | Lead&Calling | `dial_logs.duration_seconds where connected` |
-| 3 | Lead Conversion | Lead&Calling | `leads` group status (reuse funnel) |
-| 4 | Disposal/Status | Lead&Calling | `leads.status` pie + filters telecaller/area |
-| 5 | FCR | Productivity | `call_logs` count per lead, terminal status check |
-| 6 | Agent Activity | Productivity | `break_logs` + derived from `dial_logs` first/last |
-| 7 | Missed Follow-ups | Productivity | `leads.follow_up_date < today` and not terminal |
-| 8 | Upcoming Renewals | Renewal | `leads.policy_expiry_date between today and +N`, N toggle |
-| 9 | Renewal Conversion | Renewal | `leads` due + `policy_transactions` matched |
-| 10 | Pipeline Velocity | Renewal | `leads.created_at` → min `call_logs.called_at` where status='Done' |
-| 11 | Category-Wise Business | Policy&Product | `policy_transactions.policy_type` (reuse byProduct) |
-| 12 | Vehicle Type (Motor) | Policy&Product | `leads where policy_type='Motor' group vehicle_type` (use `motor_policies` if richer) |
-| 13 | Insurer Distribution | Policy&Product | `policy_transactions` group insurer (top 10) |
-| 14 | Premium Collected | Financial | `policy_transactions.premium_amount` with Daily/Weekly/Monthly toggle |
-| 15 | Broker & Payouts | Financial | `policy_transactions` group broker_id + join `brokers` |
+## Theme
+Reuse existing tokens (`bg-card`, `border-border`, `text-foreground`, `Tabs`, `Card`, `Table`, `Button`, `Badge` from shadcn). No hardcoded colors. Compact density matching current Settings tabs.
 
-Existing reports from `ReportsPanel.tsx` (premium trend, byProduct, funnel, claims, expenses, P&L, branch) are folded into the new categories — keep them rendered, no deletion.
+## Build Order
+1. Migration: 7 new payout tables + helper function + GRANT/RLS.
+2. Shell `PayoutSetupEngine.tsx` + month picker + register inside Settings.
+3. Tabs 1–7 one-by-one (each follows the same CRUD pattern using a shared hook `usePayoutRules(table, month)`).
+4. Bulk import + demo Excel downloads.
+5. Tab 8 Audit Logs (filter existing audit_logs by `table_name LIKE 'payout_%'`).
+6. Verify build, sanity-check on `/admin` → Settings → Master Payout.
 
-### B3. PerformancePanel merge
-- Inside **Productivity & Agent** tab, render `<PerformancePanel />` at the bottom as an additional card so nothing is lost.
-
-### B4. `ReportsAndPerformancePanel.tsx`
-- The old `"reports" | "performance"` toggle becomes unnecessary because the Reports Hub now encapsulates both. Replace its body with `<ReportsHubPanel />` so the existing route stays valid. Keep the file (used elsewhere if any).
-
-### B5. CSV export
-- Extract `downloadCSV` from existing `ReportsPanel.tsx` into a shared util `src/components/admin/reports/utils.ts` and import everywhere.
-
----
-
-## Files touched
-- **edit** `src/components/HamburgerMenu.tsx` (sizing, badge, subText, collapsible groups)
-- **edit** `src/pages/AdminDashboard.tsx` (BASE_NAV reorder, merged sections team_approvals + general_advance, company name fetch + subText, render branches)
-- **rewrite** `src/components/admin/ReportsHubPanel.tsx` (new 5-category structure)
-- **new**   `src/components/admin/reports/utils.ts` (downloadCSV, rangeStart, fmtINR)
-- **new**   `src/components/admin/reports/categories/LeadCallingReports.tsx`
-- **new**   `src/components/admin/reports/categories/ProductivityReports.tsx`
-- **new**   `src/components/admin/reports/categories/RenewalReports.tsx`
-- **new**   `src/components/admin/reports/categories/PolicyProductReports.tsx`
-- **new**   `src/components/admin/reports/categories/FinancialReports.tsx`
-- **edit**  `src/components/admin/ReportsAndPerformancePanel.tsx` (delegate to ReportsHubPanel)
-
-No database/schema changes. No edge function changes. Pure frontend reorganization + new queries against existing tables.
-
----
-
-## Order of implementation
-1. **Part A** first (sidebar) — small, isolated, user can verify navigation works.
-2. **Part B** second (Reports Hub) — bigger, independent.
-
-Confirm and I'll start with Part A.
+## Out of Scope (will not change in this pass)
+- Calculation engine wiring inside policy/RTO/finance create flows (current flows already snapshot amounts; rules become the *source* admins edit). If you want me to also rewire the create-flow autocalc to pull from these rules, confirm — that's a follow-up task.
