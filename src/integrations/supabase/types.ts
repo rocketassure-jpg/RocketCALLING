@@ -2156,6 +2156,54 @@ export type Database = {
           },
         ]
       }
+      external_api_registry: {
+        Row: {
+          api_key: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          last_check_result: string | null
+          last_checked_at: string | null
+          name: string
+          remark: string | null
+          status: string
+          updated_at: string
+          url: string | null
+          usecase: string | null
+        }
+        Insert: {
+          api_key?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_check_result?: string | null
+          last_checked_at?: string | null
+          name: string
+          remark?: string | null
+          status?: string
+          updated_at?: string
+          url?: string | null
+          usecase?: string | null
+        }
+        Update: {
+          api_key?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_check_result?: string | null
+          last_checked_at?: string | null
+          name?: string
+          remark?: string | null
+          status?: string
+          updated_at?: string
+          url?: string | null
+          usecase?: string | null
+        }
+        Relationships: []
+      }
       feature_flags: {
         Row: {
           company_id: string | null
