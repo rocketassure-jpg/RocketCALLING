@@ -96,7 +96,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
   { id: "branches", label: "Branches", icon: Building2, group: "Finance" },
   { id: "areas", label: "Areas", icon: MapPin, group: "Finance" },
-  { id: "team_approvals", label: "Team & Pending Approvals", icon: Shield, group: "Finance" },
+  
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
