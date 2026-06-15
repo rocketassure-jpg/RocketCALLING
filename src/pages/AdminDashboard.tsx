@@ -90,25 +90,22 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts", group: "Finance" },
   { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts", group: "Finance" },
   { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
-  // Organization
-  { id: "branches", label: "Branches", icon: Building2, group: "Organization" },
-  { id: "areas", label: "Areas", icon: MapPin, group: "Organization" },
-  { id: "team", label: "Team", icon: Shield, group: "Organization" },
-  { id: "approvals", label: "Pending Approvals", icon: UserPlus, group: "Organization" },
+  { id: "branches", label: "Branches", icon: Building2, group: "Finance" },
+  { id: "areas", label: "Areas", icon: MapPin, group: "Finance" },
+  { id: "team_approvals", label: "Team & Pending Approvals", icon: Shield, group: "Finance" },
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
   { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
-  // Settings
-  { id: "api", label: "API & Webhooks", icon: Webhook, group: "Settings" },
+  // Settings (collapsible)
   { id: "account", label: "Account Settings", icon: User, group: "Settings" },
-  { id: "settings", label: "General", icon: Settings, group: "Settings" },
+  { id: "general_advance", label: "General & Advance", icon: Settings, group: "Settings" },
   { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
   { id: "fields", label: "Fields & Statuses", icon: Tags, group: "Settings" },
-  { id: "audit", label: "Audit Logs", icon: Shield, group: "Settings" },
-  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Settings" },
+  // Call Settings (collapsible)
+  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Call Settings" },
 ];
 
 const AdminDashboard = () => {
