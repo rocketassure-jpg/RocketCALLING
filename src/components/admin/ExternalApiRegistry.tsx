@@ -5,7 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, RefreshCw, Save, Pencil, X, Globe } from "lucide-react";
+import { Plus, Trash2, RefreshCw, Save, Pencil, X, Globe, Sparkles } from "lucide-react";
+
+type Preset = { name: string; usecase: string; url: string; remark: string; category: string };
+
+const API_PRESETS: Preset[] = [
+  { name: "Meta / Facebook Graph", usecase: "FB Page posts, Instagram, Ads", url: "https://graph.facebook.com/v19.0/me", remark: "Get from developers.facebook.com — Free (limits apply)", category: "social" },
+  { name: "WhatsApp Business Cloud", usecase: "WA messaging, templates", url: "https://graph.facebook.com/v19.0/", remark: "business.facebook.com — Free 1000 conv/month", category: "communication" },
+  { name: "Google Ads", usecase: "Lead form ads, campaigns", url: "https://googleads.googleapis.com/v17/customers", remark: "ads.google.com/aw/apicenter — Free API (ad spend separate)", category: "marketing" },
+  { name: "Google My Business", usecase: "GMB posts, reviews", url: "https://mybusinessbusinessinformation.googleapis.com/v1/", remark: "console.cloud.google.com — Free", category: "marketing" },
+  { name: "LinkedIn Marketing", usecase: "Company page posts, ads", url: "https://api.linkedin.com/v2/", remark: "developer.linkedin.com — Free basic / Paid marketing", category: "social" },
+  { name: "OpenAI", usecase: "AI content / image generation", url: "https://api.openai.com/v1/models", remark: "platform.openai.com — ~$0.002/1K tokens", category: "ai" },
+  { name: "Canva", usecase: "Auto-design creatives", url: "https://api.canva.com/rest/v1/", remark: "canva.com/developers — Free tier", category: "marketing" },
+  { name: "Twilio", usecase: "SMS / voice / WhatsApp", url: "https://api.twilio.com/2010-04-01/", remark: "twilio.com — ~₹0.5/SMS pay-as-you-go", category: "communication" },
+  { name: "Razorpay", usecase: "Payments & subscriptions", url: "https://api.razorpay.com/v1/", remark: "razorpay.com — 2% transaction fee", category: "payment" },
+];
 import { toast } from "@/hooks/use-toast";
 
 type Row = {
@@ -179,6 +193,32 @@ export const ExternalApiRegistry = ({ lockedCategory, title }: Props = {}) => {
     }
   };
 
+  const seedPresets = async () => {
+    if (!companyId) return toast({ title: "No company context", variant: "destructive" });
+    const { data: { user } } = await supabase.auth.getUser();
+    const targetCat = lockedCategory;
+    const existing = new Set(rows.map((r) => r.name.toLowerCase()));
+    const toInsert = API_PRESETS
+      .filter((p) => !targetCat || p.category === targetCat)
+      .filter((p) => !existing.has(p.name.toLowerCase()))
+      .map((p) => ({
+        company_id: companyId,
+        name: p.name,
+        usecase: p.usecase,
+        url: p.url,
+        api_key: null,
+        remark: p.remark,
+        category: targetCat ?? p.category,
+        status: "pending",
+        created_by: user?.id ?? null,
+      }));
+    if (toInsert.length === 0) return toast({ title: "All presets already added" });
+    const { error } = await supabase.from("external_api_registry" as any).insert(toInsert);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: `Added ${toInsert.length} preset APIs`, description: "Fill in keys and click Refresh to verify." });
+    load();
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -198,6 +238,9 @@ export const ExternalApiRegistry = ({ lockedCategory, title }: Props = {}) => {
                 </SelectContent>
               </Select>
             )}
+            <Button variant="secondary" size="sm" onClick={seedPresets} disabled={loading}>
+              <Sparkles className="h-4 w-4 mr-1" /> Add preset APIs
+            </Button>
             <Button variant="outline" size="sm" onClick={checkAll} disabled={loading || visibleRows.length === 0}>
               <RefreshCw className="h-4 w-4 mr-1" /> Refresh All
             </Button>
@@ -206,7 +249,7 @@ export const ExternalApiRegistry = ({ lockedCategory, title }: Props = {}) => {
         <p className="text-xs text-muted-foreground">
           {lockedCategory
             ? "Scoped to this section — entries you add here also appear in the global API & Webhooks panel."
-            : "Save third-party APIs you plan to use. Add the key later — entries are kept here so admins can fill in and verify connections any time."}
+            : "Save third-party APIs you plan to use. Click 'Add preset APIs' to load Meta, WhatsApp, Google Ads, GMB, LinkedIn, OpenAI, Canva, Twilio, Razorpay — then paste keys later."}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
