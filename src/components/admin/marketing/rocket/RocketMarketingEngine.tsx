@@ -16,6 +16,7 @@ import {
   Rocket, Calendar as CalendarIcon, Sparkles, Image as ImageIcon, Users, Route, MessageCircle,
   Link2, BarChart3, Loader2, Wand2, Send, RefreshCw, Plus,
 } from "lucide-react";
+import { ExternalApiRegistry } from "@/components/admin/ExternalApiRegistry";
 
 const PLATFORMS = [
   { key: "facebook", label: "Facebook" },
