@@ -1472,36 +1472,60 @@ export type Database = {
       }
       companies: {
         Row: {
+          address: string | null
           code: string
+          contact_email: string | null
+          contact_phone: string | null
           created_at: string
           created_by: string | null
+          gst_number: string | null
           id: string
           is_active: boolean
+          logo_url: string | null
           name: string
           notes: string | null
+          owner_name: string | null
+          pincode: string | null
           plan: string
+          tagline: string | null
           updated_at: string
         }
         Insert: {
+          address?: string | null
           code: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           created_by?: string | null
+          gst_number?: string | null
           id?: string
           is_active?: boolean
+          logo_url?: string | null
           name: string
           notes?: string | null
+          owner_name?: string | null
+          pincode?: string | null
           plan?: string
+          tagline?: string | null
           updated_at?: string
         }
         Update: {
+          address?: string | null
           code?: string
+          contact_email?: string | null
+          contact_phone?: string | null
           created_at?: string
           created_by?: string | null
+          gst_number?: string | null
           id?: string
           is_active?: boolean
+          logo_url?: string | null
           name?: string
           notes?: string | null
+          owner_name?: string | null
+          pincode?: string | null
           plan?: string
+          tagline?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -3330,6 +3354,7 @@ export type Database = {
         Row: {
           body: string
           category: string
+          channels: string[]
           company_id: string | null
           created_at: string
           id: string
@@ -3341,6 +3366,7 @@ export type Database = {
         Insert: {
           body: string
           category?: string
+          channels?: string[]
           company_id?: string | null
           created_at?: string
           id?: string
@@ -3352,6 +3378,7 @@ export type Database = {
         Update: {
           body?: string
           category?: string
+          channels?: string[]
           company_id?: string | null
           created_at?: string
           id?: string
