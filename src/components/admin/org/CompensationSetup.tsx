@@ -135,7 +135,7 @@ export default function CompensationSetup() {
           <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="flex items-center gap-2"><Wallet className="h-5 w-5" /> Compensation Setup</CardTitle>
             <div className="flex items-center gap-2">
-              <Label className="text-sm">Effective Month</Label>
+              <Label className="text-sm">Effective Date</Label>
               <Input type="month" value={month} onChange={e => setMonth(e.target.value)} className="w-40" />
             </div>
           </div>

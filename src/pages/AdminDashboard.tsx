@@ -56,7 +56,7 @@ import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import PayoutSetupEngine from "@/components/admin/payout/PayoutSetupEngine";
 import OrgHierarchyPanel from "@/components/admin/org/OrgHierarchyPanel";
-import CompensationSetup from "@/components/admin/org/CompensationSetup";
+
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 import { useAuth } from "@/contexts/AuthContext";
@@ -402,7 +402,6 @@ const AdminDashboard = () => {
               <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
               <TabsTrigger value="payout"><Wallet className="h-4 w-4 mr-1" /> Master Payout</TabsTrigger>
               <TabsTrigger value="org"><User className="h-4 w-4 mr-1" /> Org Hierarchy</TabsTrigger>
-              <TabsTrigger value="comp"><Wallet className="h-4 w-4 mr-1" /> Compensation</TabsTrigger>
               <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
             </TabsList>
             <TabsContent value="account"><AccountSettings /></TabsContent>
@@ -410,7 +409,6 @@ const AdminDashboard = () => {
             <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
             <TabsContent value="payout"><PayoutSetupEngine /></TabsContent>
             <TabsContent value="org"><OrgHierarchyPanel /></TabsContent>
-            <TabsContent value="comp"><CompensationSetup /></TabsContent>
             <TabsContent value="audit"><AuditLogViewer /></TabsContent>
           </Tabs>
         );
@@ -437,12 +435,13 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-3 shadow-soft md:px-6">
-        <div className="flex items-center gap-2">
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-2 border-b bg-background px-3 shadow-soft md:px-6">
+        <div className="flex items-center gap-2 min-w-0">
           <HamburgerMenu items={NAV} active={section} onChange={setSection} />
           <Logo />
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
+        <GlobalSearch items={NAV} onPick={setSection} />
         <div className="flex items-center gap-2">
           <SuperAdminLink />
           <InstallPWA />
@@ -497,6 +496,41 @@ const SuperAdminLink = () => {
     <Button asChild variant="outline" size="sm" className="gap-1">
       <a href="/super-admin"><Shield className="h-4 w-4" /> Super Admin</a>
     </Button>
+  );
+};
+
+const GlobalSearch = ({ items, onPick }: { items: any[]; onPick: (id: string) => void }) => {
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const matches = q.trim()
+    ? items.filter((it) => `${it.label} ${it.group}`.toLowerCase().includes(q.toLowerCase())).slice(0, 8)
+    : [];
+  return (
+    <div className="relative flex-1 max-w-md hidden sm:block">
+      <Input
+        placeholder="Search system… (modules, sections)"
+        value={q}
+        onChange={(e) => { setQ(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        className="h-9"
+      />
+      {open && matches.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-1 rounded-md border bg-popover shadow-lg z-50 max-h-80 overflow-auto">
+          {matches.map((m) => (
+            <button
+              key={m.id}
+              onMouseDown={(e) => { e.preventDefault(); onPick(m.id); setQ(""); setOpen(false); }}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted text-left"
+            >
+              <m.icon className="h-4 w-4 text-muted-foreground" />
+              <span className="flex-1">{m.label}</span>
+              <span className="text-xs text-muted-foreground">{m.group}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

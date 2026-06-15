@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Save, Download, Settings as SettingsIcon, Tags, Ban, KeyRound, ShieldCheck } from "lucide-react";
+import { Loader2, Save, Download, Settings as SettingsIcon, Tags, Ban, KeyRound, ShieldCheck, Search } from "lucide-react";
 import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
 import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
 import { TrashPanel } from "@/components/admin/TrashPanel";
@@ -52,6 +52,8 @@ export const GeneralSettings = () => {
   const [syncing, setSyncing] = useState(false);
   const [telecallers, setTelecallers] = useState<Tele[]>([]);
   const [templates, setTemplates] = useState<Tpl[]>([]);
+  const [q, setQ] = useState("");
+  const match = (text: string) => !q.trim() || text.toLowerCase().includes(q.toLowerCase());
 
   const syncSheet = async () => {
     if (!s?.master_sheet_url) return toast({ title: "Add a Sheet URL first", variant: "destructive" });
@@ -107,10 +109,14 @@ export const GeneralSettings = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">General Settings</h1>
           <p className="text-sm text-muted-foreground">Communication, fields, permissions & privacy</p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <Search className="h-4 w-4 absolute left-2 top-3 text-muted-foreground" />
+          <Input className="pl-8" placeholder="Search settings…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
       </div>
 
@@ -130,6 +136,7 @@ export const GeneralSettings = () => {
             </Button>
           </div>
 
+      {match("Master Google Sheet master sheet url sync import leads") && (
       <Card>
         <CardHeader><CardTitle>Master Google Sheet</CardTitle></CardHeader>
         <CardContent className="space-y-3 pt-0">
@@ -145,7 +152,9 @@ export const GeneralSettings = () => {
           </Button>
         </CardContent>
       </Card>
+      )}
 
+      {match("Communication WhatsApp Business Messaging Notifications SMS Email Post-Interaction") && (
       <Card>
         <CardHeader><CardTitle>Communication</CardTitle></CardHeader>
         <CardContent className="pt-0">
@@ -160,7 +169,9 @@ export const GeneralSettings = () => {
           </Row>
         </CardContent>
       </Card>
+      )}
 
+      {match("Lead Allocation Retry Auto Start Variable Not Connected hours") && (
       <Card>
         <CardHeader><CardTitle>Lead Allocation & Retry</CardTitle></CardHeader>
         <CardContent className="pt-0">
@@ -182,7 +193,9 @@ export const GeneralSettings = () => {
           </div>
         </CardContent>
       </Card>
+      )}
 
+      {match("Login Security Logout Mobile Web sign out") && (
       <Card>
         <CardHeader><CardTitle>Login Security</CardTitle></CardHeader>
         <CardContent className="pt-0">
@@ -194,7 +207,9 @@ export const GeneralSettings = () => {
           </Row>
         </CardContent>
       </Card>
+      )}
 
+      {match("Renewal Automation Reminders Alert Days Channel WhatsApp SMS RCS Telecaller Template") && (
       <Card>
         <CardHeader><CardTitle>Renewal Automation</CardTitle></CardHeader>
         <CardContent className="pt-0">
@@ -239,6 +254,7 @@ export const GeneralSettings = () => {
           </div>
         </CardContent>
       </Card>
+      )}
         </TabsContent>
 
         <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
