@@ -5,10 +5,13 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Save, Download } from "lucide-react";
-import { BrandingPanel } from "@/components/admin/BrandingPanel";
+import { Loader2, Save, Download, Settings as SettingsIcon, Tags, Ban, KeyRound, ShieldCheck } from "lucide-react";
 import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
+import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
+import { TrashPanel } from "@/components/admin/TrashPanel";
+import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 
 type Settings = {
   id: string;
