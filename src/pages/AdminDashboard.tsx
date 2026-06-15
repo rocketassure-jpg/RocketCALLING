@@ -459,28 +459,6 @@ const AdminDashboard = () => {
         </Card>
       );
       case "team": return teamView;
-      case "trash": return (
-        <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>
-          <CardContent className="overflow-x-auto p-0">
-            {trashedLeads.length === 0 ? <p className="p-6 text-sm text-muted-foreground">No unsubscribed leads.</p> : (
-              <Table>
-                <TableHeader><TableRow><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead><TableHead>Policy</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                <TableBody>{trashedLeads.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell className="font-medium">{l.customer_name}</TableCell><TableCell>{l.phone_number}</TableCell>
-                    <TableCell>{l.areas?.name}</TableCell><TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <Button variant="outline" size="sm" onClick={() => restoreLead(l.id)}><RotateCcw className="h-4 w-4" /> Restore</Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}</TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      );
       default: return null;
     }
   };
