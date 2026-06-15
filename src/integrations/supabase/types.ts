@@ -2689,7 +2689,9 @@ export type Database = {
           insurance_company: string | null
           issue_date: string | null
           last_called_at: string | null
+          lead_score: number | null
           lead_source: string | null
+          lead_temperature: string | null
           maker_name: string | null
           manager_id: string | null
           mobile_2: string | null
@@ -2745,7 +2747,9 @@ export type Database = {
           insurance_company?: string | null
           issue_date?: string | null
           last_called_at?: string | null
+          lead_score?: number | null
           lead_source?: string | null
+          lead_temperature?: string | null
           maker_name?: string | null
           manager_id?: string | null
           mobile_2?: string | null
@@ -2801,7 +2805,9 @@ export type Database = {
           insurance_company?: string | null
           issue_date?: string | null
           last_called_at?: string | null
+          lead_score?: number | null
           lead_source?: string | null
+          lead_temperature?: string | null
           maker_name?: string | null
           manager_id?: string | null
           mobile_2?: string | null
@@ -3304,6 +3310,522 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      mkt_audiences: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean
+          last_synced_at: string | null
+          member_count: number
+          name: string
+          rules: Json
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          member_count?: number
+          name: string
+          rules?: Json
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          last_synced_at?: string | null
+          member_count?: number
+          name?: string
+          rules?: Json
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_audiences_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_auto_triggers: {
+        Row: {
+          channel: string
+          company_id: string
+          created_at: string
+          id: string
+          is_enabled: boolean
+          label: string
+          message_body: string
+          trigger_key: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          channel?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          label: string
+          message_body: string
+          trigger_key: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          label?: string
+          message_body?: string
+          trigger_key?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_auto_triggers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_campaign_metrics: {
+        Row: {
+          campaign_id: string
+          clicks: number | null
+          company_id: string
+          conversions: number | null
+          created_at: string
+          id: string
+          impressions: number | null
+          leads: number | null
+          metric_date: string
+          platform: string | null
+          revenue: number | null
+          spend: number | null
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          clicks?: number | null
+          company_id: string
+          conversions?: number | null
+          created_at?: string
+          id?: string
+          impressions?: number | null
+          leads?: number | null
+          metric_date: string
+          platform?: string | null
+          revenue?: number | null
+          spend?: number | null
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          clicks?: number | null
+          company_id?: string
+          conversions?: number | null
+          created_at?: string
+          id?: string
+          impressions?: number | null
+          leads?: number | null
+          metric_date?: string
+          platform?: string | null
+          revenue?: number | null
+          spend?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_campaign_metrics_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_campaign_metrics_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_campaigns: {
+        Row: {
+          audience_id: string | null
+          budget_daily: number | null
+          budget_monthly: number | null
+          campaign_type: string
+          channels: string[] | null
+          company_id: string
+          cpl_limit: number | null
+          created_at: string
+          created_by: string | null
+          end_date: string | null
+          id: string
+          name: string
+          start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          audience_id?: string | null
+          budget_daily?: number | null
+          budget_monthly?: number | null
+          campaign_type: string
+          channels?: string[] | null
+          company_id: string
+          cpl_limit?: number | null
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          audience_id?: string | null
+          budget_daily?: number | null
+          budget_monthly?: number | null
+          campaign_type?: string
+          channels?: string[] | null
+          company_id?: string
+          cpl_limit?: number | null
+          created_at?: string
+          created_by?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_campaigns_audience_id_fkey"
+            columns: ["audience_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_audiences"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_campaigns_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_channels: {
+        Row: {
+          account_handle: string | null
+          company_id: string
+          config: Json | null
+          created_at: string
+          created_by: string | null
+          display_name: string | null
+          id: string
+          last_synced_at: string | null
+          platform: string
+          secret_ref: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          account_handle?: string | null
+          company_id: string
+          config?: Json | null
+          created_at?: string
+          created_by?: string | null
+          display_name?: string | null
+          id?: string
+          last_synced_at?: string | null
+          platform: string
+          secret_ref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          account_handle?: string | null
+          company_id?: string
+          config?: Json | null
+          created_at?: string
+          created_by?: string | null
+          display_name?: string | null
+          id?: string
+          last_synced_at?: string | null
+          platform?: string
+          secret_ref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_channels_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_festivals: {
+        Row: {
+          campaign_offset_days: number
+          company_id: string | null
+          created_at: string
+          festival_date: string
+          id: string
+          is_active: boolean
+          is_system: boolean
+          name: string
+          preferred_post_time: string | null
+          updated_at: string
+        }
+        Insert: {
+          campaign_offset_days?: number
+          company_id?: string | null
+          created_at?: string
+          festival_date: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name: string
+          preferred_post_time?: string | null
+          updated_at?: string
+        }
+        Update: {
+          campaign_offset_days?: number
+          company_id?: string | null
+          created_at?: string
+          festival_date?: string
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          name?: string
+          preferred_post_time?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_festivals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_lead_routing_rules: {
+        Row: {
+          agent_priority: string[] | null
+          city: string | null
+          company_id: string
+          created_at: string
+          escalate_after_min: number | null
+          fallback_user_id: string | null
+          hot_threshold: number | null
+          id: string
+          is_active: boolean
+          max_pending_per_agent: number | null
+          name: string
+          pincode: string | null
+          product: string | null
+          updated_at: string
+          warm_threshold: number | null
+        }
+        Insert: {
+          agent_priority?: string[] | null
+          city?: string | null
+          company_id: string
+          created_at?: string
+          escalate_after_min?: number | null
+          fallback_user_id?: string | null
+          hot_threshold?: number | null
+          id?: string
+          is_active?: boolean
+          max_pending_per_agent?: number | null
+          name: string
+          pincode?: string | null
+          product?: string | null
+          updated_at?: string
+          warm_threshold?: number | null
+        }
+        Update: {
+          agent_priority?: string[] | null
+          city?: string | null
+          company_id?: string
+          created_at?: string
+          escalate_after_min?: number | null
+          fallback_user_id?: string | null
+          hot_threshold?: number | null
+          id?: string
+          is_active?: boolean
+          max_pending_per_agent?: number | null
+          name?: string
+          pincode?: string | null
+          product?: string | null
+          updated_at?: string
+          warm_threshold?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_lead_routing_rules_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_scheduled_posts: {
+        Row: {
+          channels: string[]
+          company_id: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          media_url: string | null
+          publish_result: Json | null
+          scheduled_at: string
+          status: string
+          template_id: string | null
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          channels?: string[]
+          company_id: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_url?: string | null
+          publish_result?: Json | null
+          scheduled_at: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          channels?: string[]
+          company_id?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          media_url?: string | null
+          publish_result?: Json | null
+          scheduled_at?: string
+          status?: string
+          template_id?: string | null
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_scheduled_posts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mkt_scheduled_posts_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "mkt_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mkt_templates: {
+        Row: {
+          body: string
+          category: string
+          company_id: string | null
+          created_at: string
+          created_by: string | null
+          default_channels: string[] | null
+          hashtags: string | null
+          id: string
+          is_active: boolean
+          is_system: boolean
+          language: string
+          title: string
+          updated_at: string
+          variables: Json | null
+        }
+        Insert: {
+          body: string
+          category: string
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_channels?: string[] | null
+          hashtags?: string | null
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          language?: string
+          title: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Update: {
+          body?: string
+          category?: string
+          company_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          default_channels?: string[] | null
+          hashtags?: string | null
+          id?: string
+          is_active?: boolean
+          is_system?: boolean
+          language?: string
+          title?: string
+          updated_at?: string
+          variables?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mkt_templates_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       modules: {
         Row: {
