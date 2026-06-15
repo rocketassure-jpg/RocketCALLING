@@ -100,13 +100,8 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
-  // Settings (collapsible)
-  { id: "account", label: "Account Settings", icon: User, group: "Settings" },
-  { id: "general_advance", label: "General & Advance", icon: Settings, group: "Settings" },
-  { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
-  { id: "fields", label: "Fields & Statuses", icon: Tags, group: "Settings" },
-  // Call Settings (collapsible)
-  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Call Settings" },
+  // Unified Settings (single entry → tabs inside)
+  { id: "settings_hub", label: "Settings", icon: Settings, group: "Settings" },
 ];
 
 const AdminDashboard = () => {
@@ -384,21 +379,60 @@ const AdminDashboard = () => {
       case "marketing": return <MarketingAutomationPanel />;
      case "calculator": return <PremiumCalculator />;
       case "training": return <TrainingModule canManage={true} />;
-      case "account": return <AccountSettings />;
-      case "permissions": return <PermissionsMatrix />;
-      case "fields": return <FieldsAndStatusesPanel />;
-      case "general_advance": return (
-        <Tabs defaultValue="general" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
-            <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
-            <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
-          </TabsList>
-          <TabsContent value="general"><GeneralSettings /></TabsContent>
-          <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
-          <TabsContent value="audit"><AuditLogViewer /></TabsContent>
-        </Tabs>
-      );
+      case "account":
+      case "permissions":
+      case "fields":
+      case "general_advance":
+      case "trash":
+      case "settings_hub": {
+        const defaultTab =
+          section === "permissions" ? "permissions" :
+          section === "fields" ? "fields" :
+          section === "general_advance" ? "general" :
+          section === "trash" ? "trash" :
+          section === "account" ? "account" : "account";
+        return (
+          <Tabs defaultValue={defaultTab} className="space-y-4">
+            <TabsList className="flex flex-wrap h-auto">
+              <TabsTrigger value="account"><User className="h-4 w-4 mr-1" /> Account</TabsTrigger>
+              <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
+              <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
+              <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
+              <TabsTrigger value="permissions"><KeyRound className="h-4 w-4 mr-1" /> Permissions</TabsTrigger>
+              <TabsTrigger value="fields"><Tags className="h-4 w-4 mr-1" /> Fields & Statuses</TabsTrigger>
+              <TabsTrigger value="trash"><Ban className="h-4 w-4 mr-1" /> Trash (DNC)</TabsTrigger>
+            </TabsList>
+            <TabsContent value="account"><AccountSettings /></TabsContent>
+            <TabsContent value="general"><GeneralSettings /></TabsContent>
+            <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
+            <TabsContent value="audit"><AuditLogViewer /></TabsContent>
+            <TabsContent value="permissions"><PermissionsMatrix /></TabsContent>
+            <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
+            <TabsContent value="trash">
+              <Card>
+                <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>
+                <CardContent className="overflow-x-auto p-0">
+                  {trashedLeads.length === 0 ? <p className="p-6 text-sm text-muted-foreground">No unsubscribed leads.</p> : (
+                    <Table>
+                      <TableHeader><TableRow><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead><TableHead>Policy</TableHead><TableHead></TableHead></TableRow></TableHeader>
+                      <TableBody>{trashedLeads.map((l) => (
+                        <TableRow key={l.id}>
+                          <TableCell className="font-medium">{l.customer_name}</TableCell><TableCell>{l.phone_number}</TableCell>
+                          <TableCell>{l.areas?.name}</TableCell><TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
+                          <TableCell className="space-x-2 text-right">
+                            <Button variant="outline" size="sm" onClick={() => restoreLead(l.id)}><RotateCcw className="h-4 w-4" /> Restore</Button>
+                            <Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}</TableBody>
+                    </Table>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        );
+      }
       case "team_approvals": return (
         <Tabs defaultValue="team" className="space-y-4">
           <TabsList>
@@ -425,28 +459,6 @@ const AdminDashboard = () => {
         </Card>
       );
       case "team": return teamView;
-      case "trash": return (
-        <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>
-          <CardContent className="overflow-x-auto p-0">
-            {trashedLeads.length === 0 ? <p className="p-6 text-sm text-muted-foreground">No unsubscribed leads.</p> : (
-              <Table>
-                <TableHeader><TableRow><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead><TableHead>Policy</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                <TableBody>{trashedLeads.map((l) => (
-                  <TableRow key={l.id}>
-                    <TableCell className="font-medium">{l.customer_name}</TableCell><TableCell>{l.phone_number}</TableCell>
-                    <TableCell>{l.areas?.name}</TableCell><TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <Button variant="outline" size="sm" onClick={() => restoreLead(l.id)}><RotateCcw className="h-4 w-4" /> Restore</Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                    </TableCell>
-                  </TableRow>
-                ))}</TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      );
       default: return null;
     }
   };
@@ -455,7 +467,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-3 shadow-soft md:px-6">
         <div className="flex items-center gap-2">
-          <HamburgerMenu items={NAV} active={section} onChange={setSection} collapsibleGroups={["Settings", "Call Settings"]} />
+          <HamburgerMenu items={NAV} active={section} onChange={setSection} />
           <Logo />
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
