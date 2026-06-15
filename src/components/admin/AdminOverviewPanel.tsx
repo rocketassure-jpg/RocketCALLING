@@ -393,6 +393,7 @@ export const AdminOverviewPanel = () => {
             </>
           );
         })()}
+      </Tabs>
     </div>
   );
 };
