@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Plus, Trash2, KeyRound, Webhook } from "lucide-react";
+import { Copy, Plus, Trash2, KeyRound, Webhook, MessageSquare, Save } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 type ApiKey = { id: string; name: string; prefix: string; created_at: string; last_used_at: string | null; revoked: boolean };
@@ -30,11 +30,51 @@ export const ApiKeysManager = () => {
   const [name, setName] = useState("");
   const [newKey, setNewKey] = useState<string | null>(null);
 
+  // WhatsApp Bridge config (per-company)
+  const [bridgeUrl, setBridgeUrl] = useState("");
+  const [bridgeApiKey, setBridgeApiKey] = useState("");
+  const [bridgeSaving, setBridgeSaving] = useState(false);
+  const [bridgeCompanyId, setBridgeCompanyId] = useState<string | null>(null);
+
   const load = async () => {
     const { data } = await supabase.from("api_keys").select("*").order("created_at", { ascending: false });
     setKeys((data ?? []) as ApiKey[]);
   };
-  useEffect(() => { load(); }, []);
+
+  const loadBridge = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const { data: prof } = await supabase.from("profiles").select("company_id").eq("id", user.id).maybeSingle();
+    const cid = prof?.company_id ?? null;
+    setBridgeCompanyId(cid);
+    if (!cid) return;
+    const { data: cfg } = await supabase
+      .from("whatsapp_bridge_settings")
+      .select("bridge_url, bridge_api_key")
+      .eq("company_id", cid)
+      .maybeSingle();
+    setBridgeUrl(cfg?.bridge_url ?? "");
+    setBridgeApiKey(cfg?.bridge_api_key ?? "");
+  };
+
+  useEffect(() => { load(); loadBridge(); }, []);
+
+  const saveBridge = async () => {
+    if (!bridgeCompanyId) return toast({ title: "No company context", variant: "destructive" });
+    setBridgeSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    const { error } = await supabase
+      .from("whatsapp_bridge_settings")
+      .upsert({
+        company_id: bridgeCompanyId,
+        bridge_url: bridgeUrl.trim() || null,
+        bridge_api_key: bridgeApiKey.trim() || null,
+        updated_by: user?.id ?? null,
+      }, { onConflict: "company_id" });
+    setBridgeSaving(false);
+    if (error) return toast({ title: "Error", description: error.message, variant: "destructive" });
+    toast({ title: "WhatsApp Bridge saved" });
+  };
 
   const create = async () => {
     if (!name.trim()) return toast({ title: "Enter a name", variant: "destructive" });
@@ -73,6 +113,39 @@ export const ApiKeysManager = () => {
             POST JSON to this URL with header <code className="rounded bg-muted px-1">x-api-key: YOUR_API_KEY</code>.
             Accepted fields: <code>customer_name</code>, <code>phone_number</code>, <code>policy_type</code>, <code>message</code>.
           </p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><MessageSquare className="h-5 w-5 text-primary" /> WhatsApp Bridge</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Self-hosted WhatsApp bridge endpoint used for QR pairing and outbound send. Stored per-company; only admins can see/change.
+          </p>
+          <div className="space-y-2">
+            <Label>Bridge URL</Label>
+            <Input
+              placeholder="https://your-bridge.example.com"
+              value={bridgeUrl}
+              onChange={(e) => setBridgeUrl(e.target.value)}
+              className="font-mono text-xs"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Bridge API Key</Label>
+            <Input
+              type="password"
+              placeholder="x-api-key value sent to the bridge"
+              value={bridgeApiKey}
+              onChange={(e) => setBridgeApiKey(e.target.value)}
+              className="font-mono text-xs"
+            />
+          </div>
+          <Button onClick={saveBridge} disabled={bridgeSaving || !bridgeCompanyId}>
+            <Save className="h-4 w-4 mr-1" /> {bridgeSaving ? "Saving…" : "Save Bridge Config"}
+          </Button>
         </CardContent>
       </Card>
 

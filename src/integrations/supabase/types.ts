@@ -5049,6 +5049,38 @@ export type Database = {
           },
         ]
       }
+      whatsapp_bridge_settings: {
+        Row: {
+          bridge_api_key: string | null
+          bridge_url: string | null
+          company_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          bridge_api_key?: string | null
+          bridge_url?: string | null
+          company_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          bridge_api_key?: string | null
+          bridge_url?: string | null
+          company_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_bridge_settings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       whatsapp_logs: {
         Row: {
           created_at: string
