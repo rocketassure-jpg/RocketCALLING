@@ -22,8 +22,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "@/hooks/use-toast";
 import {
   Megaphone, Plus, Loader2, Trash2, Edit3, MessageCircle, Phone, Radio, Mic,
-  Facebook, Instagram, Linkedin, RefreshCw, Send, CalendarClock, Users as UsersIcon, Eye, FileText, BarChart3,
+  Facebook, Instagram, Linkedin, RefreshCw, Send, CalendarClock, Users as UsersIcon, Eye, FileText, BarChart3, Rocket,
 } from "lucide-react";
+import { RocketMarketingEngine } from "./rocket/RocketMarketingEngine";
 
 type Integration = any;
 type Template = any;
