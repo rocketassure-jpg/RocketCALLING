@@ -96,7 +96,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
   { id: "branches", label: "Branches", icon: Building2, group: "Finance" },
   { id: "areas", label: "Areas", icon: MapPin, group: "Finance" },
-  { id: "team_approvals", label: "Team & Pending Approvals", icon: Shield, group: "Finance" },
+  
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
@@ -415,19 +415,9 @@ const AdminDashboard = () => {
           </Tabs>
         );
       }
-      case "team_approvals": return (
-        <Tabs defaultValue="team" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="team"><Shield className="h-4 w-4 mr-1" /> Team</TabsTrigger>
-            <TabsTrigger value="approvals">
-              <UserPlus className="h-4 w-4 mr-1" /> Pending Approvals
-              {pendingCount > 0 && <span className="ml-1.5 rounded-full bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 font-semibold">{pendingCount}</span>}
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="team">{teamView}</TabsContent>
-          <TabsContent value="approvals"><PendingApprovalsPanel /></TabsContent>
-        </Tabs>
-      );
+      case "team_approvals":
+        // Legacy route → Org Hierarchy panel now contains Team, Hierarchy, Pending Approvals and Invite tabs.
+        return <OrgHierarchyPanel />;
       case "leads": return leadsView;
       case "areas": return (
         <Card>
