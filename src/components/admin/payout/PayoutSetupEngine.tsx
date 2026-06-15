@@ -11,8 +11,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Upload, Download, Search, Calculator, ShieldCheck, Wallet, Car, Banknote, Users, MapPin, Receipt, History, Calendar } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Download, Search, Calculator, ShieldCheck, Wallet, Car, Banknote, Users, MapPin, Receipt, History, Calendar, Briefcase } from "lucide-react";
 import * as XLSX from "xlsx";
+import CompensationSetup from "@/components/admin/org/CompensationSetup";
 
 // shared types
 type AnyRow = Record<string, any>;
@@ -817,10 +818,10 @@ export default function PayoutSetupEngine() {
       <div className="flex flex-wrap items-end justify-between gap-3 border-b pb-3">
         <div>
           <h2 className="text-xl font-semibold tracking-tight">Payout Setup Engine</h2>
-          <p className="text-xs text-muted-foreground">Configure all commission, payout, margin and pricing rules from one central location. Each rule is versioned by month — historical entries keep their original rate.</p>
+          <p className="text-xs text-muted-foreground">Configure all commission, payout, margin and pricing rules from one central location. Each rule is versioned by date — historical entries keep their original rate.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Label className="text-xs text-muted-foreground">Effective Month</Label>
+          <Label className="text-xs text-muted-foreground">Effective Date</Label>
           <MonthPicker value={month} onChange={setMonth} />
         </div>
       </div>
@@ -834,6 +835,7 @@ export default function PayoutSetupEngine() {
           <TabsTrigger value="vendor" className="text-xs"><Wallet className="h-3.5 w-3.5 mr-1" /> Vendor</TabsTrigger>
           <TabsTrigger value="state" className="text-xs"><MapPin className="h-3.5 w-3.5 mr-1" /> State Wise</TabsTrigger>
           <TabsTrigger value="tax" className="text-xs"><Receipt className="h-3.5 w-3.5 mr-1" /> Tax & GST</TabsTrigger>
+          <TabsTrigger value="compensation" className="text-xs"><Briefcase className="h-3.5 w-3.5 mr-1" /> Compensation</TabsTrigger>
           <TabsTrigger value="audit" className="text-xs"><History className="h-3.5 w-3.5 mr-1" /> Audit Logs</TabsTrigger>
         </TabsList>
         <TabsContent value="insurance"><InsuranceCommissionTab month={month} companyId={companyId} /></TabsContent>
@@ -843,6 +845,7 @@ export default function PayoutSetupEngine() {
         <TabsContent value="vendor"><VendorRulesTab month={month} companyId={companyId} /></TabsContent>
         <TabsContent value="state"><StateWiseTab month={month} companyId={companyId} /></TabsContent>
         <TabsContent value="tax"><TaxGstTab month={month} companyId={companyId} /></TabsContent>
+        <TabsContent value="compensation"><CompensationSetup /></TabsContent>
         <TabsContent value="audit"><AuditLogsTab companyId={companyId} /></TabsContent>
       </Tabs>
     </div>
