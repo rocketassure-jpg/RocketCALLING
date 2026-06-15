@@ -151,6 +151,28 @@ const AdminDashboard = () => {
   };
   useEffect(() => { load(); }, []);
 
+  // Pending approvals count + company name for sidebar
+  useEffect(() => {
+    (async () => {
+      const { count } = await (supabase as any)
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_approved", false);
+      setPendingCount(count ?? 0);
+      if (companyId) {
+        const { data } = await (supabase as any).from("companies").select("name").eq("id", companyId).maybeSingle();
+        if (data?.name) setCompanyName(data.name);
+      }
+    })();
+  }, [companyId, section]);
+
+  const NAV = useMemo(() => BASE_FILTERED.map((n) => {
+    if (n.id === "team_approvals") return { ...n, badge: pendingCount };
+    if (n.id === "customers_hub") return { ...n, subText: companyName };
+    return n;
+  }), [BASE_FILTERED, pendingCount, companyName]);
+
+
   const telecallers = useMemo(() => { const ids = new Set(roles.filter((r) => r.role === "telecaller").map((r) => r.user_id)); return profiles.filter((x) => ids.has(x.id)); }, [profiles, roles]);
   const managers = useMemo(() => { const ids = new Set(roles.filter((r) => r.role === "manager").map((r) => r.user_id)); return profiles.filter((x) => ids.has(x.id)); }, [profiles, roles]);
   const profileById = useMemo(() => new Map(profiles.map((p) => [p.id, p])), [profiles]);
