@@ -284,6 +284,84 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const teamView = (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Invite User</CardTitle></CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-4">
+          <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(sanitizeName(e.target.value))} placeholder="No emoji / special chars" /></div>
+          <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label>Role</Label>
+            <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="manager">Manager</SelectItem><SelectItem value="telecaller">Telecaller</SelectItem></SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-end"><Button variant="hero" className="w-full" onClick={sendInvite}><Copy className="h-4 w-4" /> Copy Invite Link</Button></div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Assign telecaller → area</CardTitle></CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-3">
+          <Select value={assignT} onValueChange={setAssignT}><SelectTrigger><SelectValue placeholder="Telecaller" /></SelectTrigger><SelectContent>{telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}</SelectContent></Select>
+          <Select value={assignA} onValueChange={setAssignA}><SelectTrigger><SelectValue placeholder="Area" /></SelectTrigger><SelectContent>{areas.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select>
+          <Button variant="hero" onClick={addAssignment}><Plus className="h-4 w-4" /> Assign</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Managers ({managers.length})</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {managers.length === 0 ? <p className="text-sm text-muted-foreground">No managers.</p> : managers.map((m) => (
+            <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 transition-all hover:shadow-md">
+              <div className="font-medium">{m.full_name || "(no name)"}</div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: m, role: "manager" })}>
+                  <Edit3 className="h-4 w-4" /> Edit
+                </Button>
+                <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Telecallers ({telecallers.length})</CardTitle></CardHeader>
+        <CardContent>
+          {telecallers.length === 0 ? <p className="text-sm text-muted-foreground">No telecallers yet.</p> : (
+            <div className="space-y-3">{telecallers.map((t) => (
+              <div key={t.id} className="rounded-lg border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-medium">{t.full_name || "(no name)"}</div>
+                    <div className="text-sm text-muted-foreground">Areas: {areasFor(t.id) || "—"}</div>
+                    <div className="text-sm text-muted-foreground">Manager: {managerName(t.manager_id)}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select value={t.manager_id ?? "none"} onValueChange={(v) => setManager(t.id, v === "none" ? null : v)}>
+                      <SelectTrigger className="w-[180px]"><SelectValue placeholder="Set manager" /></SelectTrigger>
+                      <SelectContent><SelectItem value="none">No manager</SelectItem>{managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: t, role: "telecaller" })}>
+                      <Edit3 className="h-4 w-4" /> Edit
+                    </Button>
+                    <RemoveTeamButton name={t.full_name} onConfirm={() => removeFromTeam(t.id, "telecaller")} />
+                  </div>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1">{assignments.filter((x) => x.telecaller_id === t.id).map((x) => {
+                  const area = areas.find((a) => a.id === x.area_id);
+                  return <Badge key={x.id} variant="outline" className="gap-1">{area?.name}<button onClick={() => removeAssignment(x.id)}><Trash2 className="h-3 w-3 text-destructive" /></button></Badge>;
+                })}</div>
+              </div>
+            ))}</div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
