@@ -16,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database } from "lucide-react";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
+import { SecretsManager } from "@/components/admin/SecretsManager";
 
 type Company = { id: string; name: string; code: string; plan: string; is_active: boolean; created_at: string };
 type Module = { module_key: string; name: string; base_monthly_price: number; is_always_included: boolean; sort_order: number };
@@ -30,6 +31,7 @@ const SECTIONS = [
   { id: "settings", label: "Global Settings", icon: SettingsIcon },
   { id: "flags", label: "Feature Flags", icon: Flag },
   { id: "plans", label: "Plan Templates", icon: Layers },
+  { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
 ];
 
@@ -260,6 +262,7 @@ const SuperAdminDashboard = () => {
             {section === "settings" && <GlobalSettingsPanel />}
             {section === "flags" && <FeatureFlagsPanel />}
             {section === "plans" && <PlanTemplatesPanel />}
+            {section === "secrets" && <SecretsManager />}
             {section === "audit" && <SuperAdminAuditPanel />}
           </div>
         </main>
