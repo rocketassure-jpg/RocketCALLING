@@ -16,6 +16,7 @@ import {
   Rocket, Calendar as CalendarIcon, Sparkles, Image as ImageIcon, Users, Route, MessageCircle,
   Link2, BarChart3, Loader2, Wand2, Send, RefreshCw, Plus,
 } from "lucide-react";
+import { ExternalApiRegistry } from "@/components/admin/ExternalApiRegistry";
 
 const PLATFORMS = [
   { key: "facebook", label: "Facebook" },
@@ -672,27 +673,32 @@ const ChannelsTab = () => {
   };
 
   return (
-    <Card>
-      <CardHeader><CardTitle>Connected Channels</CardTitle></CardHeader>
-      <CardContent>
-        {loading ? <Loader2 className="animate-spin" /> : (
-          <div className="grid md:grid-cols-2 gap-3">
-            {items.map((c) => (
-              <div key={c.id} className="p-3 border rounded">
-                <div className="flex items-center justify-between mb-1">
-                  <div className="font-semibold">{c.display_name || c.platform}</div>
-                  <Badge variant={c.status === "connected" ? "default" : "secondary"}>{c.status}</Badge>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle>Connected Channels</CardTitle></CardHeader>
+        <CardContent>
+          {loading ? <Loader2 className="animate-spin" /> : (
+            <div className="grid md:grid-cols-2 gap-3">
+              {items.map((c) => (
+                <div key={c.id} className="p-3 border rounded">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="font-semibold">{c.display_name || c.platform}</div>
+                    <Badge variant={c.status === "connected" ? "default" : "secondary"}>{c.status}</Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground">{SETUP[c.platform]}</div>
                 </div>
-                <div className="text-xs text-muted-foreground">{SETUP[c.platform]}</div>
-              </div>
-            ))}
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground mt-4">
-          Tell me when you're ready to connect a platform — I'll request the required API credentials securely and wire up live publishing.
-        </p>
-      </CardContent>
-    </Card>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-muted-foreground mt-4">
+            Tell me when you're ready to connect a platform — I'll request the required API credentials securely and wire up live publishing.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Marketing-scoped External API Registry — shares storage with the global API & Webhooks panel */}
+      <ExternalApiRegistry lockedCategory="marketing" title="Marketing API Registry" />
+    </div>
   );
 };
 

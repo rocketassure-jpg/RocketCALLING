@@ -2159,6 +2159,7 @@ export type Database = {
       external_api_registry: {
         Row: {
           api_key: string | null
+          category: string
           company_id: string
           created_at: string
           created_by: string | null
@@ -2174,6 +2175,7 @@ export type Database = {
         }
         Insert: {
           api_key?: string | null
+          category?: string
           company_id: string
           created_at?: string
           created_by?: string | null
@@ -2189,6 +2191,7 @@ export type Database = {
         }
         Update: {
           api_key?: string | null
+          category?: string
           company_id?: string
           created_at?: string
           created_by?: string | null

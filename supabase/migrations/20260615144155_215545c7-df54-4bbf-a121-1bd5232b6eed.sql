@@ -1,0 +1,2 @@
+ALTER TABLE public.external_api_registry ADD COLUMN IF NOT EXISTS category TEXT NOT NULL DEFAULT 'general';
+CREATE INDEX IF NOT EXISTS idx_external_api_registry_category ON public.external_api_registry(company_id, category);
