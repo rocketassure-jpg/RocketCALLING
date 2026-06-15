@@ -34,16 +34,16 @@ export const SecretsManager = () => {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 auto-rows-fr">
         {SECRETS.map((s) => (
-          <Card key={s.key}>
+          <Card key={s.key} className="flex flex-col h-full">
             <CardHeader className="pb-2">
-              <CardTitle className="flex items-center justify-between text-base">
-                <span>{s.label}</span>
-                <Badge variant="outline" className="font-mono text-xs">{s.key}</Badge>
+              <CardTitle className="flex items-start justify-between gap-2 text-base">
+                <span className="leading-tight">{s.label}</span>
+                <Badge variant="outline" className="font-mono text-[10px] shrink-0 whitespace-nowrap">{s.key}</Badge>
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="flex flex-col flex-1 justify-between gap-3">
               <p className="text-sm text-muted-foreground">{s.help}</p>
               <div className="flex flex-wrap gap-2">
                 <Button asChild variant="outline" size="sm">
