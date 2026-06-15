@@ -335,7 +335,6 @@ const AdminDashboard = () => {
         </Tabs>
       );
       case "leads": return leadsView;
-      case "leads": return leadsView;
       case "areas": return (
         <Card>
           <CardHeader><CardTitle>Manage areas</CardTitle></CardHeader>
