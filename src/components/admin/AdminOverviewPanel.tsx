@@ -54,11 +54,12 @@ export const AdminOverviewPanel = () => {
   const [perTelecaller, setPerTelecaller] = useState<{ name: string; calls: number; interested: number; converted: number; last: string | null }[]>([]);
   const [trend, setTrend] = useState<{ day: string; calls: number }[]>([]);
   const [dispoSlice, setDispoSlice] = useState<{ name: string; value: number }[]>([]);
+  const [branches, setBranches] = useState<{ id: string; name: string; leads: number; converted: number }[]>([]);
 
   useEffect(() => {
     let mounted = true;
-    const load = async () => {
-      setLoading(true);
+    const load = async (silent = false) => {
+      if (!silent) setLoading(true);
       const since = startOfRange(range).toISOString();
       const sinceDay = startOfRange(range).toISOString().slice(0, 10);
       const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
