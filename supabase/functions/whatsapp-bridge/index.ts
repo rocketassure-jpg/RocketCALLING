@@ -8,8 +8,11 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const BRIDGE_URL = Deno.env.get("BRIDGE_URL") ?? "";
-const BRIDGE_API_KEY = Deno.env.get("BRIDGE_API_KEY") ?? "";
+// Bridge URL / API key are now stored per-company in public.whatsapp_bridge_settings
+// (managed by admins from Settings → API & Webhooks). Env fallbacks are kept for
+// backwards compatibility only.
+const ENV_BRIDGE_URL = Deno.env.get("BRIDGE_URL") ?? "";
+const ENV_BRIDGE_API_KEY = Deno.env.get("BRIDGE_API_KEY") ?? "";
 
 const json = (body: unknown, status = 200, extra: HeadersInit = {}) =>
   new Response(JSON.stringify(body), {
@@ -21,10 +24,6 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    if (!BRIDGE_URL || !BRIDGE_API_KEY) {
-      return json({ error: "Bridge not configured on server" }, 503);
-    }
-
     // Auth: validate JWT
     const authHeader = req.headers.get("Authorization") ?? "";
     if (!authHeader.startsWith("Bearer ")) return json({ error: "Unauthorized" }, 401);
@@ -43,8 +42,28 @@ Deno.serve(async (req) => {
       .from("user_roles").select("role").eq("user_id", uid);
     const allowed = (roles ?? []).some((r: any) => r.role === "admin" || r.role === "manager");
     const { data: prof } = await supabase
-      .from("profiles").select("is_super_admin").eq("id", uid).maybeSingle();
+      .from("profiles").select("is_super_admin, company_id").eq("id", uid).maybeSingle();
     if (!allowed && !prof?.is_super_admin) return json({ error: "Forbidden" }, 403);
+
+    // Resolve bridge config: per-company DB row first, then env fallback
+    let BRIDGE_URL = ENV_BRIDGE_URL;
+    let BRIDGE_API_KEY = ENV_BRIDGE_API_KEY;
+    const admin = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+    if (prof?.company_id) {
+      const { data: cfg } = await admin
+        .from("whatsapp_bridge_settings")
+        .select("bridge_url, bridge_api_key")
+        .eq("company_id", prof.company_id)
+        .maybeSingle();
+      if (cfg?.bridge_url) BRIDGE_URL = cfg.bridge_url;
+      if (cfg?.bridge_api_key) BRIDGE_API_KEY = cfg.bridge_api_key;
+    }
+    if (!BRIDGE_URL || !BRIDGE_API_KEY) {
+      return json({ error: "Bridge not configured. Set it in Settings → API & Webhooks." }, 503);
+    }
 
     const body = await req.json().catch(() => ({}));
     const action = String(body?.action ?? "");
