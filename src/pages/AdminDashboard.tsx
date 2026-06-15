@@ -111,8 +111,10 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
 const AdminDashboard = () => {
   const { companyId } = useAuth();
   const { has: hasModule } = useModuleAccess();
-  const NAV = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
+  const BASE_FILTERED = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
   const [section, setSection] = useState("overview");
+  const [pendingCount, setPendingCount] = useState(0);
+  const [companyName, setCompanyName] = useState<string>("");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
