@@ -5,7 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, RefreshCw, Save, Pencil, X, Globe } from "lucide-react";
+import { Plus, Trash2, RefreshCw, Save, Pencil, X, Globe, Sparkles } from "lucide-react";
+
+type Preset = { name: string; usecase: string; url: string; remark: string; category: string };
+
+const API_PRESETS: Preset[] = [
+  { name: "Meta / Facebook Graph", usecase: "FB Page posts, Instagram, Ads", url: "https://graph.facebook.com/v19.0/me", remark: "Get from developers.facebook.com — Free (limits apply)", category: "social" },
+  { name: "WhatsApp Business Cloud", usecase: "WA messaging, templates", url: "https://graph.facebook.com/v19.0/", remark: "business.facebook.com — Free 1000 conv/month", category: "communication" },
+  { name: "Google Ads", usecase: "Lead form ads, campaigns", url: "https://googleads.googleapis.com/v17/customers", remark: "ads.google.com/aw/apicenter — Free API (ad spend separate)", category: "marketing" },
+  { name: "Google My Business", usecase: "GMB posts, reviews", url: "https://mybusinessbusinessinformation.googleapis.com/v1/", remark: "console.cloud.google.com — Free", category: "marketing" },
+  { name: "LinkedIn Marketing", usecase: "Company page posts, ads", url: "https://api.linkedin.com/v2/", remark: "developer.linkedin.com — Free basic / Paid marketing", category: "social" },
+  { name: "OpenAI", usecase: "AI content / image generation", url: "https://api.openai.com/v1/models", remark: "platform.openai.com — ~$0.002/1K tokens", category: "ai" },
+  { name: "Canva", usecase: "Auto-design creatives", url: "https://api.canva.com/rest/v1/", remark: "canva.com/developers — Free tier", category: "marketing" },
+  { name: "Twilio", usecase: "SMS / voice / WhatsApp", url: "https://api.twilio.com/2010-04-01/", remark: "twilio.com — ~₹0.5/SMS pay-as-you-go", category: "communication" },
+  { name: "Razorpay", usecase: "Payments & subscriptions", url: "https://api.razorpay.com/v1/", remark: "razorpay.com — 2% transaction fee", category: "payment" },
+];
 import { toast } from "@/hooks/use-toast";
 
 type Row = {
