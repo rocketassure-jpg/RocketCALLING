@@ -389,10 +389,10 @@ const AdminDashboard = () => {
       case "trash":
       case "settings_hub": {
         const defaultTab =
-          section === "permissions" ? "permissions" :
-          section === "fields" ? "fields" :
+          section === "permissions" ? "general" :
+          section === "fields" ? "general" :
           section === "general_advance" ? "general" :
-          section === "trash" ? "trash" :
+          section === "trash" ? "general" :
           section === "account" ? "account" : "account";
         return (
           <Tabs defaultValue={defaultTab} className="space-y-4">
@@ -404,9 +404,6 @@ const AdminDashboard = () => {
               <TabsTrigger value="org"><User className="h-4 w-4 mr-1" /> Org Hierarchy</TabsTrigger>
               <TabsTrigger value="comp"><Wallet className="h-4 w-4 mr-1" /> Compensation</TabsTrigger>
               <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
-              <TabsTrigger value="permissions"><KeyRound className="h-4 w-4 mr-1" /> Permissions</TabsTrigger>
-              <TabsTrigger value="fields"><Tags className="h-4 w-4 mr-1" /> Fields & Statuses</TabsTrigger>
-              <TabsTrigger value="trash"><Ban className="h-4 w-4 mr-1" /> Trash (DNC)</TabsTrigger>
             </TabsList>
             <TabsContent value="account"><AccountSettings /></TabsContent>
             <TabsContent value="general"><GeneralSettings /></TabsContent>
@@ -415,32 +412,6 @@ const AdminDashboard = () => {
             <TabsContent value="org"><OrgHierarchyPanel /></TabsContent>
             <TabsContent value="comp"><CompensationSetup /></TabsContent>
             <TabsContent value="audit"><AuditLogViewer /></TabsContent>
-            <TabsContent value="permissions"><PermissionsMatrix /></TabsContent>
-            <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
-
-
-            <TabsContent value="trash">
-              <Card>
-                <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>
-                <CardContent className="overflow-x-auto p-0">
-                  {trashedLeads.length === 0 ? <p className="p-6 text-sm text-muted-foreground">No unsubscribed leads.</p> : (
-                    <Table>
-                      <TableHeader><TableRow><TableHead>Customer</TableHead><TableHead>Phone</TableHead><TableHead>Area</TableHead><TableHead>Policy</TableHead><TableHead></TableHead></TableRow></TableHeader>
-                      <TableBody>{trashedLeads.map((l) => (
-                        <TableRow key={l.id}>
-                          <TableCell className="font-medium">{l.customer_name}</TableCell><TableCell>{l.phone_number}</TableCell>
-                          <TableCell>{l.areas?.name}</TableCell><TableCell><Badge variant="outline">{l.policy_type}</Badge></TableCell>
-                          <TableCell className="space-x-2 text-right">
-                            <Button variant="outline" size="sm" onClick={() => restoreLead(l.id)}><RotateCcw className="h-4 w-4" /> Restore</Button>
-                            <Button variant="ghost" size="icon" onClick={() => deleteLead(l.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}</TableBody>
-                    </Table>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
           </Tabs>
         );
       }

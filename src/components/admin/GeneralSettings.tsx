@@ -5,10 +5,13 @@ import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Loader2, Save, Download } from "lucide-react";
-import { BrandingPanel } from "@/components/admin/BrandingPanel";
+import { Loader2, Save, Download, Settings as SettingsIcon, Tags, Ban, KeyRound, ShieldCheck } from "lucide-react";
 import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
+import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
+import { TrashPanel } from "@/components/admin/TrashPanel";
+import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
 
 type Settings = {
   id: string;
@@ -103,16 +106,29 @@ export const GeneralSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">General Settings</h1>
-          <p className="text-sm text-muted-foreground">Communication, allocation, retry & security</p>
+          <p className="text-sm text-muted-foreground">Communication, fields, permissions & privacy</p>
         </div>
-        <Button variant="hero" onClick={save} disabled={saving}>
-          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save
-        </Button>
       </div>
+
+      <Tabs defaultValue="general" className="space-y-4">
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="general"><SettingsIcon className="h-4 w-4 mr-1" /> General</TabsTrigger>
+          <TabsTrigger value="fields"><Tags className="h-4 w-4 mr-1" /> Fields &amp; Statuses</TabsTrigger>
+          <TabsTrigger value="trash"><Ban className="h-4 w-4 mr-1" /> Trash (DNC)</TabsTrigger>
+          <TabsTrigger value="permissions"><KeyRound className="h-4 w-4 mr-1" /> Permissions</TabsTrigger>
+          <TabsTrigger value="privacy"><ShieldCheck className="h-4 w-4 mr-1" /> Phone Number Privacy</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="general" className="space-y-6">
+          <div className="flex justify-end">
+            <Button variant="hero" onClick={save} disabled={saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save
+            </Button>
+          </div>
 
       <Card>
         <CardHeader><CardTitle>Master Google Sheet</CardTitle></CardHeader>
@@ -223,10 +239,13 @@ export const GeneralSettings = () => {
           </div>
         </CardContent>
       </Card>
+        </TabsContent>
 
-
-      <BrandingPanel />
-      <MaskingPolicyPanel />
+        <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
+        <TabsContent value="trash"><TrashPanel /></TabsContent>
+        <TabsContent value="permissions"><PermissionsMatrix /></TabsContent>
+        <TabsContent value="privacy"><MaskingPolicyPanel /></TabsContent>
+      </Tabs>
     </div>
   );
 };

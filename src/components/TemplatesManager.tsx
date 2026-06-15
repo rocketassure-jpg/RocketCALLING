@@ -9,13 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Edit3, Trash2, FileText, Users2, User as UserIcon, Loader2 } from "lucide-react";
+import { Plus, Edit3, Trash2, FileText, Users2, User as UserIcon, Loader2, MessageCircle, MessageSquare, Radio } from "lucide-react";
 
 export const TEMPLATE_VARIABLES = ["{name}", "{vehicle}", "{policy_date}", "{agent_name}"];
 const CATEGORIES = ["Thanks", "Follow-up", "Quote", "Reminder", "Custom"];
+const ALL_CHANNELS = [
+  { key: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+  { key: "sms", label: "SMS / Text", icon: MessageSquare },
+  { key: "rcs", label: "RCS", icon: Radio },
+] as const;
 
 export type MessageTemplate = {
   id: string;
@@ -24,6 +29,7 @@ export type MessageTemplate = {
   body: string;
   category: string;
   shared: boolean;
+  channels: string[];
 };
 
 export const fillTemplate = (
@@ -49,7 +55,7 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
       .from("message_templates")
       .select("*")
       .order("updated_at", { ascending: false });
-    setItems((data ?? []) as any);
+    setItems(((data ?? []) as any[]).map((t) => ({ ...t, channels: t.channels ?? ["whatsapp"] })) as any);
     setLoading(false);
   };
 
@@ -63,22 +69,31 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
       body: "Namaste {name}, Rocket Services se {agent_name}. ",
       category: "Custom",
       shared: false,
+      channels: ["whatsapp"],
     });
     setOpen(true);
   };
 
-  const openEdit = (t: MessageTemplate) => { setEditing(t); setOpen(true); };
+  const openEdit = (t: MessageTemplate) => { setEditing({ ...t, channels: t.channels ?? ["whatsapp"] }); setOpen(true); };
+
+  const toggleChannel = (key: string) => {
+    if (!editing) return;
+    const has = editing.channels.includes(key);
+    const next = has ? editing.channels.filter((c) => c !== key) : [...editing.channels, key];
+    setEditing({ ...editing, channels: next.length ? next : [key] });
+  };
 
   const save = async () => {
     if (!editing || !user) return;
     if (!editing.title.trim() || !editing.body.trim()) {
-      return toast({ title: "Title and message required", variant: "destructive" });
+      return toast({ title: "Template name and message required", variant: "destructive" });
     }
-    const payload = {
+    const payload: any = {
       title: editing.title.trim(),
       body: editing.body,
       category: editing.category,
       shared: canShare ? editing.shared : false,
+      channels: editing.channels.length ? editing.channels : ["whatsapp"],
     };
     const { error } = editing.id
       ? await supabase.from("message_templates").update(payload).eq("id", editing.id)
@@ -104,13 +119,13 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2 pb-3">
         <CardTitle className="flex items-center gap-2 text-base"><FileText className="h-4 w-4" /> Message Templates</CardTitle>
-        <Button size="sm" variant="hero" onClick={openNew}><Plus className="h-4 w-4" /> Add</Button>
+        <Button size="sm" variant="hero" onClick={openNew}><Plus className="h-4 w-4" /> New Template</Button>
       </CardHeader>
       <CardContent className="space-y-2">
         {loading ? (
           <div className="flex justify-center py-6"><Loader2 className="h-5 w-5 animate-spin text-primary" /></div>
         ) : items.length === 0 ? (
-          <p className="py-6 text-center text-sm text-muted-foreground">Koi template nahi hai. Add karke shuru karo.</p>
+          <p className="py-6 text-center text-sm text-muted-foreground">No templates. Click "New Template" to add one.</p>
         ) : items.map((t) => (
           <div key={t.id} className="flex items-start justify-between gap-2 rounded-lg border bg-card p-3">
             <div className="min-w-0 flex-1">
@@ -122,6 +137,12 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
                 ) : (
                   <Badge variant="secondary" className="text-[10px]"><UserIcon className="h-2.5 w-2.5" /> Personal</Badge>
                 )}
+                {(t.channels ?? []).map((c) => {
+                  const meta = ALL_CHANNELS.find((x) => x.key === c);
+                  if (!meta) return null;
+                  const Icon = meta.icon;
+                  return <Badge key={c} variant="outline" className="text-[10px]"><Icon className="h-2.5 w-2.5 mr-0.5" /> {meta.label}</Badge>;
+                })}
               </div>
               <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{t.body}</p>
             </div>
@@ -163,7 +184,7 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
           {editing && (
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Title</Label>
+                <Label>Template name</Label>
                 <Input value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} placeholder="e.g. Thank you message" />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -182,6 +203,21 @@ export const TemplatesManager = ({ canShare }: { canShare: boolean }) => {
                     </div>
                   </div>
                 )}
+              </div>
+              <div className="space-y-1.5">
+                <Label>Channels (multi-select)</Label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_CHANNELS.map((c) => {
+                    const Icon = c.icon;
+                    const active = editing.channels.includes(c.key);
+                    return (
+                      <Button key={c.key} type="button" size="sm" variant={active ? "hero" : "outline"} onClick={() => toggleChannel(c.key)}>
+                        <Icon className="h-3.5 w-3.5" /> {c.label}
+                      </Button>
+                    );
+                  })}
+                </div>
+                <p className="text-[11px] text-muted-foreground">Telecaller, dialer and other modules will pick templates by channel.</p>
               </div>
               <div className="space-y-1.5">
                 <Label>Message body</Label>

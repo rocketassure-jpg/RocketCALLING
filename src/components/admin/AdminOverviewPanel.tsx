@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users, UserCheck, Coffee, UserX,
   Phone, CheckCircle2, Clock, PhoneOff,
   Sparkles, ThumbsUp, MessageSquare, FileText,
   Handshake, Trophy, Flame, ThumbsDown, ArrowUpRight, CheckSquare,
-  Briefcase, Calendar, TrendingUp, Loader2,
+  Briefcase, Calendar, TrendingUp, Loader2, Building2,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as ChartTooltip, ResponsiveContainer,
@@ -53,11 +54,12 @@ export const AdminOverviewPanel = () => {
   const [perTelecaller, setPerTelecaller] = useState<{ name: string; calls: number; interested: number; converted: number; last: string | null }[]>([]);
   const [trend, setTrend] = useState<{ day: string; calls: number }[]>([]);
   const [dispoSlice, setDispoSlice] = useState<{ name: string; value: number }[]>([]);
+  const [branches, setBranches] = useState<{ id: string; name: string; leads: number; converted: number }[]>([]);
 
   useEffect(() => {
     let mounted = true;
-    const load = async () => {
-      setLoading(true);
+    const load = async (silent = false) => {
+      if (!silent) setLoading(true);
       const since = startOfRange(range).toISOString();
       const sinceDay = startOfRange(range).toISOString().slice(0, 10);
       const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
@@ -161,10 +163,23 @@ export const AdminOverviewPanel = () => {
       callRows.forEach((c) => { dispoCount[c.status] = (dispoCount[c.status] ?? 0) + 1; });
       setDispoSlice(Object.entries(dispoCount).map(([name, value]) => ({ name, value })));
 
+      // Branches breakdown
+      const { data: brData } = await supabase.from("branches").select("id,name").eq("is_active", true).order("name");
+      const { data: brLeads } = await supabase.from("leads").select("branch_id,status");
+      const map = new Map<string, { leads: number; converted: number }>();
+      ((brLeads ?? []) as any[]).forEach((l) => {
+        if (!l.branch_id) return;
+        const cur = map.get(l.branch_id) ?? { leads: 0, converted: 0 };
+        cur.leads += 1;
+        if (l.status === "Converted") cur.converted += 1;
+        map.set(l.branch_id, cur);
+      });
+      setBranches(((brData ?? []) as any[]).map((b) => ({ id: b.id, name: b.name, leads: map.get(b.id)?.leads ?? 0, converted: map.get(b.id)?.converted ?? 0 })));
+
       setLoading(false);
     };
     load();
-    const iv = setInterval(load, 30000);
+    const iv = setInterval(() => load(true), 30000);
     return () => { mounted = false; clearInterval(iv); };
   }, [range]);
 
@@ -201,146 +216,184 @@ export const AdminOverviewPanel = () => {
         </div>
       </div>
 
-      {loading && (
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Loader2 className="h-3 w-3 animate-spin" /> Refreshing…
-        </div>
-      )}
+      <Tabs defaultValue="all" className="space-y-5">
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="team"><Users className="h-3.5 w-3.5 mr-1" /> Team</TabsTrigger>
+          <TabsTrigger value="pipeline"><Sparkles className="h-3.5 w-3.5 mr-1" /> Pipeline</TabsTrigger>
+          <TabsTrigger value="campaigns"><Flame className="h-3.5 w-3.5 mr-1" /> Campaigns</TabsTrigger>
+          <TabsTrigger value="branches"><Building2 className="h-3.5 w-3.5 mr-1" /> Branches</TabsTrigger>
+        </TabsList>
 
-      {/* Row 1 — Team */}
-      <div>
-        <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Team</div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          <StatCard icon={Users}     label="Telecallers"  value={team.total}  accent="border-l-primary" />
-          <StatCard icon={UserCheck} label="Active Today" value={team.active} accent="border-l-success" />
-          <StatCard icon={Coffee}    label="On Break"     value={team.onBreak} accent="border-l-warning" />
-          <StatCard icon={UserX}     label="Offline"      value={team.offline} accent="border-l-muted-foreground" />
-        </div>
-      </div>
-
-      {/* Row 2 — Calls */}
-      <div>
-        <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Calls ({range})</div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          <StatCard icon={Phone}        label="Total Calls"   value={calls.total}     accent="border-l-primary" />
-          <StatCard icon={CheckCircle2} label="Done"          value={calls.done}      accent="border-l-success" />
-          <StatCard icon={Clock}        label="Remaining"     value={calls.remaining} accent="border-l-warning" />
-          <StatCard icon={PhoneOff}     label="Not Picked"    value={calls.notPicked} accent="border-l-destructive" />
-        </div>
-      </div>
-
-      {/* Row 3 — Pipeline */}
-      <div>
-        <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Pipeline</div>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {pipelineCards.map((p) => (
-            <StatCard key={p.key} icon={p.icon} label={p.key} value={pipeline[p.key] ?? 0} accent={p.accent} />
-          ))}
-        </div>
-      </div>
-
-      {/* Row 4 — Campaigns */}
-      <div>
-        <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Campaigns</div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          <StatCard icon={Briefcase}  label="Total Campaigns" value={campaigns.total}     accent="border-l-primary" />
-          <StatCard icon={Flame}      label="Active"          value={campaigns.active}    accent="border-l-warning" />
-          <StatCard icon={CheckSquare} label="Completed"       value={campaigns.completed} accent="border-l-success" />
-          <StatCard icon={Users}      label="Leads in Camps." value={campaigns.leads}     accent="border-l-accent" />
-        </div>
-      </div>
-
-      {/* Row 5 — Business */}
-      <div>
-        <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Business Summary</div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          <StatCard icon={Briefcase}  label="Total Leads"   value={business.total}      accent="border-l-primary" />
-          <StatCard icon={UserCheck}  label="Assigned"      value={business.assigned}   accent="border-l-success" />
-          <StatCard icon={UserX}      label="Unassigned"    value={business.unassigned} accent="border-l-warning" />
-          <StatCard icon={TrendingUp} label="Conversion %"  value={`${business.conversion}%`} accent="border-l-accent" />
-        </div>
-      </div>
-
-      {/* Charts */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Calls per Telecaller</CardTitle></CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={perTelecaller.slice(0, 10)}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-25} textAnchor="end" height={50} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <ChartTooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Bar dataKey="calls" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Daily Call Volume (last 30 days)</CardTitle></CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={trend}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="day" tick={{ fontSize: 10 }} interval={4} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <ChartTooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
-                <Line type="monotone" dataKey="calls" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="md:col-span-2">
-          <CardHeader className="pb-2"><CardTitle className="text-sm">Disposition Breakdown ({range})</CardTitle></CardHeader>
-          <CardContent className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie data={dispoSlice} dataKey="value" nameKey="name" outerRadius={90} label>
-                  {dispoSlice.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-                </Pie>
-                <ChartTooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Leaderboard */}
-      <Card>
-        <CardHeader className="pb-2"><CardTitle className="text-sm">Telecaller Leaderboard</CardTitle></CardHeader>
-        <CardContent className="overflow-x-auto p-0">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-xs uppercase text-muted-foreground">
-              <tr>
-                <th className="p-2 text-left">#</th>
-                <th className="p-2 text-left">Name</th>
-                <th className="p-2 text-right">Calls</th>
-                <th className="p-2 text-right">Interested</th>
-                <th className="p-2 text-right">Converted</th>
-                <th className="p-2 text-left">Last Active</th>
-              </tr>
-            </thead>
-            <tbody>
-              {perTelecaller.map((t, i) => (
-                <tr key={t.name + i} className="border-t">
-                  <td className="p-2 font-mono text-muted-foreground">{i + 1}</td>
-                  <td className="p-2 font-medium">{t.name}</td>
-                  <td className="p-2 text-right tabular-nums">{t.calls}</td>
-                  <td className="p-2 text-right tabular-nums"><Badge variant="outline" className="bg-success/10">{t.interested}</Badge></td>
-                  <td className="p-2 text-right tabular-nums"><Badge variant="outline" className="bg-primary/10">{t.converted}</Badge></td>
-                  <td className="p-2 text-xs text-muted-foreground">{t.last ? new Date(t.last).toLocaleString() : "—"}</td>
-                </tr>
-              ))}
-              {perTelecaller.length === 0 && (
-                <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">No telecallers yet</td></tr>
+        {(() => {
+          const teamBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Team</div>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                <StatCard icon={Users}     label="Telecallers"  value={team.total}  accent="border-l-primary" />
+                <StatCard icon={UserCheck} label="Active Today" value={team.active} accent="border-l-success" />
+                <StatCard icon={Coffee}    label="On Break"     value={team.onBreak} accent="border-l-warning" />
+                <StatCard icon={UserX}     label="Offline"      value={team.offline} accent="border-l-muted-foreground" />
+              </div>
+            </div>
+          );
+          const callsBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Calls ({range})</div>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                <StatCard icon={Phone}        label="Total Calls"   value={calls.total}     accent="border-l-primary" />
+                <StatCard icon={CheckCircle2} label="Done"          value={calls.done}      accent="border-l-success" />
+                <StatCard icon={Clock}        label="Remaining"     value={calls.remaining} accent="border-l-warning" />
+                <StatCard icon={PhoneOff}     label="Not Picked"    value={calls.notPicked} accent="border-l-destructive" />
+              </div>
+            </div>
+          );
+          const pipelineBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Pipeline</div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {pipelineCards.map((p) => (
+                  <StatCard key={p.key} icon={p.icon} label={p.key} value={pipeline[p.key] ?? 0} accent={p.accent} />
+                ))}
+              </div>
+            </div>
+          );
+          const campaignsBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Campaigns</div>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                <StatCard icon={Briefcase}  label="Total Campaigns" value={campaigns.total}     accent="border-l-primary" />
+                <StatCard icon={Flame}      label="Active"          value={campaigns.active}    accent="border-l-warning" />
+                <StatCard icon={CheckSquare} label="Completed"       value={campaigns.completed} accent="border-l-success" />
+                <StatCard icon={Users}      label="Leads in Camps." value={campaigns.leads}     accent="border-l-accent" />
+              </div>
+            </div>
+          );
+          const businessBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Business Summary</div>
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                <StatCard icon={Briefcase}  label="Total Leads"   value={business.total}      accent="border-l-primary" />
+                <StatCard icon={UserCheck}  label="Assigned"      value={business.assigned}   accent="border-l-success" />
+                <StatCard icon={UserX}      label="Unassigned"    value={business.unassigned} accent="border-l-warning" />
+                <StatCard icon={TrendingUp} label="Conversion %"  value={`${business.conversion}%`} accent="border-l-accent" />
+              </div>
+            </div>
+          );
+          const branchesBlock = (
+            <div>
+              <div className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Branches</div>
+              {branches.length === 0 ? (
+                <p className="rounded-lg border bg-card p-4 text-sm text-muted-foreground">No branches configured.</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+                  {branches.map((b) => (
+                    <StatCard key={b.id} icon={Building2} label={b.name} value={`${b.leads} (${b.converted} won)`} accent="border-l-accent" />
+                  ))}
+                </div>
               )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
+            </div>
+          );
+          const chartsBlock = (
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Calls per Telecaller</CardTitle></CardHeader>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={perTelecaller.slice(0, 10)}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-25} textAnchor="end" height={50} />
+                      <YAxis tick={{ fontSize: 10 }} />
+                      <ChartTooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                      <Bar dataKey="calls" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Daily Call Volume (last 30 days)</CardTitle></CardHeader>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={trend}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                      <XAxis dataKey="day" tick={{ fontSize: 10 }} interval={4} />
+                      <YAxis tick={{ fontSize: 10 }} />
+                      <ChartTooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))" }} />
+                      <Line type="monotone" dataKey="calls" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+              <Card className="md:col-span-2">
+                <CardHeader className="pb-2"><CardTitle className="text-sm">Disposition Breakdown ({range})</CardTitle></CardHeader>
+                <CardContent className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={dispoSlice} dataKey="value" nameKey="name" outerRadius={90} label>
+                        {dispoSlice.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+                      </Pie>
+                      <ChartTooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          );
+          const leaderboardBlock = (
+            <Card>
+              <CardHeader className="pb-2"><CardTitle className="text-sm">Telecaller Leaderboard</CardTitle></CardHeader>
+              <CardContent className="overflow-x-auto p-0">
+                <table className="w-full text-sm">
+                  <thead className="bg-muted text-xs uppercase text-muted-foreground">
+                    <tr>
+                      <th className="p-2 text-left">#</th>
+                      <th className="p-2 text-left">Name</th>
+                      <th className="p-2 text-right">Calls</th>
+                      <th className="p-2 text-right">Interested</th>
+                      <th className="p-2 text-right">Converted</th>
+                      <th className="p-2 text-left">Last Active</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {perTelecaller.map((t, i) => (
+                      <tr key={t.name + i} className="border-t">
+                        <td className="p-2 font-mono text-muted-foreground">{i + 1}</td>
+                        <td className="p-2 font-medium">{t.name}</td>
+                        <td className="p-2 text-right tabular-nums">{t.calls}</td>
+                        <td className="p-2 text-right tabular-nums"><Badge variant="outline" className="bg-success/10">{t.interested}</Badge></td>
+                        <td className="p-2 text-right tabular-nums"><Badge variant="outline" className="bg-primary/10">{t.converted}</Badge></td>
+                        <td className="p-2 text-xs text-muted-foreground">{t.last ? new Date(t.last).toLocaleString() : "—"}</td>
+                      </tr>
+                    ))}
+                    {perTelecaller.length === 0 && (
+                      <tr><td colSpan={6} className="p-6 text-center text-muted-foreground">No telecallers yet</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </CardContent>
+            </Card>
+          );
+
+          return (
+            <>
+              <TabsContent value="all" className="space-y-5">
+                {teamBlock}
+                {callsBlock}
+                {pipelineBlock}
+                {campaignsBlock}
+                {businessBlock}
+                {branchesBlock}
+                {chartsBlock}
+                {leaderboardBlock}
+              </TabsContent>
+              <TabsContent value="team" className="space-y-5">{teamBlock}{leaderboardBlock}</TabsContent>
+              <TabsContent value="pipeline" className="space-y-5">{pipelineBlock}{businessBlock}</TabsContent>
+              <TabsContent value="campaigns" className="space-y-5">{campaignsBlock}</TabsContent>
+              <TabsContent value="branches" className="space-y-5">{branchesBlock}</TabsContent>
+            </>
+          );
+        })()}
+      </Tabs>
     </div>
   );
 };
