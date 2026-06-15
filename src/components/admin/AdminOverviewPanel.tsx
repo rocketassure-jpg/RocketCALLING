@@ -3,12 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Users, UserCheck, Coffee, UserX,
   Phone, CheckCircle2, Clock, PhoneOff,
   Sparkles, ThumbsUp, MessageSquare, FileText,
   Handshake, Trophy, Flame, ThumbsDown, ArrowUpRight, CheckSquare,
-  Briefcase, Calendar, TrendingUp, Loader2,
+  Briefcase, Calendar, TrendingUp, Loader2, Building2,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip as ChartTooltip, ResponsiveContainer,
