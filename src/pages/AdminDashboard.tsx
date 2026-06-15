@@ -305,14 +305,36 @@ const AdminDashboard = () => {
      case "messaging": return <WhatsAppBulkMessaging />;
       case "marketing": return <MarketingAutomationPanel />;
      case "calculator": return <PremiumCalculator />;
-      case "api": return <ApiAndWebhooksPanel />;
       case "training": return <TrainingModule canManage={true} />;
-      case "settings": return <GeneralSettings />;
-      case "audit": return <AuditLogViewer />;
       case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
-      case "approvals": return <PendingApprovalsPanel />;
       case "fields": return <FieldsAndStatusesPanel />;
+      case "general_advance": return (
+        <Tabs defaultValue="general" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
+            <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
+            <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general"><GeneralSettings /></TabsContent>
+          <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
+          <TabsContent value="audit"><AuditLogViewer /></TabsContent>
+        </Tabs>
+      );
+      case "team_approvals": return (
+        <Tabs defaultValue="team" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="team"><Shield className="h-4 w-4 mr-1" /> Team</TabsTrigger>
+            <TabsTrigger value="approvals">
+              <UserPlus className="h-4 w-4 mr-1" /> Pending Approvals
+              {pendingCount > 0 && <span className="ml-1.5 rounded-full bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 font-semibold">{pendingCount}</span>}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="team">{teamView}</TabsContent>
+          <TabsContent value="approvals"><PendingApprovalsPanel /></TabsContent>
+        </Tabs>
+      );
+      case "leads": return leadsView;
       case "leads": return leadsView;
       case "areas": return (
         <Card>
