@@ -163,10 +163,23 @@ export const AdminOverviewPanel = () => {
       callRows.forEach((c) => { dispoCount[c.status] = (dispoCount[c.status] ?? 0) + 1; });
       setDispoSlice(Object.entries(dispoCount).map(([name, value]) => ({ name, value })));
 
+      // Branches breakdown
+      const { data: brData } = await supabase.from("branches").select("id,name").eq("is_active", true).order("name");
+      const { data: brLeads } = await supabase.from("leads").select("branch_id,status");
+      const map = new Map<string, { leads: number; converted: number }>();
+      ((brLeads ?? []) as any[]).forEach((l) => {
+        if (!l.branch_id) return;
+        const cur = map.get(l.branch_id) ?? { leads: 0, converted: 0 };
+        cur.leads += 1;
+        if (l.status === "Converted") cur.converted += 1;
+        map.set(l.branch_id, cur);
+      });
+      setBranches(((brData ?? []) as any[]).map((b) => ({ id: b.id, name: b.name, leads: map.get(b.id)?.leads ?? 0, converted: map.get(b.id)?.converted ?? 0 })));
+
       setLoading(false);
     };
     load();
-    const iv = setInterval(load, 30000);
+    const iv = setInterval(() => load(true), 30000);
     return () => { mounted = false; clearInterval(iv); };
   }, [range]);
 
