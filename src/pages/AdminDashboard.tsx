@@ -467,7 +467,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-3 shadow-soft md:px-6">
         <div className="flex items-center gap-2">
-          <HamburgerMenu items={NAV} active={section} onChange={setSection} collapsibleGroups={["Settings", "Call Settings"]} />
+          <HamburgerMenu items={NAV} active={section} onChange={setSection} />
           <Logo />
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
