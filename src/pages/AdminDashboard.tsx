@@ -401,6 +401,8 @@ const AdminDashboard = () => {
               <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
               <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
               <TabsTrigger value="payout"><Wallet className="h-4 w-4 mr-1" /> Master Payout</TabsTrigger>
+              <TabsTrigger value="org"><User className="h-4 w-4 mr-1" /> Org Hierarchy</TabsTrigger>
+              <TabsTrigger value="comp"><Wallet className="h-4 w-4 mr-1" /> Compensation</TabsTrigger>
               <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
               <TabsTrigger value="permissions"><KeyRound className="h-4 w-4 mr-1" /> Permissions</TabsTrigger>
               <TabsTrigger value="fields"><Tags className="h-4 w-4 mr-1" /> Fields & Statuses</TabsTrigger>
@@ -410,9 +412,12 @@ const AdminDashboard = () => {
             <TabsContent value="general"><GeneralSettings /></TabsContent>
             <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
             <TabsContent value="payout"><PayoutSetupEngine /></TabsContent>
+            <TabsContent value="org"><OrgHierarchyPanel /></TabsContent>
+            <TabsContent value="comp"><CompensationSetup /></TabsContent>
             <TabsContent value="audit"><AuditLogViewer /></TabsContent>
             <TabsContent value="permissions"><PermissionsMatrix /></TabsContent>
             <TabsContent value="fields"><FieldsAndStatusesPanel /></TabsContent>
+
 
             <TabsContent value="trash">
               <Card>
