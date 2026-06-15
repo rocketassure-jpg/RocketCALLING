@@ -55,6 +55,8 @@ import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { AccountSettings } from "@/components/AccountSettings";
 import PayoutSetupEngine from "@/components/admin/payout/PayoutSetupEngine";
+import OrgHierarchyPanel from "@/components/admin/org/OrgHierarchyPanel";
+import CompensationSetup from "@/components/admin/org/CompensationSetup";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 import { useAuth } from "@/contexts/AuthContext";
