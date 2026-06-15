@@ -1566,6 +1566,75 @@ export type Database = {
           },
         ]
       }
+      compensation_rules: {
+        Row: {
+          base_salary: number
+          branch_id: string | null
+          commission_percent: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          designation_key: string
+          effective_month: string
+          id: string
+          incentive_type: string
+          incentive_value: number
+          notes: string | null
+          slabs: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          base_salary?: number
+          branch_id?: string | null
+          commission_percent?: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          designation_key: string
+          effective_month: string
+          id?: string
+          incentive_type?: string
+          incentive_value?: number
+          notes?: string | null
+          slabs?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          base_salary?: number
+          branch_id?: string | null
+          commission_percent?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          designation_key?: string
+          effective_month?: string
+          id?: string
+          incentive_type?: string
+          incentive_value?: number
+          notes?: string | null
+          slabs?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compensation_rules_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compensation_rules_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       complaints: {
         Row: {
           assigned_to: string | null
@@ -1942,6 +2011,47 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_designations: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          key: string
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key: string
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key?: string
+          label?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_designations_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
             referencedColumns: ["id"]
           },
         ]
@@ -4067,6 +4177,7 @@ export type Database = {
           company_id: string
           created_at: string
           department: string | null
+          designation: string | null
           full_name: string
           id: string
           is_active: boolean
@@ -4084,6 +4195,7 @@ export type Database = {
           company_id: string
           created_at?: string
           department?: string | null
+          designation?: string | null
           full_name?: string
           id: string
           is_active?: boolean
@@ -4101,6 +4213,7 @@ export type Database = {
           company_id?: string
           created_at?: string
           department?: string | null
+          designation?: string | null
           full_name?: string
           id?: string
           is_active?: boolean
