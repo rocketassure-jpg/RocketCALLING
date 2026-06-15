@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3, Megaphone } from "lucide-react";
 import { MarketingAutomationPanel } from "@/components/admin/marketing/MarketingAutomationPanel";
@@ -90,32 +91,31 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts", group: "Finance" },
   { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts", group: "Finance" },
   { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
-  // Organization
-  { id: "branches", label: "Branches", icon: Building2, group: "Organization" },
-  { id: "areas", label: "Areas", icon: MapPin, group: "Organization" },
-  { id: "team", label: "Team", icon: Shield, group: "Organization" },
-  { id: "approvals", label: "Pending Approvals", icon: UserPlus, group: "Organization" },
+  { id: "branches", label: "Branches", icon: Building2, group: "Finance" },
+  { id: "areas", label: "Areas", icon: MapPin, group: "Finance" },
+  { id: "team_approvals", label: "Team & Pending Approvals", icon: Shield, group: "Finance" },
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
   { id: "messaging", label: "WhatsApp", icon: MessageCircle, group: "Tools" },
   { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
-  // Settings
-  { id: "api", label: "API & Webhooks", icon: Webhook, group: "Settings" },
+  // Settings (collapsible)
   { id: "account", label: "Account Settings", icon: User, group: "Settings" },
-  { id: "settings", label: "General", icon: Settings, group: "Settings" },
+  { id: "general_advance", label: "General & Advance", icon: Settings, group: "Settings" },
   { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
   { id: "fields", label: "Fields & Statuses", icon: Tags, group: "Settings" },
-  { id: "audit", label: "Audit Logs", icon: Shield, group: "Settings" },
-  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Settings" },
+  // Call Settings (collapsible)
+  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Call Settings" },
 ];
 
 const AdminDashboard = () => {
   const { companyId } = useAuth();
   const { has: hasModule } = useModuleAccess();
-  const NAV = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
+  const BASE_FILTERED = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
   const [section, setSection] = useState("overview");
+  const [pendingCount, setPendingCount] = useState(0);
+  const [companyName, setCompanyName] = useState<string>("");
   const [areas, setAreas] = useState<Area[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
@@ -151,6 +151,28 @@ const AdminDashboard = () => {
     setBranchList((br.data ?? []) as any);
   };
   useEffect(() => { load(); }, []);
+
+  // Pending approvals count + company name for sidebar
+  useEffect(() => {
+    (async () => {
+      const { count } = await (supabase as any)
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .eq("is_approved", false);
+      setPendingCount(count ?? 0);
+      if (companyId) {
+        const { data } = await (supabase as any).from("companies").select("name").eq("id", companyId).maybeSingle();
+        if (data?.name) setCompanyName(data.name);
+      }
+    })();
+  }, [companyId, section]);
+
+  const NAV = useMemo(() => BASE_FILTERED.map((n) => {
+    if (n.id === "team_approvals") return { ...n, badge: pendingCount };
+    if (n.id === "customers_hub") return { ...n, subText: companyName };
+    return n;
+  }), [BASE_FILTERED, pendingCount, companyName]);
+
 
   const telecallers = useMemo(() => { const ids = new Set(roles.filter((r) => r.role === "telecaller").map((r) => r.user_id)); return profiles.filter((x) => ids.has(x.id)); }, [profiles, roles]);
   const managers = useMemo(() => { const ids = new Set(roles.filter((r) => r.role === "manager").map((r) => r.user_id)); return profiles.filter((x) => ids.has(x.id)); }, [profiles, roles]);
@@ -262,6 +284,84 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const teamView = (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader><CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Invite User</CardTitle></CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-4">
+          <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(sanitizeName(e.target.value))} placeholder="No emoji / special chars" /></div>
+          <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
+          <div className="space-y-1.5"><Label>Role</Label>
+            <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="manager">Manager</SelectItem><SelectItem value="telecaller">Telecaller</SelectItem></SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-end"><Button variant="hero" className="w-full" onClick={sendInvite}><Copy className="h-4 w-4" /> Copy Invite Link</Button></div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Assign telecaller → area</CardTitle></CardHeader>
+        <CardContent className="grid gap-3 md:grid-cols-3">
+          <Select value={assignT} onValueChange={setAssignT}><SelectTrigger><SelectValue placeholder="Telecaller" /></SelectTrigger><SelectContent>{telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}</SelectContent></Select>
+          <Select value={assignA} onValueChange={setAssignA}><SelectTrigger><SelectValue placeholder="Area" /></SelectTrigger><SelectContent>{areas.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select>
+          <Button variant="hero" onClick={addAssignment}><Plus className="h-4 w-4" /> Assign</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Managers ({managers.length})</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+          {managers.length === 0 ? <p className="text-sm text-muted-foreground">No managers.</p> : managers.map((m) => (
+            <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 transition-all hover:shadow-md">
+              <div className="font-medium">{m.full_name || "(no name)"}</div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: m, role: "manager" })}>
+                  <Edit3 className="h-4 w-4" /> Edit
+                </Button>
+                <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader><CardTitle>Telecallers ({telecallers.length})</CardTitle></CardHeader>
+        <CardContent>
+          {telecallers.length === 0 ? <p className="text-sm text-muted-foreground">No telecallers yet.</p> : (
+            <div className="space-y-3">{telecallers.map((t) => (
+              <div key={t.id} className="rounded-lg border p-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <div className="font-medium">{t.full_name || "(no name)"}</div>
+                    <div className="text-sm text-muted-foreground">Areas: {areasFor(t.id) || "—"}</div>
+                    <div className="text-sm text-muted-foreground">Manager: {managerName(t.manager_id)}</div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select value={t.manager_id ?? "none"} onValueChange={(v) => setManager(t.id, v === "none" ? null : v)}>
+                      <SelectTrigger className="w-[180px]"><SelectValue placeholder="Set manager" /></SelectTrigger>
+                      <SelectContent><SelectItem value="none">No manager</SelectItem>{managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>)}</SelectContent>
+                    </Select>
+                    <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: t, role: "telecaller" })}>
+                      <Edit3 className="h-4 w-4" /> Edit
+                    </Button>
+                    <RemoveTeamButton name={t.full_name} onConfirm={() => removeFromTeam(t.id, "telecaller")} />
+                  </div>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-1">{assignments.filter((x) => x.telecaller_id === t.id).map((x) => {
+                  const area = areas.find((a) => a.id === x.area_id);
+                  return <Badge key={x.id} variant="outline" className="gap-1">{area?.name}<button onClick={() => removeAssignment(x.id)}><Trash2 className="h-3 w-3 text-destructive" /></button></Badge>;
+                })}</div>
+              </div>
+            ))}</div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
@@ -283,14 +383,35 @@ const AdminDashboard = () => {
      case "messaging": return <WhatsAppBulkMessaging />;
       case "marketing": return <MarketingAutomationPanel />;
      case "calculator": return <PremiumCalculator />;
-      case "api": return <ApiAndWebhooksPanel />;
       case "training": return <TrainingModule canManage={true} />;
-      case "settings": return <GeneralSettings />;
-      case "audit": return <AuditLogViewer />;
       case "account": return <AccountSettings />;
       case "permissions": return <PermissionsMatrix />;
-      case "approvals": return <PendingApprovalsPanel />;
       case "fields": return <FieldsAndStatusesPanel />;
+      case "general_advance": return (
+        <Tabs defaultValue="general" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
+            <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
+            <TabsTrigger value="audit"><Shield className="h-4 w-4 mr-1" /> Audit Logs</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general"><GeneralSettings /></TabsContent>
+          <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
+          <TabsContent value="audit"><AuditLogViewer /></TabsContent>
+        </Tabs>
+      );
+      case "team_approvals": return (
+        <Tabs defaultValue="team" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="team"><Shield className="h-4 w-4 mr-1" /> Team</TabsTrigger>
+            <TabsTrigger value="approvals">
+              <UserPlus className="h-4 w-4 mr-1" /> Pending Approvals
+              {pendingCount > 0 && <span className="ml-1.5 rounded-full bg-primary/15 text-primary text-[10px] px-1.5 py-0.5 font-semibold">{pendingCount}</span>}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="team">{teamView}</TabsContent>
+          <TabsContent value="approvals"><PendingApprovalsPanel /></TabsContent>
+        </Tabs>
+      );
       case "leads": return leadsView;
       case "areas": return (
         <Card>
@@ -303,83 +424,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
       );
-      case "team": return (
-        <div className="space-y-4">
-          <Card>
-            <CardHeader><CardTitle className="flex items-center gap-2"><UserPlus className="h-5 w-5 text-primary" /> Invite User</CardTitle></CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-4">
-              <div className="space-y-1.5"><Label>Full Name</Label><Input value={inviteName} onChange={(e) => setInviteName(sanitizeName(e.target.value))} placeholder="No emoji / special chars" /></div>
-              <div className="space-y-1.5"><Label>Email</Label><Input type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} /></div>
-              <div className="space-y-1.5"><Label>Role</Label>
-                <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as any)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent><SelectItem value="manager">Manager</SelectItem><SelectItem value="telecaller">Telecaller</SelectItem></SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-end"><Button variant="hero" className="w-full" onClick={sendInvite}><Copy className="h-4 w-4" /> Copy Invite Link</Button></div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Assign telecaller → area</CardTitle></CardHeader>
-            <CardContent className="grid gap-3 md:grid-cols-3">
-              <Select value={assignT} onValueChange={setAssignT}><SelectTrigger><SelectValue placeholder="Telecaller" /></SelectTrigger><SelectContent>{telecallers.map((t) => <SelectItem key={t.id} value={t.id}>{t.full_name || t.id.slice(0, 8)}</SelectItem>)}</SelectContent></Select>
-              <Select value={assignA} onValueChange={setAssignA}><SelectTrigger><SelectValue placeholder="Area" /></SelectTrigger><SelectContent>{areas.map((a) => <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>)}</SelectContent></Select>
-              <Button variant="hero" onClick={addAssignment}><Plus className="h-4 w-4" /> Assign</Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Managers ({managers.length})</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              {managers.length === 0 ? <p className="text-sm text-muted-foreground">No managers.</p> : managers.map((m) => (
-                <div key={m.id} className="flex items-center justify-between rounded-lg border p-3 transition-all hover:shadow-md">
-                  <div className="font-medium">{m.full_name || "(no name)"}</div>
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: m, role: "manager" })}>
-                      <Edit3 className="h-4 w-4" /> Edit
-                    </Button>
-                    <RemoveTeamButton name={m.full_name} onConfirm={() => removeFromTeam(m.id, "manager")} />
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle>Telecallers ({telecallers.length})</CardTitle></CardHeader>
-            <CardContent>
-              {telecallers.length === 0 ? <p className="text-sm text-muted-foreground">No telecallers yet.</p> : (
-                <div className="space-y-3">{telecallers.map((t) => (
-                  <div key={t.id} className="rounded-lg border p-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div>
-                        <div className="font-medium">{t.full_name || "(no name)"}</div>
-                        <div className="text-sm text-muted-foreground">Areas: {areasFor(t.id) || "—"}</div>
-                        <div className="text-sm text-muted-foreground">Manager: {managerName(t.manager_id)}</div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Select value={t.manager_id ?? "none"} onValueChange={(v) => setManager(t.id, v === "none" ? null : v)}>
-                          <SelectTrigger className="w-[180px]"><SelectValue placeholder="Set manager" /></SelectTrigger>
-                          <SelectContent><SelectItem value="none">No manager</SelectItem>{managers.map((m) => <SelectItem key={m.id} value={m.id}>{m.full_name}</SelectItem>)}</SelectContent>
-                        </Select>
-                        <Button variant="outline" size="sm" onClick={() => setEditMember({ profile: t, role: "telecaller" })}>
-                          <Edit3 className="h-4 w-4" /> Edit
-                        </Button>
-                        <RemoveTeamButton name={t.full_name} onConfirm={() => removeFromTeam(t.id, "telecaller")} />
-                      </div>
-                    </div>
-                    <div className="mt-2 flex flex-wrap gap-1">{assignments.filter((x) => x.telecaller_id === t.id).map((x) => {
-                      const area = areas.find((a) => a.id === x.area_id);
-                      return <Badge key={x.id} variant="outline" className="gap-1">{area?.name}<button onClick={() => removeAssignment(x.id)}><Trash2 className="h-3 w-3 text-destructive" /></button></Badge>;
-                    })}</div>
-                  </div>
-                ))}</div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      );
+      case "team": return teamView;
       case "trash": return (
         <Card>
           <CardHeader><CardTitle className="flex items-center gap-2"><Ban className="h-5 w-5 text-destructive" /> Do Not Call (Trash)</CardTitle></CardHeader>
@@ -410,7 +455,7 @@ const AdminDashboard = () => {
     <div className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background px-3 shadow-soft md:px-6">
         <div className="flex items-center gap-2">
-          <HamburgerMenu items={NAV} active={section} onChange={setSection} />
+          <HamburgerMenu items={NAV} active={section} onChange={setSection} collapsibleGroups={["Settings", "Call Settings"]} />
           <Logo />
           <Badge variant="secondary" className="hidden md:inline-flex">Owner</Badge>
         </div>
