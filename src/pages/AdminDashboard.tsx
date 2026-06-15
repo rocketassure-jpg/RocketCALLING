@@ -100,13 +100,8 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "marketing", label: "Marketing Hub", icon: Megaphone, group: "Tools" },
   { id: "calculator", label: "Premium Calculator", icon: Calculator, group: "Tools" },
   { id: "training", label: "Training", icon: GraduationCap, group: "Tools" },
-  // Settings (collapsible)
-  { id: "account", label: "Account Settings", icon: User, group: "Settings" },
-  { id: "general_advance", label: "General & Advance", icon: Settings, group: "Settings" },
-  { id: "permissions", label: "Permissions", icon: KeyRound, group: "Settings" },
-  { id: "fields", label: "Fields & Statuses", icon: Tags, group: "Settings" },
-  // Call Settings (collapsible)
-  { id: "trash", label: "Trash (DNC)", icon: Ban, group: "Call Settings" },
+  // Unified Settings (single entry → tabs inside)
+  { id: "settings_hub", label: "Settings", icon: Settings, group: "Settings" },
 ];
 
 const AdminDashboard = () => {
