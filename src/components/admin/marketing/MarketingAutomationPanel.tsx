@@ -22,8 +22,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { toast } from "@/hooks/use-toast";
 import {
   Megaphone, Plus, Loader2, Trash2, Edit3, MessageCircle, Phone, Radio, Mic,
-  Facebook, Instagram, Linkedin, RefreshCw, Send, CalendarClock, Users as UsersIcon, Eye, FileText, BarChart3,
+  Facebook, Instagram, Linkedin, RefreshCw, Send, CalendarClock, Users as UsersIcon, Eye, FileText, BarChart3, Rocket,
 } from "lucide-react";
+import { RocketMarketingEngine } from "./rocket/RocketMarketingEngine";
 
 type Integration = any;
 type Template = any;
@@ -52,8 +53,9 @@ export const MarketingAutomationPanel = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="accounts" className="space-y-4">
+      <Tabs defaultValue="rocket" className="space-y-4">
         <TabsList className="flex-wrap">
+          <TabsTrigger value="rocket"><Rocket className="h-4 w-4 mr-1" />Rocket Engine</TabsTrigger>
           <TabsTrigger value="accounts">Connected Accounts</TabsTrigger>
           <TabsTrigger value="campaigns">Renewal Campaigns</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
@@ -61,6 +63,7 @@ export const MarketingAutomationPanel = () => {
           <TabsTrigger value="audience">Audience Sync</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="rocket"><RocketMarketingEngine /></TabsContent>
         <TabsContent value="accounts"><ConnectedAccountsTab /></TabsContent>
         <TabsContent value="campaigns"><RenewalCampaignsTab /></TabsContent>
         <TabsContent value="templates"><TemplatesTab /></TabsContent>
