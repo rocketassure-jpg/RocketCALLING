@@ -26,7 +26,7 @@ const youtubeEmbed = (url: string) => {
 export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) => {
   const { user } = useAuth();
   const [items, setItems] = useState<Material[]>([]);
-  const [form, setForm] = useState({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "" });
+  const [form, setForm] = useState({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "", module_key: "" });
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
