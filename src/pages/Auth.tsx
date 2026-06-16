@@ -58,8 +58,8 @@ const Auth = () => {
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
 
-    // Enforce invite code when configured by admin
-    if (inviteRequired) {
+    // Enforce invite code only when joining existing company (new company signup is always open)
+    if (inviteRequired && signupMode === "join") {
       if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
       const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
       if (!valid) return toast({ title: "Invalid invite code", variant: "destructive" });
@@ -182,7 +182,7 @@ const Auth = () => {
                       )}
                     </div>
 
-                    {inviteRequired && (
+                    {inviteRequired && signupMode === "join" && (
                       <div className="space-y-1.5">
                         <Label>Invite Code *</Label>
                         <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Admin se invite code lo" />
@@ -194,7 +194,8 @@ const Auth = () => {
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground">Staff signup — admin approval ke baad access milega.</p>
+                    <p className="text-center text-xs text-muted-foreground">{signupMode === "create" ? "Naya account turant active hoga — tum admin ho." : "Staff signup — admin approval ke baad access milega."}</p>
+
                   </form>
                 </TabsContent>
               </Tabs>
