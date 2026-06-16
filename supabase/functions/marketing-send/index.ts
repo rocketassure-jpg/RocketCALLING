@@ -42,6 +42,10 @@ Deno.serve(async (req) => {
     const callerCompanyId = callerProfile?.company_id;
     if (!callerCompanyId) return jsonErr("Caller has no company", 403);
 
+    const { data: roleRow } = await supabase
+      .from("user_roles").select("role").eq("user_id", userId).in("role", ["admin", "manager"]).maybeSingle();
+    if (!roleRow) return jsonErr("Forbidden: admin/manager role required", 403);
+
     const body = await req.json();
     const { action, ...params } = body;
 
