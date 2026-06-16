@@ -4784,6 +4784,7 @@ export type Database = {
           is_approved: boolean
           is_super_admin: boolean
           manager_id: string | null
+          mobile: string | null
           rejection_reason: string | null
           requested_role: string | null
           ui_theme: string
@@ -4802,6 +4803,7 @@ export type Database = {
           is_approved?: boolean
           is_super_admin?: boolean
           manager_id?: string | null
+          mobile?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
           ui_theme?: string
@@ -4820,6 +4822,7 @@ export type Database = {
           is_approved?: boolean
           is_super_admin?: boolean
           manager_id?: string | null
+          mobile?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
           ui_theme?: string
@@ -6599,6 +6602,8 @@ export type Database = {
         Args: { _area_id: string; _manager_id: string }
         Returns: boolean
       }
+      my_company_name: { Args: never; Returns: string }
+      resolve_login_email: { Args: { _login: string }; Returns: string }
       telecaller_has_area: {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean

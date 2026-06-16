@@ -23,6 +23,7 @@ interface AuthCtx {
   role: Role;
   profileStatus: ProfileStatus;
   companyId: string | null;
+  companyName: string | null;
   isSuperAdmin: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<Role>(null);
   const [profileStatus, setProfileStatus] = useState<ProfileStatus>(null);
   const [companyId, setCompanyId] = useState<string | null>(null);
+  const [companyName, setCompanyName] = useState<string | null>(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -53,6 +55,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } : null);
     setCompanyId(p?.company_id ?? null);
     setIsSuperAdmin(!!p?.is_super_admin);
+    if (p?.company_id) {
+      const { data: co } = await supabase.from("companies").select("name").eq("id", p.company_id).maybeSingle();
+      setCompanyName((co as any)?.name ?? null);
+    } else {
+      setCompanyName(null);
+    }
   };
 
   useEffect(() => {
@@ -65,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setRole(null);
         setProfileStatus(null);
         setCompanyId(null);
+        setCompanyName(null);
         setIsSuperAdmin(false);
       }
     });
@@ -84,7 +93,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     window.location.href = "/";
   };
 
-  return <Ctx.Provider value={{ user, session, role, profileStatus, companyId, isSuperAdmin, loading, signOut }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ user, session, role, profileStatus, companyId, companyName, isSuperAdmin, loading, signOut }}>{children}</Ctx.Provider>;
 };
 
 
