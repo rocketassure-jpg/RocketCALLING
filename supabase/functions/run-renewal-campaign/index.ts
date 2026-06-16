@@ -40,6 +40,12 @@ Deno.serve(async (req) => {
         status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const { data: roleRow } = await supabase.from("user_roles").select("role").eq("user_id", userId).in("role", ["admin", "manager"]).maybeSingle();
+    if (!roleRow) {
+      return new Response(JSON.stringify({ error: "Forbidden: admin/manager required" }), {
+        status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const body = await req.json();
     const { company_id, name, channel, template_id, expiry_from, expiry_to, policy_type, city } = body;
