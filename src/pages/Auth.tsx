@@ -52,7 +52,16 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    let loginEmail = email.trim();
+    if (loginEmail && !loginEmail.includes("@")) {
+      const { data } = await (supabase as any).rpc("resolve_login_email", { _login: loginEmail });
+      if (!data) {
+        setLoading(false);
+        return toast({ title: "Account not found", description: "Yeh mobile/email registered nahi hai", variant: "destructive" });
+      }
+      loginEmail = data as string;
+    }
+    const { error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
     setLoading(false);
     if (error) return toast({ title: "Sign in failed", description: error.message, variant: "destructive" });
     nav("/dashboard");
@@ -71,6 +80,8 @@ const Auth = () => {
     e.preventDefault();
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
+    if (signupMode === "create" && !email.trim()) return toast({ title: "Email zaruri hai", description: "Company admin ke liye email chahiye", variant: "destructive" });
+    if (signupMode === "join" && !mobile.trim()) return toast({ title: "Mobile number daalo", description: "Employee signup ke liye mobile zaruri hai", variant: "destructive" });
 
     if (inviteRequired && signupMode === "join") {
       if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
@@ -80,21 +91,28 @@ const Auth = () => {
 
     setLoading(true);
     const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole, mobile };
-    if (signupMode === "join") meta.company_code = companyCode;
-    else {
+    let signupEmail = email.trim();
+    if (signupMode === "join") {
+      meta.company_code = companyCode;
+      if (!signupEmail) {
+        const digits = mobile.replace(/\D/g, "");
+        const codeSlug = (companyCode || "staff").toLowerCase().replace(/[^a-z0-9]/g, "");
+        signupEmail = `${digits}@${codeSlug}.staff.local`;
+      }
+    } else {
       meta.create_company = "true";
       meta.company_name = companyName.trim();
       if (companyCode.trim().length >= 3) meta.company_code = companyCode.trim().toUpperCase();
     }
     const { error } = await supabase.auth.signUp({
-      email, password,
+      email: signupEmail, password,
       options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: meta },
     });
     if (error) {
       setLoading(false);
       return toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
     }
-    await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
+    await supabase.auth.signInWithPassword({ email: signupEmail, password }).catch(() => {});
     setLoading(false);
     toast({ title: "Account created", description: "Welcome!" });
     if (signupMode === "create") nav("/admin?tab=training&onboarding=1");
