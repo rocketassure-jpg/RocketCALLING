@@ -143,8 +143,8 @@ const Auth = () => {
                 <TabsContent value="signin">
                   <form onSubmit={handleSignIn} className="space-y-4 pt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="se">Email</Label>
-                      <Input id="se" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                      <Label htmlFor="se">Email or Mobile</Label>
+                      <Input id="se" type="text" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email@company.com ya 10-digit mobile" />
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="sp">Password</Label>
@@ -176,8 +176,9 @@ const Auth = () => {
                       <Input id="n" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="ue">Email *</Label>
-                      <Input id="ue" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                      <Label htmlFor="ue">Email {signupMode === "create" ? "*" : <span className="text-muted-foreground font-normal">(optional)</span>}</Label>
+                      <Input id="ue" type="email" required={signupMode === "create"} value={email} onChange={(e) => setEmail(e.target.value)} placeholder={signupMode === "join" ? "Optional — mobile se login ho jayega" : ""} />
+                      {signupMode === "join" && <p className="text-[11px] text-muted-foreground">Employees mobile + password se login karenge. Email zaruri nahi.</p>}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="up">Password *</Label>
