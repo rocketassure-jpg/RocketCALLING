@@ -126,6 +126,24 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2"><Label>Attach to Module (optional)</Label>
+              <Select value={form.module_key || "__none__"} onValueChange={(v) => setForm({ ...form, module_key: v === "__none__" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="General (no module)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">General (no module)</SelectItem>
+                  <SelectItem value="onboarding">System Onboarding</SelectItem>
+                  <SelectItem value="hr">HR / Team</SelectItem>
+                  <SelectItem value="leads">Leads & Enquiries</SelectItem>
+                  <SelectItem value="customers">Customers</SelectItem>
+                  <SelectItem value="renewals">Renewals</SelectItem>
+                  <SelectItem value="policies">Policies & Transactions</SelectItem>
+                  <SelectItem value="payouts">Payouts & Commissions</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="reports">Reports</SelectItem>
+                  <SelectItem value="settings">Settings</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2 md:col-span-2"><Label>Description</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
             {form.content_type !== "note" ? (
               <div className="space-y-2 md:col-span-2"><Label>URL</Label><Input placeholder="https://..." value={form.url} onChange={(e) => setForm({ ...form, url: e.target.value })} /></div>
