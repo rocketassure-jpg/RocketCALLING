@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck } from "lucide-react";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Profile = {
   id: string;
