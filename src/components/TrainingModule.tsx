@@ -93,12 +93,32 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
     </Card>
   );
 
+  const isOnboarding = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("onboarding") === "1";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <GraduationCap className="h-6 w-6 text-primary" />
         <h2 className="text-xl font-bold">Training Module</h2>
       </div>
+
+      {isOnboarding && (
+        <Card className="border-primary/40 bg-primary/5">
+          <CardContent className="p-4 space-y-2">
+            <div className="text-base font-semibold">🎉 Welcome to your new Insurance CRM!</div>
+            <p className="text-sm text-muted-foreground">
+              Aapki company successfully ban gayi. Yahan se start karein:
+            </p>
+            <ul className="ml-5 list-disc text-sm text-muted-foreground space-y-1">
+              <li><strong>Org Hierarchy</strong> — apni team add karein (Telecallers, Managers)</li>
+              <li><strong>General Settings</strong> — Fields, Statuses & Permissions configure karein</li>
+              <li><strong>Branding</strong> — Logo aur company details upload karein</li>
+              <li><strong>Leads / Customers</strong> — pehli entries import ya add karein</li>
+              <li><strong>Training Module</strong> — har module ke liye videos / PDFs add karein — har module ke header me 🎓 Help icon dikhega</li>
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       {canManage && (
         <Card>
