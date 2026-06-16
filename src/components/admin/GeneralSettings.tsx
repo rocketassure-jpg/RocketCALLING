@@ -12,6 +12,7 @@ import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
 import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
 import { TrashPanel } from "@/components/admin/TrashPanel";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Settings = {
   id: string;
