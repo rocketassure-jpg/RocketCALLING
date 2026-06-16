@@ -58,8 +58,8 @@ const Auth = () => {
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
 
-    // Enforce invite code when configured by admin
-    if (inviteRequired) {
+    // Enforce invite code only when joining existing company (new company signup is always open)
+    if (inviteRequired && signupMode === "join") {
       if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
       const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
       if (!valid) return toast({ title: "Invalid invite code", variant: "destructive" });
