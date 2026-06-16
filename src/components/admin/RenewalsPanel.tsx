@@ -6,6 +6,7 @@ import { RenewalAnalytics } from "@/components/admin/renewals/RenewalAnalytics";
 import { RenewalSettings } from "@/components/admin/renewals/RenewalSettings";
 import { AlarmClock, Megaphone, FileText, BarChart3, Settings as SettingsIcon } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 export const RenewalsPanel = () => {
   const { role, isSuperAdmin } = useAuth();
@@ -13,9 +14,12 @@ export const RenewalsPanel = () => {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Renewals</h1>
-        <p className="text-sm text-muted-foreground">Renewal queue, bulk campaigns, templates aur analytics — sab ek jagah.</p>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-bold">Renewals</h1>
+          <p className="text-sm text-muted-foreground">Renewal queue, bulk campaigns, templates aur analytics — sab ek jagah.</p>
+        </div>
+        <TrainingHelp moduleKey="renewals" label="Renewals" />
       </div>
       <Tabs defaultValue="queue" className="space-y-4">
         <TabsList className="flex-wrap">
