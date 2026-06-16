@@ -13,16 +13,24 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 
 type SignupMode = "join" | "create";
 
+const slugifyCode = (name: string, mobile: string) => {
+  const base = (name || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  const tail = (mobile || "").replace(/\D/g, "").slice(-4);
+  return (base + tail).slice(0, 12);
+};
+
 const Auth = () => {
   const nav = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [mobile, setMobile] = useState("");
   const [department, setDepartment] = useState("Sales");
   const [requestedRole, setRequestedRole] = useState<"telecaller" | "manager">("telecaller");
-  const [signupMode, setSignupMode] = useState<SignupMode>("join");
+  const [signupMode, setSignupMode] = useState<SignupMode>("create");
   const [companyCode, setCompanyCode] = useState("");
+  const [companyCodeEdited, setCompanyCodeEdited] = useState(false);
   const [companyName, setCompanyName] = useState("");
   const [companyPreview, setCompanyPreview] = useState<{ name: string } | null>(null);
   const [codeChecking, setCodeChecking] = useState(false);
@@ -34,6 +42,12 @@ const Auth = () => {
       if (data === true) setInviteRequired(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (signupMode === "create" && !companyCodeEdited) {
+      setCompanyCode(slugifyCode(companyName, mobile));
+    }
+  }, [companyName, mobile, signupMode, companyCodeEdited]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +72,6 @@ const Auth = () => {
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
 
-    // Enforce invite code only when joining existing company (new company signup is always open)
     if (inviteRequired && signupMode === "join") {
       if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
       const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
@@ -66,9 +79,13 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole };
+    const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole, mobile };
     if (signupMode === "join") meta.company_code = companyCode;
-    else { meta.create_company = "true"; meta.company_name = companyName.trim(); }
+    else {
+      meta.create_company = "true";
+      meta.company_name = companyName.trim();
+      if (companyCode.trim().length >= 3) meta.company_code = companyCode.trim().toUpperCase();
+    }
     const { error } = await supabase.auth.signUp({
       email, password,
       options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: meta },
@@ -80,7 +97,8 @@ const Auth = () => {
     await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
     setLoading(false);
     toast({ title: "Account created", description: "Welcome!" });
-    nav("/dashboard");
+    if (signupMode === "create") nav("/admin?tab=training&onboarding=1");
+    else nav("/dashboard");
   };
 
   return (
