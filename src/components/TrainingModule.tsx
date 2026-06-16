@@ -46,7 +46,7 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
     setSaving(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: "Training material added ✅" });
-    setForm({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "" });
+    setForm({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "", module_key: "" });
     load();
   };
 
