@@ -1,20 +1,39 @@
 // Marketing Engine: AI content generator (Lovable AI Gateway)
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const jsonHeaders = { ...corsHeaders, "Content-Type": "application/json" };
   try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: jsonHeaders });
+    }
+    const userClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: jsonHeaders });
+    }
+    const userId = claimsData.claims.sub as string;
+    const admin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: roleRow } = await admin.from("user_roles").select("role").eq("user_id", userId).in("role", ["admin", "manager"]).maybeSingle();
+    if (!roleRow) {
+      return new Response(JSON.stringify({ error: "Forbidden: admin/manager required" }), { status: 403, headers: jsonHeaders });
+    }
+
     const key = Deno.env.get("LOVABLE_API_KEY");
     if (!key) {
-      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY missing" }), { status: 500, headers: jsonHeaders });
     }
     const { topic, language = "hinglish", phone = "", channels = ["facebook","instagram","whatsapp"] } = await req.json();
     if (!topic || typeof topic !== "string") {
-      return new Response(JSON.stringify({ error: "topic required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify({ error: "topic required" }), { status: 400, headers: jsonHeaders });
     }
 
     const system = `You are a senior insurance marketing copywriter for an Indian insurance CRM (Rocketdial).
@@ -43,21 +62,14 @@ Return JSON:
     });
     if (!r.ok) {
       const text = await r.text();
-      return new Response(JSON.stringify({ error: "ai_failed", status: r.status, body: text }), {
-        status: r.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(JSON.stringify({ error: "ai_failed", status: r.status, body: text }), { status: r.status, headers: jsonHeaders });
     }
     const data = await r.json();
-    let content = data.choices?.[0]?.message?.content ?? "{}";
+    const content = data.choices?.[0]?.message?.content ?? "{}";
     let parsed: any = {};
     try { parsed = JSON.parse(content); } catch { parsed = { variants: [{ title: "AI", body: content }] }; }
-
-    return new Response(JSON.stringify(parsed), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify(parsed), { headers: jsonHeaders });
   } catch (e) {
-    return new Response(JSON.stringify({ error: String(e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(JSON.stringify({ error: String(e) }), { status: 500, headers: jsonHeaders });
   }
 });

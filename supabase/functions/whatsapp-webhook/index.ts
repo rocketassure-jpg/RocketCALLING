@@ -30,7 +30,7 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const apiKey = req.headers.get("x-api-key") ?? url.searchParams.get("api_key");
+    const apiKey = req.headers.get("x-api-key");
     if (!apiKey) {
       return new Response(JSON.stringify({ error: "Missing api_key" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
