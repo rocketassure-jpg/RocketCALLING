@@ -4,11 +4,12 @@ import { MobileNumberSearch } from "@/components/MobileNumberSearch";
 import { Users, Inbox } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 export const LeadsEnquiriesPanel = ({ leadsView }: { leadsView: React.ReactNode }) => (
   <div className="space-y-4">
     <Card>
-      <CardHeader className="pb-2"><CardTitle className="text-base">Quick lookup</CardTitle></CardHeader>
+      <CardHeader className="pb-2 flex flex-row items-center justify-between"><CardTitle className="text-base">Quick lookup</CardTitle><TrainingHelp moduleKey="leads" label="Leads & Enquiries" /></CardHeader>
       <CardContent>
         <MobileNumberSearch
           onPrefill={(h) => toast({ title: "Record mil gaya", description: `${h.customer_name} (${h.source}) — form me copy ho gaya` })}

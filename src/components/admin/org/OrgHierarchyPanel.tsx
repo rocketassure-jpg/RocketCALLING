@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck } from "lucide-react";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Profile = {
   id: string;
@@ -239,8 +240,9 @@ export default function OrgHierarchyPanel() {
         {/* HIERARCHY */}
         <TabsContent value="hierarchy" className="space-y-3">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
               <CardTitle className="text-sm flex items-center gap-2"><Building2 className="h-4 w-4" /> Org Hierarchy</CardTitle>
+              <TrainingHelp moduleKey="hr" label="HR / Team" />
             </CardHeader>
             <CardContent className="space-y-2">
               {branchManagers.length === 0 && (

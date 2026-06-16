@@ -5805,6 +5805,7 @@ export type Database = {
           created_by: string
           description: string | null
           id: string
+          module_key: string | null
           sort_order: number
           title: string
           updated_at: string
@@ -5819,6 +5820,7 @@ export type Database = {
           created_by: string
           description?: string | null
           id?: string
+          module_key?: string | null
           sort_order?: number
           title: string
           updated_at?: string
@@ -5833,6 +5835,7 @@ export type Database = {
           created_by?: string
           description?: string | null
           id?: string
+          module_key?: string | null
           sort_order?: number
           title?: string
           updated_at?: string

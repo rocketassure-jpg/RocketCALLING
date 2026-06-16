@@ -26,7 +26,7 @@ const youtubeEmbed = (url: string) => {
 export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) => {
   const { user } = useAuth();
   const [items, setItems] = useState<Material[]>([]);
-  const [form, setForm] = useState({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "" });
+  const [form, setForm] = useState({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "", module_key: "" });
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
@@ -46,7 +46,7 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
     setSaving(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: "Training material added ✅" });
-    setForm({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "" });
+    setForm({ title: "", description: "", category: "video", content_type: "youtube", url: "", body: "", module_key: "" });
     load();
   };
 
@@ -93,12 +93,32 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
     </Card>
   );
 
+  const isOnboarding = typeof window !== "undefined" && new URLSearchParams(window.location.search).get("onboarding") === "1";
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
         <GraduationCap className="h-6 w-6 text-primary" />
         <h2 className="text-xl font-bold">Training Module</h2>
       </div>
+
+      {isOnboarding && (
+        <Card className="border-primary/40 bg-primary/5">
+          <CardContent className="p-4 space-y-2">
+            <div className="text-base font-semibold">🎉 Welcome to your new Insurance CRM!</div>
+            <p className="text-sm text-muted-foreground">
+              Aapki company successfully ban gayi. Yahan se start karein:
+            </p>
+            <ul className="ml-5 list-disc text-sm text-muted-foreground space-y-1">
+              <li><strong>Org Hierarchy</strong> — apni team add karein (Telecallers, Managers)</li>
+              <li><strong>General Settings</strong> — Fields, Statuses & Permissions configure karein</li>
+              <li><strong>Branding</strong> — Logo aur company details upload karein</li>
+              <li><strong>Leads / Customers</strong> — pehli entries import ya add karein</li>
+              <li><strong>Training Module</strong> — har module ke liye videos / PDFs add karein — har module ke header me 🎓 Help icon dikhega</li>
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       {canManage && (
         <Card>
@@ -123,6 +143,24 @@ export const TrainingModule = ({ canManage = false }: { canManage?: boolean }) =
                   <SelectItem value="pdf">PDF link</SelectItem>
                   <SelectItem value="image">Image URL</SelectItem>
                   <SelectItem value="note">Text note</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2"><Label>Attach to Module (optional)</Label>
+              <Select value={form.module_key || "__none__"} onValueChange={(v) => setForm({ ...form, module_key: v === "__none__" ? "" : v })}>
+                <SelectTrigger><SelectValue placeholder="General (no module)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">General (no module)</SelectItem>
+                  <SelectItem value="onboarding">System Onboarding</SelectItem>
+                  <SelectItem value="hr">HR / Team</SelectItem>
+                  <SelectItem value="leads">Leads & Enquiries</SelectItem>
+                  <SelectItem value="customers">Customers</SelectItem>
+                  <SelectItem value="renewals">Renewals</SelectItem>
+                  <SelectItem value="policies">Policies & Transactions</SelectItem>
+                  <SelectItem value="payouts">Payouts & Commissions</SelectItem>
+                  <SelectItem value="marketing">Marketing</SelectItem>
+                  <SelectItem value="reports">Reports</SelectItem>
+                  <SelectItem value="settings">Settings</SelectItem>
                 </SelectContent>
               </Select>
             </div>

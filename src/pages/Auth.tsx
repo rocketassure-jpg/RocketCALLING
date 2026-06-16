@@ -13,16 +13,24 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 
 type SignupMode = "join" | "create";
 
+const slugifyCode = (name: string, mobile: string) => {
+  const base = (name || "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8);
+  const tail = (mobile || "").replace(/\D/g, "").slice(-4);
+  return (base + tail).slice(0, 12);
+};
+
 const Auth = () => {
   const nav = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [mobile, setMobile] = useState("");
   const [department, setDepartment] = useState("Sales");
   const [requestedRole, setRequestedRole] = useState<"telecaller" | "manager">("telecaller");
-  const [signupMode, setSignupMode] = useState<SignupMode>("join");
+  const [signupMode, setSignupMode] = useState<SignupMode>("create");
   const [companyCode, setCompanyCode] = useState("");
+  const [companyCodeEdited, setCompanyCodeEdited] = useState(false);
   const [companyName, setCompanyName] = useState("");
   const [companyPreview, setCompanyPreview] = useState<{ name: string } | null>(null);
   const [codeChecking, setCodeChecking] = useState(false);
@@ -34,6 +42,12 @@ const Auth = () => {
       if (data === true) setInviteRequired(true);
     });
   }, []);
+
+  useEffect(() => {
+    if (signupMode === "create" && !companyCodeEdited) {
+      setCompanyCode(slugifyCode(companyName, mobile));
+    }
+  }, [companyName, mobile, signupMode, companyCodeEdited]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +72,6 @@ const Auth = () => {
     if (signupMode === "join" && !companyPreview) return toast({ title: "Valid Company Code daalo", description: "Apni company ka code admin se lo", variant: "destructive" });
     if (signupMode === "create" && !companyName.trim()) return toast({ title: "Company ka naam daalo", variant: "destructive" });
 
-    // Enforce invite code only when joining existing company (new company signup is always open)
     if (inviteRequired && signupMode === "join") {
       if (!inviteCode.trim()) return toast({ title: "Invite code required", description: "Admin se invite code lo", variant: "destructive" });
       const { data: valid } = await (supabase as any).rpc("validate_invite_code", { _code: inviteCode.trim() });
@@ -66,9 +79,13 @@ const Auth = () => {
     }
 
     setLoading(true);
-    const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole };
+    const meta: Record<string, any> = { full_name: fullName, department, requested_role: requestedRole, mobile };
     if (signupMode === "join") meta.company_code = companyCode;
-    else { meta.create_company = "true"; meta.company_name = companyName.trim(); }
+    else {
+      meta.create_company = "true";
+      meta.company_name = companyName.trim();
+      if (companyCode.trim().length >= 3) meta.company_code = companyCode.trim().toUpperCase();
+    }
     const { error } = await supabase.auth.signUp({
       email, password,
       options: { emailRedirectTo: `${window.location.origin}/dashboard`, data: meta },
@@ -80,7 +97,8 @@ const Auth = () => {
     await supabase.auth.signInWithPassword({ email, password }).catch(() => {});
     setLoading(false);
     toast({ title: "Account created", description: "Welcome!" });
-    nav("/dashboard");
+    if (signupMode === "create") nav("/admin?tab=training&onboarding=1");
+    else nav("/dashboard");
   };
 
   return (
@@ -122,22 +140,56 @@ const Auth = () => {
 
                 <TabsContent value="signup">
                   <form onSubmit={handleSignUp} className="space-y-4 pt-4">
+                    {/* Mode toggle on top */}
+                    <div className="flex gap-2">
+                      <button type="button" onClick={() => setSignupMode("create")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "create" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Create New Company</button>
+                      <button type="button" onClick={() => setSignupMode("join")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "join" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Join Company</button>
+                    </div>
+
+                    {signupMode === "create" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="cn">Company Name *</Label>
+                        <Input id="cn" required value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. XYZ Insurance Broker" />
+                      </div>
+                    )}
+
                     <div className="space-y-2">
-                      <Label htmlFor="n">Full name</Label>
+                      <Label htmlFor="n">Full Name *</Label>
                       <Input id="n" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="ue">Email</Label>
+                      <Label htmlFor="ue">Email *</Label>
                       <Input id="ue" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="up">Password</Label>
+                      <Label htmlFor="up">Password *</Label>
                       <Input id="up" type="password" minLength={6} required value={password} onChange={(e) => setPassword(e.target.value)} />
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="mob">Mobile {signupMode === "create" ? "*" : ""}</Label>
+                      <Input id="mob" type="tel" inputMode="numeric" required={signupMode === "create"} value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="10-digit mobile" />
+                    </div>
+
+                    {signupMode === "create" ? (
+                      <div className="space-y-2">
+                        <Label htmlFor="cc">Company Code (auto, editable)</Label>
+                        <Input id="cc" value={companyCode} onChange={(e) => { setCompanyCodeEdited(true); setCompanyCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "")); }} placeholder="Auto from name + mobile" />
+                        <p className="text-xs text-muted-foreground">Default = Company name + last 4 of mobile. Edit allowed.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Label htmlFor="jc">Company Code *</Label>
+                        <Input id="jc" value={companyCode} onChange={(e) => { const v = e.target.value.toUpperCase(); setCompanyCode(v); verifyCode(v); }} placeholder="e.g. ROCKET" />
+                        {codeChecking && <p className="text-xs text-muted-foreground">Checking…</p>}
+                        {companyPreview && <p className="text-xs text-success">✓ Joining <strong>{companyPreview.name}</strong></p>}
+                        {!codeChecking && !companyPreview && companyCode.length >= 3 && <p className="text-xs text-destructive">Code not found</p>}
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-2">
                         <Label>Role</Label>
-                        <Select value={requestedRole} onValueChange={(v) => setRequestedRole(v as any)}>
+                        <Select value={requestedRole} onValueChange={(v) => setRequestedRole(v as any)} disabled={signupMode === "create"}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent className="bg-background">
                             <SelectItem value="telecaller">Telecaller</SelectItem>
@@ -159,43 +211,17 @@ const Auth = () => {
                       </div>
                     </div>
 
-                    {/* Company selection */}
-                    <div className="rounded-lg border bg-muted/30 p-3 space-y-3">
-                      <div className="flex gap-2">
-                        <button type="button" onClick={() => setSignupMode("join")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "join" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Join Company</button>
-                        <button type="button" onClick={() => setSignupMode("create")} className={`flex-1 rounded-md border px-3 py-1.5 text-xs font-medium transition ${signupMode === "create" ? "border-primary bg-primary/10" : "hover:bg-muted"}`}>Create New Company</button>
-                      </div>
-                      {signupMode === "join" ? (
-                        <div className="space-y-1.5">
-                          <Label>Company Code</Label>
-                          <Input value={companyCode} onChange={(e) => { const v = e.target.value.toUpperCase(); setCompanyCode(v); verifyCode(v); }} placeholder="e.g. ROCKET" />
-                          {codeChecking && <p className="text-xs text-muted-foreground">Checking…</p>}
-                          {companyPreview && <p className="text-xs text-success">✓ Joining <strong>{companyPreview.name}</strong></p>}
-                          {!codeChecking && !companyPreview && companyCode.length >= 3 && <p className="text-xs text-destructive">Code not found</p>}
-                        </div>
-                      ) : (
-                        <div className="space-y-1.5">
-                          <Label>Company Name</Label>
-                          <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="e.g. XYZ Insurance Broker" />
-                          <p className="text-xs text-muted-foreground">Tum is company ke admin banoge. Code automatic generate hoga.</p>
-                        </div>
-                      )}
-                    </div>
-
                     {inviteRequired && signupMode === "join" && (
                       <div className="space-y-1.5">
                         <Label>Invite Code *</Label>
                         <Input value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Admin se invite code lo" />
-                        <p className="text-xs text-muted-foreground">Aapki organisation ne signup ke liye invite code zaroori kar diya hai.</p>
                       </div>
                     )}
 
-
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
-                      {loading && <Loader2 className="h-4 w-4 animate-spin" />} Create account
+                      {loading && <Loader2 className="h-4 w-4 animate-spin" />} {signupMode === "create" ? "Create Company & Admin Account" : "Create account"}
                     </Button>
-                    <p className="text-center text-xs text-muted-foreground">{signupMode === "create" ? "Naya account turant active hoga — tum admin ho." : "Staff signup — admin approval ke baad access milega."}</p>
-
+                    <p className="text-center text-xs text-muted-foreground">{signupMode === "create" ? "Naya account turant active hoga — tum admin ho. Signup ke baad training page khulega." : "Staff signup — admin approval ke baad access milega."}</p>
                   </form>
                 </TabsContent>
               </Tabs>

@@ -12,6 +12,7 @@ import { MaskingPolicyPanel } from "@/components/admin/MaskingPolicyPanel";
 import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
 import { TrashPanel } from "@/components/admin/TrashPanel";
 import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
+import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Settings = {
   id: string;
@@ -114,9 +115,12 @@ export const GeneralSettings = () => {
           <h1 className="text-2xl font-bold">General Settings</h1>
           <p className="text-sm text-muted-foreground">Communication, fields, permissions & privacy</p>
         </div>
-        <div className="relative w-full sm:w-72">
-          <Search className="h-4 w-4 absolute left-2 top-3 text-muted-foreground" />
-          <Input className="pl-8" placeholder="Search settings…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="relative w-full sm:w-72">
+            <Search className="h-4 w-4 absolute left-2 top-3 text-muted-foreground" />
+            <Input className="pl-8" placeholder="Search settings…" value={q} onChange={(e) => setQ(e.target.value)} />
+          </div>
+          <TrainingHelp moduleKey="settings" label="Settings" />
         </div>
       </div>
 
