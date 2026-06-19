@@ -2580,6 +2580,7 @@ export type Database = {
       }
       export_history: {
         Row: {
+          company_id: string | null
           export_type: string
           file_size_bytes: number | null
           file_url: string | null
@@ -2588,6 +2589,7 @@ export type Database = {
           id: string
         }
         Insert: {
+          company_id?: string | null
           export_type: string
           file_size_bytes?: number | null
           file_url?: string | null
@@ -2596,6 +2598,7 @@ export type Database = {
           id?: string
         }
         Update: {
+          company_id?: string | null
           export_type?: string
           file_size_bytes?: number | null
           file_url?: string | null
