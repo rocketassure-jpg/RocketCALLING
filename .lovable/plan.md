@@ -1,79 +1,121 @@
-# Rocket Marketing Automation Engine
+# Super Admin Section — System Settings & Blueprint Export
 
-This is a very large module (9 sub-modules, 7+ external API integrations, AI generation, scheduling, analytics). Shipping it in one go would take many hours and a lot of credits, and most external APIs (Meta, Google Ads, LinkedIn, GMB, X) require **your own developer accounts + app review + access tokens** before any code can actually post or fetch leads. So I'm proposing a phased rollout — each phase is independently usable.
+Adds a new admin-only Super Admin area to Rocket CRM with two pages: a consolidated **System Settings** dashboard and a **Blueprint & Export** migration-safety page.
 
-I will follow the existing Rocketdial theme (dark, red/orange accents, the same shadcn + Tailwind tokens already used in `AdminDashboard`). New surface lives under **Admin → Marketing → Rocket Marketing Engine** as sub-tabs.
-
----
-
-## Scope split
-
-### Phase 1 — Foundation + Content Engine *(build now)*
-Everything that works **without** waiting for third-party API approvals.
-
-1. **DB schema** (one migration, company-scoped, RLS = company admin/manager + super admin):
-   - `mkt_channels` — connected platform accounts (FB, IG, Threads, LinkedIn, WA, GMB, X) with status + token ref (token stored as secret name, not value)
-   - `mkt_templates` — 50+ seeded post templates (festival, renewal, cross-sell, testimonial, educational, urgency, new product, RTO) with body + variables + category + language
-   - `mkt_festivals` — Indian festival calendar (seeded for 2026-2027) with auto-campaign offset days
-   - `mkt_scheduled_posts` — calendar entries (channel, scheduled_at, status, content, media_url, variables)
-   - `mkt_audiences` — smart audience definitions (rule JSON, last_synced, member_count) — 5 seeded (Expiring 7d, Expiring 30d, Cross-Sell Health, New Vehicle, Lost)
-   - `mkt_campaigns` — campaign shell (name, type, channels[], budget_daily, budget_monthly, cpl_limit, status, audience_id)
-   - `mkt_campaign_metrics` — daily spend/leads/cpl/ctr (manual + later API-fed)
-   - `mkt_lead_routing_rules` — city/pincode → agent priority list, score thresholds
-   - `mkt_auto_triggers` — WhatsApp trigger templates (8 seeded: expiry 30/7/1, cross-sell, festival, new lead, quote sent, renewed)
-   - All tables get GRANT + RLS + audit triggers + `updated_at`
-
-2. **Frontend** `src/components/admin/marketing/rocket/`:
-   - `RocketMarketingEngine.tsx` — shell with 9 tabs matching your spec
-   - `ContentCalendarTab.tsx` — monthly calendar (react-day-picker grid) showing scheduled posts, click to edit, drag-to-reschedule
-   - `TemplatesLibraryTab.tsx` — browse/edit/duplicate 50+ templates, preview per platform
-   - `AIContentGeneratorTab.tsx` — input prompt → calls **Lovable AI Gateway** (`google/gemini-3-flash-preview`) via edge function → returns 5 copy variants + hashtags + best-time suggestion + per-platform preview + "Schedule all"
-   - `ImageGeneratorTab.tsx` — Lovable AI image gen (`google/gemini-3.1-flash-image-preview`) with brand color overlay + contact + QR
-   - `SmartAudiencesTab.tsx` — visual rule builder, live member count from CRM data, manual "Sync now"
-   - `LeadRoutingTab.tsx` — distribution rules, scoring weights, escalation timers
-   - `WhatsAppTriggersTab.tsx` — 8 trigger templates with edit + enable toggle (uses existing `whatsapp-bridge` function)
-   - `AnalyticsTab.tsx` — dashboard cards (spend, leads, CPL, ROAS) + platform table + content performance
-   - `ConnectedChannelsTab.tsx` — list of 7 platforms with Connect / Disconnected / Pending status badges, "Add credentials" CTA that documents what each API needs
-
-3. **Edge functions** (Lovable Cloud):
-   - `mkt-ai-content` — generates post copy/hashtags via Lovable AI
-   - `mkt-ai-image` — generates branded post image via Lovable AI image model, uploads to `customer-docs` storage
-   - `mkt-audience-sync` — recomputes audience member lists from `customers`/`renewals`/`policy_transactions` (cron daily)
-   - `mkt-scheduled-runner` — cron every 5 min, picks due posts, currently logs + marks "ready" (actual platform POST in Phase 2)
-
-4. **Settings**:
-   - Festival calendar editor pre-seeded
-   - Notification settings (new lead → agent WhatsApp, hot lead → manager, budget 80% → admin email)
-   - Budget alert thresholds
-
-5. **Integration with existing CRM**:
-   - "New lead" trigger fires from existing `leads` insert (DB trigger → enqueue WA via existing bridge)
-   - Cross-sell detector view over `customers` + `policy_transactions`
-   - Lead score column added to `leads`
-
-### Phase 2 — Platform API connectors *(only after you provide credentials)*
-For each platform you'll need to provide developer app credentials (I'll request them via the secrets flow when you're ready):
-- **Meta** (FB Page + IG Business + Threads + WA Business + Lead Ads): App ID, App Secret, long-lived Page token, WABA ID, Phone Number ID
-- **Google** (Ads + GMB): OAuth client + refresh token + Ads developer token + manager account ID
-- **LinkedIn**: Client ID/Secret + Company URN + 3-legged OAuth
-- **X/Twitter**: Consumer key/secret + access token/secret (see twitter knowledge — must use `api.x.com`, Read+Write app)
-
-Each connector becomes its own edge function (`mkt-publish-meta`, `mkt-publish-google`, etc.) wired into `mkt-scheduled-runner`. Lead-form webhooks land on `mkt-webhook-{platform}` and create CRM leads.
-
-### Phase 3 — Paid Ads automation, Lookalike, A/B optimizer, GMB review auto-reply
-Built on top of Phase 2 once basic publishing works.
+> Note: Much of what you described already exists in this project (a `/super-admin` route with sidebar, `system_config`, `audit_logs`, `feature_flags`, `SecretsManager`, `DataSettingsPanel`, user/role management, module toggles via `company_subscriptions`, message templates, etc.). This plan **reuses** those pieces and adds only what is missing, so we don't duplicate UI or tables.
 
 ---
 
-## What I will NOT do
-- Won't fake "connected" status for platforms whose credentials don't exist — they'll show "Not connected" with clear setup steps.
-- Won't add Canva API (Lovable AI image gen covers the same use case without a paid Canva account).
-- Won't store any external API token in code or `.env` — all go through the secrets flow.
+## Page 1 — System Settings
+
+Single page at `/super-admin` → **System Settings** sidebar entry, organized as tabs. Each tab maps to an existing panel where possible:
+
+| Tab | Source |
+|---|---|
+| App Config | New small form (app name, logo, brand color `#e85d24`, version) → stored in `system_config` |
+| User & Role Management | Existing user management panel (promote/demote, deactivate) |
+| Module Toggles | Existing module/subscription toggle UI (Lead Capture, WhatsApp, Dialer, Life/Health/Motor, Enquiries, Reports) |
+| Data Sources / API Keys | Existing `SecretsManager` (masked inputs + Test Connection already implemented) |
+| Notifications | Existing `TemplatesManager` (`message_templates` with `{placeholder}` support) |
+| Audit Log | Existing `AuditLogViewer` (read-only, from `audit_logs`) |
+| Feature Flags | New panel reading/writing `feature_flags` table |
+
+New work for Page 1:
+- `AppConfigPanel.tsx` — name/logo/color/version fields, persisted via `system_config` upserts (audit-logged by existing trigger).
+- `FeatureFlagsPanel.tsx` — list + toggle switches on the existing `feature_flags` table.
+- Wire both into the System Settings tabs.
 
 ---
 
-## Confirmation needed
+## Page 2 — Blueprint & Export
 
-1. **Proceed with Phase 1 now?** (~1 big migration + ~12 new files + 4 edge functions). This gives you a working calendar, AI content+image generation, audience builder, lead routing, WhatsApp triggers, and analytics shell — all without external API setup.
-2. **Language for AI-generated content** — Hinglish (like your examples) as default? I'll add EN / HI toggles too.
-3. Reply "go" to start Phase 1, or tell me which sub-modules to drop/reorder.
+New page `/super-admin/blueprint` (sidebar entry "Blueprint & Export"), admin-only, with a password re-auth gate before any download.
+
+Three cards:
+
+**Card 1 — Generate Build Prompt**
+- Client-side generator that introspects: enabled modules (`company_subscriptions`), CRM fields (`crm_fields`), lead statuses (`status_mappings`/`lead_statuses`), feature flags, and a static module/screen map maintained in `src/lib/blueprint/spec.ts`.
+- Produces a Markdown spec suitable for pasting into any AI builder.
+- "Last generated" timestamp + "Regenerate Now" stored in `export_history`.
+- Download as `rocket-crm-blueprint.md`.
+
+**Card 2 — Export Source Code**
+- Since the running app cannot read its own source, this card calls a new edge function `export-source` that returns a manifest + `README.md` describing folder structure, env vars, and `npm install / npm run dev` steps, plus a pointer to the GitHub repo connected via Lovable. Packaged client-side into a `.zip` using `jszip`.
+- Clearly labeled: "Latest committed source — connect GitHub in Lovable for full code mirror."
+
+**Card 3 — Export Full System**
+- Client-side `jszip` build combining:
+  - `/code` — same manifest/README as Card 2
+  - `/database` — schema SQL (fetched from a new edge function `export-schema` using `pg_dump`-style introspection via `information_schema`) + per-table CSV dumps for the core tables (leads, customers, policies, enquiries, call_logs, renewals, claims) using `supabase.from(...).select('*')` with pagination
+  - `/assets` — signed-URL list of files in the `customer-docs` bucket
+  - `/docs` — generated blueprint markdown + `MIGRATION.md` template
+- Single `.zip` download; entry recorded in `export_history`.
+
+Shared UI:
+- File-size estimate (computed before zip finalization).
+- "Last export" timestamp per card from `export_history`.
+- Yellow warning banner: API keys/secrets excluded.
+- "Schedule Auto-Export" toggle → writes to `system_config` (`auto_export_weekly = true`) + creates a `pg_cron` job invoking `export-full` weekly, storing the zip in a new private `system-exports` bucket and emailing the admin.
+- Password re-auth dialog (re-uses pattern already in `DataSettingsPanel`).
+
+---
+
+## Database changes
+
+Only one new table is needed; the rest already exist:
+
+```sql
+CREATE TABLE public.export_history (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  export_type text NOT NULL,  -- 'blueprint' | 'code' | 'full'
+  file_url text,
+  file_size_bytes bigint,
+  generated_at timestamptz NOT NULL DEFAULT now(),
+  generated_by uuid REFERENCES auth.users(id)
+);
+-- GRANTs + RLS: super-admin only read/insert
+```
+
+Plus:
+- New private storage bucket `system-exports` for scheduled auto-exports.
+- One row added to `system_config` for `auto_export_weekly`.
+
+No changes to `system_config`, `audit_logs`, `feature_flags` (already present).
+
+---
+
+## Edge functions
+
+- `export-schema` — returns `public` schema DDL as text (super-admin only, JWT-checked).
+- `export-source` — returns repo manifest + README (super-admin only).
+- `run-weekly-export` — invoked by `pg_cron`, writes zip to `system-exports`, emails admin.
+
+---
+
+## File map
+
+New:
+- `src/pages/SuperAdminBlueprint.tsx`
+- `src/components/super-admin/AppConfigPanel.tsx`
+- `src/components/super-admin/FeatureFlagsPanel.tsx`
+- `src/components/super-admin/blueprint/BlueprintCard.tsx`
+- `src/components/super-admin/blueprint/SourceExportCard.tsx`
+- `src/components/super-admin/blueprint/FullExportCard.tsx`
+- `src/components/super-admin/blueprint/PasswordGate.tsx`
+- `src/lib/blueprint/spec.ts` (module/screen catalog)
+- `src/lib/blueprint/generate.ts` (markdown builder)
+- `supabase/functions/export-schema/index.ts`
+- `supabase/functions/export-source/index.ts`
+- `supabase/functions/run-weekly-export/index.ts`
+
+Edited:
+- `src/pages/SuperAdminDashboard.tsx` — restructure System Settings tab to include App Config + Feature Flags; add Blueprint sidebar entry.
+- `src/App.tsx` — add `/super-admin/blueprint` route, admin-guarded.
+
+---
+
+## Out of scope / accepted limitations
+
+- True source-code zip requires Lovable to mirror to GitHub; Card 2 ships a manifest + setup README, not raw `.tsx` files. Called out in UI.
+- Call recordings are stored externally by the dialer provider — only references are exported, not audio files.
+- CSV exports cover the 7 core tables listed; other tables can be added later on request.
