@@ -263,23 +263,23 @@ export const LeadActions = ({
             <IconBtn
               label="SMS" asChild href={smsLink(smsMsg)}
               className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
-            ><MessageSquare className="h-5 w-5" /></IconBtn>
+            ><MessageSquare className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label="WhatsApp" asChild href={waLink(introMsg)} target="_blank" rel="noopener noreferrer"
               className="w-full bg-success text-success-foreground hover:opacity-90"
-            ><MessageCircle className="h-5 w-5" /></IconBtn>
+            ><MessageCircle className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label="Send quote" asChild href={waLink(quoteMsg)} target="_blank" rel="noopener noreferrer"
               className="w-full bg-warning text-warning-foreground hover:opacity-90"
-            ><FileText className="h-5 w-5" /></IconBtn>
+            ><FileText className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label={moreOpen ? "Hide details" : "More options"}
               onClick={() => setMoreOpen((v) => !v)}
               className={`w-full ${moreOpen ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            ><MoreHorizontal className="h-5 w-5" /></IconBtn>
+            ><MoreHorizontal className="h-4 w-4" /></IconBtn>
           </div>
         </>
       )}
