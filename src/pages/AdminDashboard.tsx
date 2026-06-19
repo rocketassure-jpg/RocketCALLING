@@ -22,10 +22,11 @@ import { AnnouncementsBanner } from "@/components/AnnouncementsBanner";
 import { useAuth } from "@/contexts/AuthContext";
 
 // Lazy-load every panel — only the active section's JS is downloaded
-const named = (loader: () => Promise<any>, name: string) =>
-  lazy(() => loader().then((m) => ({ default: m[name] })));
+const named = <P = any>(loader: () => Promise<any>, name: string) =>
+  lazy(loader().then ? () => loader().then((m) => ({ default: m[name] })) : (loader as any)) as React.ComponentType<P>;
 
 const MarketingAutomationPanel = named(() => import("@/components/admin/marketing/MarketingAutomationPanel"), "MarketingAutomationPanel");
+const AccountsPanel = named(() => import("@/components/admin/accounts/AccountsPanel"), "AccountsPanel");
 const MotorPanel = named(() => import("@/components/admin/motor/MotorPanel"), "MotorPanel");
 const HealthPanel = named(() => import("@/components/admin/health/HealthPanel"), "HealthPanel");
 const LifePanel = named(() => import("@/components/admin/life/LifePanel"), "LifePanel");
