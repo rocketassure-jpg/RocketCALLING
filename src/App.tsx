@@ -16,6 +16,7 @@ import AdminDashboard from "./pages/AdminDashboard.tsx";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard.tsx";
 import SubAgentDashboard from "./pages/SubAgentDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Trust from "./pages/Trust.tsx";
 
 const queryClient = new QueryClient();
 
