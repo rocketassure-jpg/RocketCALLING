@@ -365,7 +365,8 @@ const AdminDashboard = () => {
       case "overview": return <AdminOverviewPanel />;
       case "policies_services": return <PoliciesServicesPanel />;
       case "finance": return <FinancePanel />;
-      case "accounts": return <AccountsPanel />;
+     case "accounts": return <AccountsPanel />;
+     case "vendors": return <VendorManagementPanel />;
       case "brokers": return <BrokerPanel />;
       case "motor": return <MotorPanel />;
       case "health": return <HealthPanel />;
