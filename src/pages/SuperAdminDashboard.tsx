@@ -13,11 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket } from "lucide-react";
+import { Link } from "react-router-dom";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
 import { DataSettingsPanel } from "@/components/super-admin/DataSettingsPanel";
 import { SecretsManager } from "@/components/admin/SecretsManager";
+import { AppConfigPanel } from "@/components/super-admin/AppConfigPanel";
 
 type Company = { id: string; name: string; code: string; plan: string; is_active: boolean; created_at: string };
 type Module = { module_key: string; name: string; base_monthly_price: number; is_always_included: boolean; sort_order: number };
@@ -29,11 +31,11 @@ const SECTIONS = [
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "data", label: "Data Explorer", icon: Database },
   { id: "announcements", label: "Announcements", icon: Megaphone },
-  { id: "settings", label: "Global Settings", icon: SettingsIcon },
-  { id: "flags", label: "Feature Flags", icon: Flag },
+  { id: "settings", label: "System Settings", icon: SettingsIcon },
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
+  { id: "blueprint", label: "Blueprint & Export", icon: Rocket, href: "/super-admin/blueprint" },
 ];
 
 const SuperAdminDashboard = () => {
@@ -184,11 +186,17 @@ const SuperAdminDashboard = () => {
       <div className="container grid gap-4 px-3 py-4 md:grid-cols-[200px_1fr]">
         <aside className="md:sticky md:top-20 md:self-start">
           <nav className="flex flex-row gap-1 overflow-x-auto md:flex-col md:overflow-visible">
-            {SECTIONS.map((s) => (
-              <button key={s.id} onClick={() => setSection(s.id)} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition ${section === s.id ? "bg-primary text-primary-foreground" : "text-slate-300 hover:bg-slate-800"}`}>
-                <s.icon className="h-4 w-4" /> {s.label}
-              </button>
-            ))}
+            {SECTIONS.map((s: any) => {
+              const cls = `flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition ${section === s.id ? "bg-primary text-primary-foreground" : "text-slate-300 hover:bg-slate-800"}`;
+              if (s.href) return (
+                <Link key={s.id} to={s.href} className={cls}><s.icon className="h-4 w-4" /> {s.label}</Link>
+              );
+              return (
+                <button key={s.id} onClick={() => setSection(s.id)} className={cls}>
+                  <s.icon className="h-4 w-4" /> {s.label}
+                </button>
+              );
+            })}
           </nav>
         </aside>
 
@@ -261,16 +269,19 @@ const SuperAdminDashboard = () => {
             {section === "data" && <DataExplorerPanel />}
             {section === "announcements" && <AnnouncementsPanel />}
             {section === "settings" && (
-              <Tabs defaultValue="global" className="space-y-4">
-                <TabsList>
-                  <TabsTrigger value="global"><SettingsIcon className="mr-1 h-4 w-4" />Global Settings</TabsTrigger>
-                  <TabsTrigger value="data"><Sliders className="mr-1 h-4 w-4" />Data Settings</TabsTrigger>
+              <Tabs defaultValue="app" className="space-y-4">
+                <TabsList className="flex-wrap h-auto">
+                  <TabsTrigger value="app"><Palette className="mr-1 h-4 w-4" />App Config</TabsTrigger>
+                  <TabsTrigger value="global"><SettingsIcon className="mr-1 h-4 w-4" />Global</TabsTrigger>
+                  <TabsTrigger value="data"><Sliders className="mr-1 h-4 w-4" />Data</TabsTrigger>
+                  <TabsTrigger value="flags"><Flag className="mr-1 h-4 w-4" />Feature Flags</TabsTrigger>
                 </TabsList>
+                <TabsContent value="app"><AppConfigPanel /></TabsContent>
                 <TabsContent value="global"><GlobalSettingsPanel /></TabsContent>
                 <TabsContent value="data"><DataSettingsPanel /></TabsContent>
+                <TabsContent value="flags"><FeatureFlagsPanel /></TabsContent>
               </Tabs>
             )}
-            {section === "flags" && <FeatureFlagsPanel />}
             {section === "plans" && <PlanTemplatesPanel />}
             {section === "secrets" && <SecretsManager />}
             {section === "audit" && <SuperAdminAuditPanel />}
