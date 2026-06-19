@@ -9,6 +9,7 @@ import { InstallPWA } from "@/components/InstallPWA";
 import { PremiumCalculator } from "@/components/PremiumCalculator";
 import { Heart, Stethoscope, Car, ShieldCheck, Phone, Clock, Award, MessageCircle, Calculator, ArrowUpRight } from "lucide-react";
 import heroImage from "@/assets/hero-insurance-neon.jpg.asset.json";
+import { InsuranceChatWidget } from "@/components/InsuranceChatWidget";
 
 const WA_NUMBER = "919669762808";
 
