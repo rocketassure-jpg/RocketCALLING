@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { Button } from "@/components/ui/button";
@@ -12,58 +12,57 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3, Megaphone, Briefcase } from "lucide-react";
-import { MarketingAutomationPanel } from "@/components/admin/marketing/MarketingAutomationPanel";
+import { Plus, Trash2, MapPin, UserPlus, Copy, Phone, Users, Upload, Shield, GraduationCap, Webhook, Settings, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, ShieldCheck, Building2, Edit3, Megaphone, Briefcase } from "lucide-react";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
-import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
-import { MotorPanel } from "@/components/admin/motor/MotorPanel";
-import { HealthPanel } from "@/components/admin/health/HealthPanel";
-import { LifePanel } from "@/components/admin/life/LifePanel";
-import { RtoPanel } from "@/components/admin/rto/RtoPanel";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
-import { CallingList } from "@/components/CallingList";
-import { EnquiriesPanel } from "@/components/EnquiriesPanel";
-import { CallReportsPanel } from "@/components/admin/CallReportsPanel";
-import { FieldsAndStatusesPanel } from "@/components/admin/FieldsAndStatusesPanel";
-import { ApiAndWebhooksPanel } from "@/components/admin/ApiAndWebhooksPanel";
-import { ReportsAndPerformancePanel } from "@/components/admin/ReportsAndPerformancePanel";
-import { SmartImportPanel } from "@/components/admin/SmartImportPanel";
-import { ApiKeysManager } from "@/components/admin/ApiKeysManager";
-import { SecretsManager } from "@/components/admin/SecretsManager";
-import { TrainingModule } from "@/components/TrainingModule";
-import { GeneralSettings } from "@/components/admin/GeneralSettings";
-import { PermissionsMatrix } from "@/components/admin/PermissionsMatrix";
-import { CRMFieldsManager } from "@/components/admin/CRMFieldsManager";
-import { StatusConfigurator } from "@/components/admin/StatusConfigurator";
-import { AddCustomerForm } from "@/components/admin/AddCustomerForm";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
 import { InstallPWA } from "@/components/InstallPWA";
 import { BulkActionBar } from "@/components/BulkActionBar";
-import { RenewalsPanel } from "@/components/admin/RenewalsPanel";
-import { CustomersHubPanel } from "@/components/admin/CustomersHubPanel";
-import { ReportsHubPanel } from "@/components/admin/ReportsHubPanel";
-import { LeadsEnquiriesPanel } from "@/components/admin/LeadsEnquiriesPanel";
-import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
-import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
-import { ClaimsPanel } from "@/components/admin/claims/ClaimsPanel";
-import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
-import { ReportsPanel } from "@/components/admin/reports/ReportsPanel";
-import { AuditLogViewer } from "@/components/admin/audit/AuditLogViewer";
 import { AnnouncementsBanner } from "@/components/AnnouncementsBanner";
-import { PerformancePanel } from "@/components/admin/PerformancePanel";
-import { WhatsAppBulkMessaging } from "@/components/WhatsAppBulkMessaging";
-import { PremiumCalculator } from "@/components/PremiumCalculator";
-import { AccountSettings } from "@/components/AccountSettings";
-import PayoutSetupEngine from "@/components/admin/payout/PayoutSetupEngine";
-import OrgHierarchyPanel from "@/components/admin/org/OrgHierarchyPanel";
-
-import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
-import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
-import { PoliciesServicesPanel } from "@/components/admin/PoliciesServicesPanel";
-import { FinancePanel } from "@/components/admin/FinancePanel";
-import { MasterDataPanel } from "@/components/admin/master/MasterDataPanel";
-import { VendorManagementPanel } from "@/components/admin/vendor/VendorManagementPanel";
 import { useAuth } from "@/contexts/AuthContext";
+
+// Lazy-load every panel — only the active section's JS is downloaded.
+// Cast to `any` so call sites can keep their existing prop types.
+const named = (loader: () => Promise<any>, name: string): any =>
+  lazy(() => loader().then((m) => ({ default: m[name] })));
+
+const MarketingAutomationPanel = named(() => import("@/components/admin/marketing/MarketingAutomationPanel"), "MarketingAutomationPanel");
+const AccountsPanel = named(() => import("@/components/admin/accounts/AccountsPanel"), "AccountsPanel");
+const MotorPanel = named(() => import("@/components/admin/motor/MotorPanel"), "MotorPanel");
+const HealthPanel = named(() => import("@/components/admin/health/HealthPanel"), "HealthPanel");
+const LifePanel = named(() => import("@/components/admin/life/LifePanel"), "LifePanel");
+const RtoPanel = named(() => import("@/components/admin/rto/RtoPanel"), "RtoPanel");
+const CallingList = named(() => import("@/components/CallingList"), "CallingList");
+const ApiAndWebhooksPanel = named(() => import("@/components/admin/ApiAndWebhooksPanel"), "ApiAndWebhooksPanel");
+const SmartImportPanel = named(() => import("@/components/admin/SmartImportPanel"), "SmartImportPanel");
+const TrainingModule = named(() => import("@/components/TrainingModule"), "TrainingModule");
+const GeneralSettings = named(() => import("@/components/admin/GeneralSettings"), "GeneralSettings");
+const AddCustomerForm = named(() => import("@/components/admin/AddCustomerForm"), "AddCustomerForm");
+const RenewalsPanel = named(() => import("@/components/admin/RenewalsPanel"), "RenewalsPanel");
+const CustomersHubPanel = named(() => import("@/components/admin/CustomersHubPanel"), "CustomersHubPanel");
+const ReportsHubPanel = named(() => import("@/components/admin/ReportsHubPanel"), "ReportsHubPanel");
+const LeadsEnquiriesPanel = named(() => import("@/components/admin/LeadsEnquiriesPanel"), "LeadsEnquiriesPanel");
+const BranchesPanel = named(() => import("@/components/admin/branches/BranchesPanel"), "BranchesPanel");
+const BrokerPanel = named(() => import("@/components/admin/brokers/BrokerPanel"), "BrokerPanel");
+const ClaimsPanel = named(() => import("@/components/admin/claims/ClaimsPanel"), "ClaimsPanel");
+const OperationsPanel = named(() => import("@/components/admin/operations/OperationsPanel"), "OperationsPanel");
+const AuditLogViewer = named(() => import("@/components/admin/audit/AuditLogViewer"), "AuditLogViewer");
+const WhatsAppBulkMessaging = named(() => import("@/components/WhatsAppBulkMessaging"), "WhatsAppBulkMessaging");
+const PremiumCalculator = named(() => import("@/components/PremiumCalculator"), "PremiumCalculator");
+const AccountSettings = named(() => import("@/components/AccountSettings"), "AccountSettings");
+const PayoutSetupEngine = lazy(() => import("@/components/admin/payout/PayoutSetupEngine"));
+const OrgHierarchyPanel = lazy(() => import("@/components/admin/org/OrgHierarchyPanel"));
+const AdminOverviewPanel = named(() => import("@/components/admin/AdminOverviewPanel"), "AdminOverviewPanel");
+const PoliciesServicesPanel = named(() => import("@/components/admin/PoliciesServicesPanel"), "PoliciesServicesPanel");
+const FinancePanel = named(() => import("@/components/admin/FinancePanel"), "FinancePanel");
+const MasterDataPanel = named(() => import("@/components/admin/master/MasterDataPanel"), "MasterDataPanel");
+const VendorManagementPanel = named(() => import("@/components/admin/vendor/VendorManagementPanel"), "VendorManagementPanel");
+
+const PanelFallback = () => (
+  <div className="flex items-center justify-center py-16">
+    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+  </div>
+);
 
 type Area = { id: string; name: string };
 type Profile = { id: string; full_name: string; manager_id?: string | null };
@@ -462,7 +461,7 @@ const AdminDashboard = () => {
         </div>
       </header>
       <AnnouncementsBanner />
-      <main className="p-4 md:p-6"><Content /></main>
+      <main className="p-3 md:p-6"><Suspense fallback={<PanelFallback />}><Content /></Suspense></main>
       {section === "leads" && (
         <BulkActionBar
           count={selectedIds.size}
