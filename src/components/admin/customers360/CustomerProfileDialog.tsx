@@ -43,7 +43,7 @@ export const CustomerProfileDialog = ({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) => {
-  const [tab, setTab] = useState("policies");
+  const [tab, setTab] = useState("products");
   const [policies, setPolicies] = useState<RowList>(empty);
   const [claims, setClaims] = useState<RowList>(empty);
   const [premiumDue, setPremiumDue] = useState<RowList>(empty);
