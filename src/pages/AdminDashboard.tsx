@@ -83,19 +83,13 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
   { id: "leads_hub", label: "Leads & Enquiries", icon: Users, group: "Sales" },
   { id: "customers_hub", label: "Customers", icon: Trophy, group: "Sales" },
-  // Policies
-  { id: "motor", label: "Motor Insurance", icon: Car, module: "motor_insurance", group: "Policies" },
-  { id: "health", label: "Health Insurance", icon: HeartPulse, module: "health_insurance", group: "Policies" },
-  { id: "life", label: "Life Insurance", icon: ShieldCheck, module: "life_insurance", group: "Policies" },
-  { id: "rto", label: "RTO Services", icon: Building2, module: "rto_services", group: "Policies" },
-  { id: "renewals", label: "Renewals", icon: AlarmClock, group: "Policies" },
-  { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies" },
-  // Finance
-  { id: "accounts", label: "Accounts", icon: Wallet, module: "accounts", group: "Finance" },
-  { id: "brokers", label: "Brokers & Payouts", icon: Wallet, module: "accounts", group: "Finance" },
-  { id: "operations", label: "Operations", icon: Wrench, group: "Finance" },
-  { id: "branches", label: "Branches", icon: Building2, group: "Finance" },
-  { id: "areas", label: "Areas", icon: MapPin, group: "Finance" },
+  // Policies & Services (consolidated)
+  { id: "policies_services", label: "Policies & Services", icon: ShieldCheck, group: "Policies & Services" },
+  { id: "renewals", label: "Renewals", icon: AlarmClock, group: "Policies & Services" },
+  { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies & Services" },
+  // Finance (consolidated)
+  { id: "finance", label: "Finance", icon: Wallet, group: "Finance" },
+  
   
   // Tools
   { id: "import", label: "Import", icon: Upload, group: "Tools" },
@@ -364,6 +358,8 @@ const AdminDashboard = () => {
   const Content = () => {
     switch (section) {
       case "overview": return <AdminOverviewPanel />;
+      case "policies_services": return <PoliciesServicesPanel />;
+      case "finance": return <FinancePanel />;
       case "accounts": return <AccountsPanel />;
       case "brokers": return <BrokerPanel />;
       case "motor": return <MotorPanel />;
