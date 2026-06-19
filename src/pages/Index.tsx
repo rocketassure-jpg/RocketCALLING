@@ -203,6 +203,9 @@ const Index = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Floating AI insurance assistant */}
+      <InsuranceChatWidget />
     </div>
   );
 };
