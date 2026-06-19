@@ -110,8 +110,17 @@ const AdminDashboard = () => {
   const { companyId } = useAuth();
   const { has: hasModule } = useModuleAccess();
   const BASE_FILTERED = useMemo(() => BASE_NAV.filter((n) => !n.module || hasModule(n.module as any)), [hasModule]);
-  const initialSection = (typeof window !== "undefined" && new URLSearchParams(window.location.search).get("tab")) || "overview";
-  const [section, setSection] = useState(initialSection);
+  const initialSection = (typeof window !== "undefined" && (new URLSearchParams(window.location.search).get("tab") || localStorage.getItem("admin:section"))) || "overview";
+  const [section, _setSection] = useState(initialSection);
+  const setSection = (s: string) => {
+    _setSection(s);
+    try {
+      localStorage.setItem("admin:section", s);
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", s);
+      window.history.replaceState({}, "", url.toString());
+    } catch {}
+  };
   const [pendingCount, setPendingCount] = useState(0);
   const [companyName, setCompanyName] = useState<string>("");
   const [areas, setAreas] = useState<Area[]>([]);
