@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, FileWarning, IndianRupee, AlarmClock,
-  MessageCircle, Phone, FileText, Users, Wallet, Building2, User,
+  MessageCircle, Phone, FileText, Users, Wallet, Building2, User, Package,
 } from "lucide-react";
+import { CustomerProductsTab } from "./CustomerProductsTab";
+
 
 type Customer = {
   id: string;
