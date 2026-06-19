@@ -4796,6 +4796,44 @@ export type Database = {
           },
         ]
       }
+      product_catalog: {
+        Row: {
+          category: string
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_catalog_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           approved_at: string | null
@@ -6073,6 +6111,59 @@ export type Database = {
           },
         ]
       }
+      vendors: {
+        Row: {
+          category: string | null
+          company_id: string
+          contact_email: string | null
+          contact_person: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          updated_at: string
+          vendor_type: string
+        }
+        Insert: {
+          category?: string | null
+          company_id: string
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          updated_at?: string
+          vendor_type: string
+        }
+        Update: {
+          category?: string | null
+          company_id?: string
+          contact_email?: string | null
+          contact_person?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          updated_at?: string
+          vendor_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendors_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wa_webhook_messages: {
         Row: {
           campaign_log_id: string | null
@@ -6703,6 +6794,7 @@ export type Database = {
       }
       my_company_name: { Args: never; Returns: string }
       resolve_login_email: { Args: { _login: string }; Returns: string }
+      seed_master_data: { Args: { _company_id: string }; Returns: undefined }
       telecaller_has_area: {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean
