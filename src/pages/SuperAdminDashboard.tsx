@@ -13,9 +13,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders } from "lucide-react";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
+import { DataSettingsPanel } from "@/components/super-admin/DataSettingsPanel";
 import { SecretsManager } from "@/components/admin/SecretsManager";
 
 type Company = { id: string; name: string; code: string; plan: string; is_active: boolean; created_at: string };
@@ -33,6 +34,7 @@ const SECTIONS = [
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
+  { id: "data-settings", label: "Data Settings", icon: Sliders },
 ];
 
 const SuperAdminDashboard = () => {
@@ -264,6 +266,7 @@ const SuperAdminDashboard = () => {
             {section === "plans" && <PlanTemplatesPanel />}
             {section === "secrets" && <SecretsManager />}
             {section === "audit" && <SuperAdminAuditPanel />}
+            {section === "data-settings" && <DataSettingsPanel />}
           </div>
         </main>
       </div>
