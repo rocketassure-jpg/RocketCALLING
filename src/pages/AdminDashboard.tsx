@@ -61,6 +61,7 @@ import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel"
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 import { PoliciesServicesPanel } from "@/components/admin/PoliciesServicesPanel";
 import { FinancePanel } from "@/components/admin/FinancePanel";
+import { MasterDataPanel } from "@/components/admin/master/MasterDataPanel";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
@@ -398,6 +399,7 @@ const AdminDashboard = () => {
             <TabsList className="flex flex-wrap h-auto">
               <TabsTrigger value="account"><User className="h-4 w-4 mr-1" /> Account</TabsTrigger>
               <TabsTrigger value="general"><Settings className="h-4 w-4 mr-1" /> General</TabsTrigger>
+              <TabsTrigger value="master"><Building2 className="h-4 w-4 mr-1" /> Master Data</TabsTrigger>
               <TabsTrigger value="api"><Webhook className="h-4 w-4 mr-1" /> API & Webhooks</TabsTrigger>
               <TabsTrigger value="payout"><Wallet className="h-4 w-4 mr-1" /> Master Payout</TabsTrigger>
               <TabsTrigger value="org"><User className="h-4 w-4 mr-1" /> Org Hierarchy</TabsTrigger>
@@ -405,6 +407,7 @@ const AdminDashboard = () => {
             </TabsList>
             <TabsContent value="account"><AccountSettings /></TabsContent>
             <TabsContent value="general"><GeneralSettings /></TabsContent>
+            <TabsContent value="master"><MasterDataPanel /></TabsContent>
             <TabsContent value="api"><ApiAndWebhooksPanel /></TabsContent>
             <TabsContent value="payout"><PayoutSetupEngine /></TabsContent>
             <TabsContent value="org"><OrgHierarchyPanel /></TabsContent>
