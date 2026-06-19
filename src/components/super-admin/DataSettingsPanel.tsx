@@ -128,7 +128,7 @@ export const DataSettingsPanel = () => {
           .from("leads")
           .delete({ count: "exact" })
           .eq("company_id", companyId)
-          .in("status", ["not_interested", "cold", "untouched"])
+          .in("status", ["Not Interested", "Cold", "Untouched"] as any)
           .lt("updated_at", cutoff.toISOString());
         if (error) throw error;
         writeAudit("DELETE", "leads", null, { reason: "bulk_cleanup", removed: count });
