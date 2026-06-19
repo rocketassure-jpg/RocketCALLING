@@ -4,7 +4,8 @@ import { RenewalCampaigns } from "@/components/admin/renewals/RenewalCampaigns";
 import { RenewalTemplates } from "@/components/admin/renewals/RenewalTemplates";
 import { RenewalAnalytics } from "@/components/admin/renewals/RenewalAnalytics";
 import { RenewalSettings } from "@/components/admin/renewals/RenewalSettings";
-import { AlarmClock, Megaphone, FileText, BarChart3, Settings as SettingsIcon } from "lucide-react";
+import { RenewalCommandCenter } from "@/components/admin/renewals/RenewalCommandCenter";
+import { AlarmClock, Megaphone, FileText, BarChart3, Settings as SettingsIcon, Sparkles } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrainingHelp } from "@/components/TrainingHelp";
 
@@ -17,18 +18,20 @@ export const RenewalsPanel = () => {
       <div className="flex items-start justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold">Renewals</h1>
-          <p className="text-sm text-muted-foreground">Renewal queue, bulk campaigns, templates aur analytics — sab ek jagah.</p>
+          <p className="text-sm text-muted-foreground">AI-ranked renewal command center, queue, campaigns, templates aur analytics.</p>
         </div>
         <TrainingHelp moduleKey="renewals" label="Renewals" />
       </div>
-      <Tabs defaultValue="queue" className="space-y-4">
+      <Tabs defaultValue="command" className="space-y-4">
         <TabsList className="flex-wrap">
+          <TabsTrigger value="command"><Sparkles className="h-4 w-4 mr-1" /> Command Center</TabsTrigger>
           <TabsTrigger value="queue"><AlarmClock className="h-4 w-4 mr-1" /> Queue</TabsTrigger>
           {canManage && <TabsTrigger value="campaigns"><Megaphone className="h-4 w-4 mr-1" /> Campaigns</TabsTrigger>}
           {canManage && <TabsTrigger value="templates"><FileText className="h-4 w-4 mr-1" /> Templates</TabsTrigger>}
           {canManage && <TabsTrigger value="analytics"><BarChart3 className="h-4 w-4 mr-1" /> Analytics</TabsTrigger>}
           {canManage && <TabsTrigger value="settings"><SettingsIcon className="h-4 w-4 mr-1" /> Settings</TabsTrigger>}
         </TabsList>
+        <TabsContent value="command"><RenewalCommandCenter /></TabsContent>
         <TabsContent value="queue"><RenewalQueue /></TabsContent>
         {canManage && <TabsContent value="campaigns"><RenewalCampaigns /></TabsContent>}
         {canManage && <TabsContent value="templates"><RenewalTemplates /></TabsContent>}
