@@ -34,7 +34,6 @@ const SECTIONS = [
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
-  { id: "data-settings", label: "Data Settings", icon: Sliders },
 ];
 
 const SuperAdminDashboard = () => {
@@ -261,12 +260,20 @@ const SuperAdminDashboard = () => {
 
             {section === "data" && <DataExplorerPanel />}
             {section === "announcements" && <AnnouncementsPanel />}
-            {section === "settings" && <GlobalSettingsPanel />}
+            {section === "settings" && (
+              <Tabs defaultValue="global" className="space-y-4">
+                <TabsList>
+                  <TabsTrigger value="global"><SettingsIcon className="mr-1 h-4 w-4" />Global Settings</TabsTrigger>
+                  <TabsTrigger value="data"><Sliders className="mr-1 h-4 w-4" />Data Settings</TabsTrigger>
+                </TabsList>
+                <TabsContent value="global"><GlobalSettingsPanel /></TabsContent>
+                <TabsContent value="data"><DataSettingsPanel /></TabsContent>
+              </Tabs>
+            )}
             {section === "flags" && <FeatureFlagsPanel />}
             {section === "plans" && <PlanTemplatesPanel />}
             {section === "secrets" && <SecretsManager />}
             {section === "audit" && <SuperAdminAuditPanel />}
-            {section === "data-settings" && <DataSettingsPanel />}
           </div>
         </main>
       </div>
