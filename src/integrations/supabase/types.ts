@@ -1204,6 +1204,60 @@ export type Database = {
           },
         ]
       }
+      claim_communications: {
+        Row: {
+          claim_id: string
+          comm_at: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          discussion: string
+          id: string
+          next_action: string | null
+          party_name: string | null
+          party_type: string
+        }
+        Insert: {
+          claim_id: string
+          comm_at?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          discussion: string
+          id?: string
+          next_action?: string | null
+          party_name?: string | null
+          party_type: string
+        }
+        Update: {
+          claim_id?: string
+          comm_at?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          discussion?: string
+          id?: string
+          next_action?: string | null
+          party_name?: string | null
+          party_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_communications_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_communications_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_documents: {
         Row: {
           claim_id: string
@@ -1251,6 +1305,156 @@ export type Database = {
           },
         ]
       }
+      claim_expenses: {
+        Row: {
+          amount: number
+          category: string
+          claim_id: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          expense_date: string
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          amount?: number
+          category: string
+          claim_id: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          expense_date?: string
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          claim_id?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          expense_date?: string
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_expenses_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_expenses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_followups: {
+        Row: {
+          channel: string
+          claim_id: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          followup_date: string
+          id: string
+          is_done: boolean
+          next_followup_date: string | null
+          remarks: string | null
+          updated_at: string
+        }
+        Insert: {
+          channel?: string
+          claim_id: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          followup_date?: string
+          id?: string
+          is_done?: boolean
+          next_followup_date?: string | null
+          remarks?: string | null
+          updated_at?: string
+        }
+        Update: {
+          channel?: string
+          claim_id?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          followup_date?: string
+          id?: string
+          is_done?: boolean
+          next_followup_date?: string | null
+          remarks?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_followups_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_followups_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claim_notes: {
+        Row: {
+          claim_id: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          note: string
+        }
+        Insert: {
+          claim_id: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note: string
+        }
+        Update: {
+          claim_id?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          note?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claim_notes_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claim_notes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       claim_status_history: {
         Row: {
           changed_by: string | null
@@ -1294,8 +1498,15 @@ export type Database = {
       }
       claims: {
         Row: {
+          admission_date: string | null
           approved_amount: number | null
           assigned_to: string | null
+          authorization_letter_url: string | null
+          authorized_email: string | null
+          authorized_id_proof_url: string | null
+          authorized_mobile: string | null
+          authorized_person_name: string | null
+          authorized_relation: string | null
           branch_id: string | null
           claim_amount: number | null
           claim_number: string
@@ -1305,7 +1516,17 @@ export type Database = {
           created_at: string
           created_by: string | null
           customer_id: string | null
+          discharge_date: string | null
+          escalation_level: number | null
+          escalation_notes: string | null
+          garage_address: string | null
+          garage_cashless: boolean | null
+          garage_contact: string | null
+          garage_estimate: number | null
+          garage_final_bill: number | null
           garage_name: string | null
+          hospital_bill: number | null
+          hospital_doctor: string | null
           hospital_name: string | null
           id: string
           incident_date: string | null
@@ -1318,13 +1539,31 @@ export type Database = {
           sla_breached: boolean
           sla_due_at: string | null
           status: string
+          sub_category: string | null
+          survey_date: string | null
+          survey_remarks: string | null
+          survey_report_url: string | null
           surveyor_contact: string | null
+          surveyor_email: string | null
+          surveyor_license: string | null
           surveyor_name: string | null
+          towing_cost: number | null
+          towing_drop: string | null
+          towing_invoice_url: string | null
+          towing_pickup: string | null
+          towing_provider: string | null
           updated_at: string
         }
         Insert: {
+          admission_date?: string | null
           approved_amount?: number | null
           assigned_to?: string | null
+          authorization_letter_url?: string | null
+          authorized_email?: string | null
+          authorized_id_proof_url?: string | null
+          authorized_mobile?: string | null
+          authorized_person_name?: string | null
+          authorized_relation?: string | null
           branch_id?: string | null
           claim_amount?: number | null
           claim_number: string
@@ -1334,7 +1573,17 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          discharge_date?: string | null
+          escalation_level?: number | null
+          escalation_notes?: string | null
+          garage_address?: string | null
+          garage_cashless?: boolean | null
+          garage_contact?: string | null
+          garage_estimate?: number | null
+          garage_final_bill?: number | null
           garage_name?: string | null
+          hospital_bill?: number | null
+          hospital_doctor?: string | null
           hospital_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1347,13 +1596,31 @@ export type Database = {
           sla_breached?: boolean
           sla_due_at?: string | null
           status?: string
+          sub_category?: string | null
+          survey_date?: string | null
+          survey_remarks?: string | null
+          survey_report_url?: string | null
           surveyor_contact?: string | null
+          surveyor_email?: string | null
+          surveyor_license?: string | null
           surveyor_name?: string | null
+          towing_cost?: number | null
+          towing_drop?: string | null
+          towing_invoice_url?: string | null
+          towing_pickup?: string | null
+          towing_provider?: string | null
           updated_at?: string
         }
         Update: {
+          admission_date?: string | null
           approved_amount?: number | null
           assigned_to?: string | null
+          authorization_letter_url?: string | null
+          authorized_email?: string | null
+          authorized_id_proof_url?: string | null
+          authorized_mobile?: string | null
+          authorized_person_name?: string | null
+          authorized_relation?: string | null
           branch_id?: string | null
           claim_amount?: number | null
           claim_number?: string
@@ -1363,7 +1630,17 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           customer_id?: string | null
+          discharge_date?: string | null
+          escalation_level?: number | null
+          escalation_notes?: string | null
+          garage_address?: string | null
+          garage_cashless?: boolean | null
+          garage_contact?: string | null
+          garage_estimate?: number | null
+          garage_final_bill?: number | null
           garage_name?: string | null
+          hospital_bill?: number | null
+          hospital_doctor?: string | null
           hospital_name?: string | null
           id?: string
           incident_date?: string | null
@@ -1376,8 +1653,19 @@ export type Database = {
           sla_breached?: boolean
           sla_due_at?: string | null
           status?: string
+          sub_category?: string | null
+          survey_date?: string | null
+          survey_remarks?: string | null
+          survey_report_url?: string | null
           surveyor_contact?: string | null
+          surveyor_email?: string | null
+          surveyor_license?: string | null
           surveyor_name?: string | null
+          towing_cost?: number | null
+          towing_drop?: string | null
+          towing_invoice_url?: string | null
+          towing_pickup?: string | null
+          towing_provider?: string | null
           updated_at?: string
         }
         Relationships: [
