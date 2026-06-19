@@ -13,11 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket } from "lucide-react";
+import { Link } from "react-router-dom";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
 import { DataSettingsPanel } from "@/components/super-admin/DataSettingsPanel";
 import { SecretsManager } from "@/components/admin/SecretsManager";
+import { AppConfigPanel } from "@/components/super-admin/AppConfigPanel";
 
 type Company = { id: string; name: string; code: string; plan: string; is_active: boolean; created_at: string };
 type Module = { module_key: string; name: string; base_monthly_price: number; is_always_included: boolean; sort_order: number };
@@ -29,11 +31,11 @@ const SECTIONS = [
   { id: "companies", label: "Companies", icon: Building2 },
   { id: "data", label: "Data Explorer", icon: Database },
   { id: "announcements", label: "Announcements", icon: Megaphone },
-  { id: "settings", label: "Global Settings", icon: SettingsIcon },
-  { id: "flags", label: "Feature Flags", icon: Flag },
+  { id: "settings", label: "System Settings", icon: SettingsIcon },
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
+  { id: "blueprint", label: "Blueprint & Export", icon: Rocket, href: "/super-admin/blueprint" },
 ];
 
 const SuperAdminDashboard = () => {

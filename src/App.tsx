@@ -14,6 +14,7 @@ import TelecallerDashboard from "./pages/TelecallerDashboard.tsx";
 import ManagerDashboard from "./pages/ManagerDashboard.tsx";
 import AdminDashboard from "./pages/AdminDashboard.tsx";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard.tsx";
+import SuperAdminBlueprint from "./pages/SuperAdminBlueprint.tsx";
 import SubAgentDashboard from "./pages/SubAgentDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Trust from "./pages/Trust.tsx";
@@ -39,6 +40,8 @@ const App = () => (
                 <Route path="/sub-agent" element={<ProtectedRoute requireRole="sub_agent"><SubAgentDashboard /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute requireRole="admin"><AdminDashboard /></ProtectedRoute>} />
                 <Route path="/super-admin" element={<ProtectedRoute requireSuperAdmin><SuperAdminDashboard /></ProtectedRoute>} />
+                <Route path="/super-admin/blueprint" element={<ProtectedRoute requireSuperAdmin><SuperAdminBlueprint /></ProtectedRoute>} />
+
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </SettingsProvider>
