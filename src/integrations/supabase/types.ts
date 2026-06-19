@@ -6111,48 +6111,345 @@ export type Database = {
           },
         ]
       }
+      vendor_commissions: {
+        Row: {
+          commission_type: string
+          company_id: string
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          fixed_amount: number | null
+          id: string
+          is_active: boolean
+          notes: string | null
+          od_rate: number | null
+          product_category: string
+          product_name: string | null
+          rate: number | null
+          slab_max: number | null
+          slab_min: number | null
+          tp_rate: number | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          commission_type?: string
+          company_id: string
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          od_rate?: number | null
+          product_category: string
+          product_name?: string | null
+          rate?: number | null
+          slab_max?: number | null
+          slab_min?: number | null
+          tp_rate?: number | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          commission_type?: string
+          company_id?: string
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          od_rate?: number | null
+          product_category?: string
+          product_name?: string | null
+          rate?: number | null
+          slab_max?: number | null
+          slab_min?: number | null
+          tp_rate?: number | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_commissions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_commissions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_documents: {
+        Row: {
+          company_id: string
+          created_at: string
+          doc_name: string | null
+          doc_type: string
+          expiry_date: string | null
+          file_url: string | null
+          id: string
+          updated_at: string
+          uploaded_by: string | null
+          vendor_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          doc_name?: string | null
+          doc_type: string
+          expiry_date?: string | null
+          file_url?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          vendor_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          doc_name?: string | null
+          doc_type?: string
+          expiry_date?: string | null
+          file_url?: string | null
+          id?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_documents_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_documents_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_products: {
+        Row: {
+          company_id: string
+          created_at: string
+          default_commission_pct: number | null
+          id: string
+          is_active: boolean
+          product_category: string
+          product_name: string
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          default_commission_pct?: number | null
+          id?: string
+          is_active?: boolean
+          product_category: string
+          product_name: string
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          default_commission_pct?: number | null
+          id?: string
+          is_active?: boolean
+          product_category?: string
+          product_name?: string
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_products_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_products_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_ratings: {
+        Row: {
+          claim_support: number | null
+          comment: string | null
+          company_id: string
+          created_at: string
+          id: string
+          overall: number | null
+          pricing: number | null
+          rated_by: string
+          service: number | null
+          turnaround: number | null
+          updated_at: string
+          vendor_id: string
+        }
+        Insert: {
+          claim_support?: number | null
+          comment?: string | null
+          company_id: string
+          created_at?: string
+          id?: string
+          overall?: number | null
+          pricing?: number | null
+          rated_by: string
+          service?: number | null
+          turnaround?: number | null
+          updated_at?: string
+          vendor_id: string
+        }
+        Update: {
+          claim_support?: number | null
+          comment?: string | null
+          company_id?: string
+          created_at?: string
+          id?: string
+          overall?: number | null
+          pricing?: number | null
+          rated_by?: string
+          service?: number | null
+          turnaround?: number | null
+          updated_at?: string
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_ratings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_ratings_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendors: {
         Row: {
+          address: string | null
+          agreement_end_date: string | null
+          agreement_start_date: string | null
           category: string | null
+          city: string | null
+          code: string | null
+          commission_type: string | null
           company_id: string
           contact_email: string | null
           contact_person: string | null
           contact_phone: string | null
+          country: string | null
           created_at: string
+          district: string | null
+          gst_number: string | null
           id: string
+          irda_expiry_date: string | null
+          irda_license_no: string | null
           is_active: boolean
+          mobile: string | null
           name: string
           notes: string | null
+          pan_number: string | null
+          pincode: string | null
+          state: string | null
+          status: string
           updated_at: string
           vendor_type: string
+          website: string | null
+          whatsapp: string | null
         }
         Insert: {
+          address?: string | null
+          agreement_end_date?: string | null
+          agreement_start_date?: string | null
           category?: string | null
+          city?: string | null
+          code?: string | null
+          commission_type?: string | null
           company_id: string
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
+          district?: string | null
+          gst_number?: string | null
           id?: string
+          irda_expiry_date?: string | null
+          irda_license_no?: string | null
           is_active?: boolean
+          mobile?: string | null
           name: string
           notes?: string | null
+          pan_number?: string | null
+          pincode?: string | null
+          state?: string | null
+          status?: string
           updated_at?: string
           vendor_type: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Update: {
+          address?: string | null
+          agreement_end_date?: string | null
+          agreement_start_date?: string | null
           category?: string | null
+          city?: string | null
+          code?: string | null
+          commission_type?: string | null
           company_id?: string
           contact_email?: string | null
           contact_person?: string | null
           contact_phone?: string | null
+          country?: string | null
           created_at?: string
+          district?: string | null
+          gst_number?: string | null
           id?: string
+          irda_expiry_date?: string | null
+          irda_license_no?: string | null
           is_active?: boolean
+          mobile?: string | null
           name?: string
           notes?: string | null
+          pan_number?: string | null
+          pincode?: string | null
+          state?: string | null
+          status?: string
           updated_at?: string
           vendor_type?: string
+          website?: string | null
+          whatsapp?: string | null
         }
         Relationships: [
           {
