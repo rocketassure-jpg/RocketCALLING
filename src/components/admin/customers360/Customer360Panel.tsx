@@ -364,6 +364,8 @@ export const Customer360Panel = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      <CustomerProfileDialog customer={profileFor} open={!!profileFor} onOpenChange={(o) => !o && setProfileFor(null)} />
     </div>
   );
 };
