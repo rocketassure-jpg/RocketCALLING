@@ -104,6 +104,7 @@ export const LeadActions = ({
   const { user } = useAuth();
   const policy = useMaskingPolicy();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("notes");
   const [revealed, setRevealed] = useState(false);
 
@@ -256,31 +257,44 @@ export const LeadActions = ({
                 {statusOptions.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
               </SelectContent>
             </Select>
+
+            {/* Collapse/expand actions toggle */}
+            <button
+              type="button"
+              onClick={() => setActionsOpen((v) => !v)}
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border bg-muted text-muted-foreground transition-all hover:bg-muted/80 active:scale-95"
+              aria-label={actionsOpen ? "Hide actions" : "Show actions"}
+              aria-expanded={actionsOpen}
+            >
+              <ChevronDown className={`h-4 w-4 transition-transform ${actionsOpen ? "rotate-180" : ""}`} />
+            </button>
           </div>
 
-          {/* Row 2: SMS, WhatsApp, Quote, More */}
-          <div className="grid grid-cols-4 gap-1.5">
-            <IconBtn
-              label="SMS" asChild href={smsLink(smsMsg)}
-              className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
-            ><MessageSquare className="h-4 w-4" /></IconBtn>
+          {/* Row 2: SMS, WhatsApp, Quote, More — collapsible */}
+          {actionsOpen && (
+            <div className="grid grid-cols-4 gap-1.5">
+              <IconBtn
+                label="SMS" asChild href={smsLink(smsMsg)}
+                className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
+              ><MessageSquare className="h-4 w-4" /></IconBtn>
 
-            <IconBtn
-              label="WhatsApp" asChild href={waLink(introMsg)} target="_blank" rel="noopener noreferrer"
-              className="w-full bg-success text-success-foreground hover:opacity-90"
-            ><MessageCircle className="h-4 w-4" /></IconBtn>
+              <IconBtn
+                label="WhatsApp" asChild href={waLink(introMsg)} target="_blank" rel="noopener noreferrer"
+                className="w-full bg-success text-success-foreground hover:opacity-90"
+              ><MessageCircle className="h-4 w-4" /></IconBtn>
 
-            <IconBtn
-              label="Send quote" asChild href={waLink(quoteMsg)} target="_blank" rel="noopener noreferrer"
-              className="w-full bg-warning text-warning-foreground hover:opacity-90"
-            ><FileText className="h-4 w-4" /></IconBtn>
+              <IconBtn
+                label="Send quote" asChild href={waLink(quoteMsg)} target="_blank" rel="noopener noreferrer"
+                className="w-full bg-warning text-warning-foreground hover:opacity-90"
+              ><FileText className="h-4 w-4" /></IconBtn>
 
-            <IconBtn
-              label={moreOpen ? "Hide details" : "More options"}
-              onClick={() => setMoreOpen((v) => !v)}
-              className={`w-full ${moreOpen ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            ><MoreHorizontal className="h-4 w-4" /></IconBtn>
-          </div>
+              <IconBtn
+                label={moreOpen ? "Hide details" : "More options"}
+                onClick={() => setMoreOpen((v) => !v)}
+                className={`w-full ${moreOpen ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+              ><MoreHorizontal className="h-4 w-4" /></IconBtn>
+            </div>
+          )}
         </>
       )}
 
