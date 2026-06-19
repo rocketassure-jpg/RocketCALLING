@@ -76,7 +76,7 @@ const IconBtn = ({
         {asChild && href ? (
           <a
             href={href} target={target} rel={rel} onClick={onClick}
-            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-9 min-w-9 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
@@ -84,7 +84,7 @@ const IconBtn = ({
         ) : (
           <button
             type="button" onClick={onClick}
-            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-9 min-w-9 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
@@ -200,26 +200,26 @@ export const LeadActions = ({
               <a
                 href={`tel:${lead.phone_number}`}
                 onClick={handleDialClick}
-                className="flex h-11 items-center gap-1.5 rounded-l-full pl-3.5 pr-2.5 text-sm font-semibold transition-all active:scale-95"
+                className="flex h-9 items-center gap-1.5 rounded-l-full pl-3 pr-2 text-xs font-semibold transition-all active:scale-95"
                 aria-label={`Dial ${phoneDisplay}`}
               >
-                <Phone className="h-4 w-4" />
-                {revealed ? <span className="font-mono text-xs">{policy.full(lead.phone_number)}</span> : "Dial"}
+                <Phone className="h-3.5 w-3.5" />
+                {revealed ? <span className="font-mono text-[10px]">{policy.full(lead.phone_number)}</span> : "Dial"}
                 {dialCount > 0 && (
-                  <span className="ml-0.5 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-background/95 px-1.5 text-[11px] font-bold text-destructive">
+                  <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-background/95 px-1 text-[10px] font-bold text-destructive">
                     {dialCount}
                   </span>
                 )}
               </a>
-              <div className="h-6 w-px bg-destructive-foreground/30" />
+              <div className="h-5 w-px bg-destructive-foreground/30" />
               <Popover open={historyOpen} onOpenChange={setHistoryOpen}>
                 <PopoverTrigger asChild>
                   <button
                     type="button"
-                    className="flex h-11 items-center justify-center rounded-r-full px-2.5 transition-all active:scale-95"
+                    className="flex h-9 items-center justify-center rounded-r-full px-2 transition-all active:scale-95"
                     aria-label="Call history"
                   >
-                    <ChevronDown className="h-4 w-4" />
+                    <ChevronDown className="h-3.5 w-3.5" />
                   </button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-72 p-0">
@@ -249,7 +249,7 @@ export const LeadActions = ({
 
             {/* Disposition dropdown pill */}
             <Select value={lead.status} onValueChange={(v) => onStatusChange(v as Status)}>
-              <SelectTrigger className={`h-11 min-w-[140px] flex-1 rounded-full border px-3 text-xs font-semibold ${statusPillColor(lead.status)}`}>
+              <SelectTrigger className={`h-9 min-w-[120px] flex-1 rounded-full border px-3 text-[11px] font-semibold ${statusPillColor(lead.status)}`}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -263,23 +263,23 @@ export const LeadActions = ({
             <IconBtn
               label="SMS" asChild href={smsLink(smsMsg)}
               className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
-            ><MessageSquare className="h-5 w-5" /></IconBtn>
+            ><MessageSquare className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label="WhatsApp" asChild href={waLink(introMsg)} target="_blank" rel="noopener noreferrer"
               className="w-full bg-success text-success-foreground hover:opacity-90"
-            ><MessageCircle className="h-5 w-5" /></IconBtn>
+            ><MessageCircle className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label="Send quote" asChild href={waLink(quoteMsg)} target="_blank" rel="noopener noreferrer"
               className="w-full bg-warning text-warning-foreground hover:opacity-90"
-            ><FileText className="h-5 w-5" /></IconBtn>
+            ><FileText className="h-4 w-4" /></IconBtn>
 
             <IconBtn
               label={moreOpen ? "Hide details" : "More options"}
               onClick={() => setMoreOpen((v) => !v)}
               className={`w-full ${moreOpen ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            ><MoreHorizontal className="h-5 w-5" /></IconBtn>
+            ><MoreHorizontal className="h-4 w-4" /></IconBtn>
           </div>
         </>
       )}
