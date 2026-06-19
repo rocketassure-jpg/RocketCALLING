@@ -461,7 +461,7 @@ const AdminDashboard = () => {
         </div>
       </header>
       <AnnouncementsBanner />
-      <main className="p-4 md:p-6"><Content /></main>
+      <main className="p-3 md:p-6"><Suspense fallback={<PanelFallback />}><Content /></Suspense></main>
       {section === "leads" && (
         <BulkActionBar
           count={selectedIds.size}
