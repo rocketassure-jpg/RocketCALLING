@@ -76,7 +76,7 @@ const IconBtn = ({
         {asChild && href ? (
           <a
             href={href} target={target} rel={rel} onClick={onClick}
-            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-9 min-w-9 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
@@ -84,7 +84,7 @@ const IconBtn = ({
         ) : (
           <button
             type="button" onClick={onClick}
-            className={`flex h-11 min-w-11 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
+            className={`flex h-9 min-w-9 items-center justify-center rounded-full transition-all active:scale-95 ${className}`}
             aria-label={label}
           >
             {children}
