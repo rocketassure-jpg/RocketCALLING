@@ -2149,6 +2149,116 @@ export type Database = {
           },
         ]
       }
+      customer_products: {
+        Row: {
+          admin_share: number | null
+          admin_share_pct: number | null
+          agent_id: string | null
+          agent_share: number | null
+          agent_share_pct: number | null
+          branch_share: number | null
+          branch_share_pct: number | null
+          category: string
+          commission_amount: number | null
+          commission_rate: number | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          customer_price: number | null
+          details: Json | null
+          expiry_date: string | null
+          govt_or_cost_fee: number | null
+          gst_amount: number | null
+          id: string
+          insurer_or_vendor: string | null
+          margin: number | null
+          policy_no: string | null
+          premium: number | null
+          product_name: string | null
+          profit: number | null
+          start_date: string | null
+          status: string | null
+          sub_category: string | null
+          tds_amount: number | null
+          updated_at: string
+        }
+        Insert: {
+          admin_share?: number | null
+          admin_share_pct?: number | null
+          agent_id?: string | null
+          agent_share?: number | null
+          agent_share_pct?: number | null
+          branch_share?: number | null
+          branch_share_pct?: number | null
+          category: string
+          commission_amount?: number | null
+          commission_rate?: number | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          customer_price?: number | null
+          details?: Json | null
+          expiry_date?: string | null
+          govt_or_cost_fee?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_or_vendor?: string | null
+          margin?: number | null
+          policy_no?: string | null
+          premium?: number | null
+          product_name?: string | null
+          profit?: number | null
+          start_date?: string | null
+          status?: string | null
+          sub_category?: string | null
+          tds_amount?: number | null
+          updated_at?: string
+        }
+        Update: {
+          admin_share?: number | null
+          admin_share_pct?: number | null
+          agent_id?: string | null
+          agent_share?: number | null
+          agent_share_pct?: number | null
+          branch_share?: number | null
+          branch_share_pct?: number | null
+          category?: string
+          commission_amount?: number | null
+          commission_rate?: number | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          customer_price?: number | null
+          details?: Json | null
+          expiry_date?: string | null
+          govt_or_cost_fee?: number | null
+          gst_amount?: number | null
+          id?: string
+          insurer_or_vendor?: string | null
+          margin?: number | null
+          policy_no?: string | null
+          premium?: number | null
+          product_name?: string | null
+          profit?: number | null
+          start_date?: string | null
+          status?: string | null
+          sub_category?: string | null
+          tds_amount?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_products_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           aadhaar_last4: string | null

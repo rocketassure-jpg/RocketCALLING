@@ -7,8 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, FileWarning, IndianRupee, AlarmClock,
-  MessageCircle, Phone, FileText, Users, Wallet, Building2, User,
+  MessageCircle, Phone, FileText, Users, Wallet, Building2, User, Package,
 } from "lucide-react";
+import { CustomerProductsTab } from "./CustomerProductsTab";
+
 
 type Customer = {
   id: string;
@@ -41,7 +43,7 @@ export const CustomerProfileDialog = ({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) => {
-  const [tab, setTab] = useState("policies");
+  const [tab, setTab] = useState("products");
   const [policies, setPolicies] = useState<RowList>(empty);
   const [claims, setClaims] = useState<RowList>(empty);
   const [premiumDue, setPremiumDue] = useState<RowList>(empty);
@@ -114,6 +116,7 @@ export const CustomerProfileDialog = ({
 
         <Tabs value={tab} onValueChange={setTab} className="space-y-3">
           <TabsList className="flex h-auto w-full flex-wrap justify-start">
+            <TabsTrigger value="products"><Package className="mr-1 h-4 w-4" /> Products</TabsTrigger>
             <TabsTrigger value="policies"><ShieldCheck className="mr-1 h-4 w-4" /> Policies</TabsTrigger>
             <TabsTrigger value="claims"><FileWarning className="mr-1 h-4 w-4" /> Claims</TabsTrigger>
             <TabsTrigger value="premium_due"><IndianRupee className="mr-1 h-4 w-4" /> Premium Due</TabsTrigger>
@@ -125,6 +128,12 @@ export const CustomerProfileDialog = ({
             <TabsTrigger value="finance"><Wallet className="mr-1 h-4 w-4" /> Finance / Loan</TabsTrigger>
             <TabsTrigger value="rto"><Building2 className="mr-1 h-4 w-4" /> RTO Services</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="products">
+            <CustomerProductsTab customerId={customer.id} customerName={customer.full_name} />
+          </TabsContent>
+
+
 
           <TabsContent value="policies">
             <SectionList data={policies} emptyLabel="No policies linked to this customer."
