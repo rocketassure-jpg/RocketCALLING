@@ -59,6 +59,8 @@ import OrgHierarchyPanel from "@/components/admin/org/OrgHierarchyPanel";
 
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
+import { PoliciesServicesPanel } from "@/components/admin/PoliciesServicesPanel";
+import { FinancePanel } from "@/components/admin/FinancePanel";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
