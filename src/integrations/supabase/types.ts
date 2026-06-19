@@ -6572,6 +6572,7 @@ export type Database = {
           target_id: string
         }[]
       }
+      get_external_api_key: { Args: { _id: string }; Returns: string }
       get_invite_code: { Args: never; Returns: string }
       has_module: {
         Args: { _company_id: string; _module_key: string }
