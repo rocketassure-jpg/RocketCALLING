@@ -129,6 +129,12 @@ export const CustomerProfileDialog = ({
             <TabsTrigger value="rto"><Building2 className="mr-1 h-4 w-4" /> RTO Services</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="products">
+            <CustomerProductsTab customerId={customer.id} customerName={customer.full_name} />
+          </TabsContent>
+
+
+
           <TabsContent value="policies">
             <SectionList data={policies} emptyLabel="No policies linked to this customer."
               render={(r: any) => (
