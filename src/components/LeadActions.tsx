@@ -104,6 +104,7 @@ export const LeadActions = ({
   const { user } = useAuth();
   const policy = useMaskingPolicy();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("notes");
   const [revealed, setRevealed] = useState(false);
 
