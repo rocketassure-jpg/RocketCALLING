@@ -2180,6 +2180,33 @@ export type Database = {
           },
         ]
       }
+      export_history: {
+        Row: {
+          export_type: string
+          file_size_bytes: number | null
+          file_url: string | null
+          generated_at: string
+          generated_by: string | null
+          id: string
+        }
+        Insert: {
+          export_type: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+        }
+        Update: {
+          export_type?: string
+          file_size_bytes?: number | null
+          file_url?: string | null
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       external_api_registry: {
         Row: {
           api_key: string | null
