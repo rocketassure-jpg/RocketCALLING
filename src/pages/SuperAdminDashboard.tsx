@@ -34,6 +34,7 @@ const SECTIONS = [
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
+  { id: "data-settings", label: "Data Settings", icon: Sliders },
 ];
 
 const SuperAdminDashboard = () => {
