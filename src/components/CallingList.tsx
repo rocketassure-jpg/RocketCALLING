@@ -432,7 +432,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
           </div>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {leads.map((lead: Lead) => {
             const overdue = isOverdue(lead.call_date);
             const blocked = lead.status === "Unsubscribed";
@@ -449,49 +449,49 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
                 className={`overflow-hidden transition-all hover:shadow-elegant ${matchesRevival ? "border-l-4 border-l-warning bg-warning/5" : expirySoon ? "border-2 border-destructive bg-destructive/5" : overdue ? "border-primary/40" : ""} ${isNext ? "ring-2 ring-primary animate-pulse" : ""}`}
               >
 
-                <CardContent className="p-3 sm:p-4">
-                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="flex flex-1 min-w-0 items-start gap-3">
-                      <Checkbox className="mt-1" checked={selectedIds.has(lead.id)} onCheckedChange={() => toggleSelect(lead.id)} onClick={(e) => e.stopPropagation()} />
+                <CardContent className="p-2 sm:p-3">
+                  <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                    <div className="flex flex-1 min-w-0 items-start gap-2">
+                      <Checkbox className="mt-0.5" checked={selectedIds.has(lead.id)} onCheckedChange={() => toggleSelect(lead.id)} onClick={(e) => e.stopPropagation()} />
                       <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h3 className="text-base font-semibold">{lead.customer_name}</h3>
-                          <Badge className={statusColor(lead.status)}>{lead.status}</Badge>
-                          <Badge variant="outline">{lead.policy_type}</Badge>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <h3 className="text-sm font-semibold">{lead.customer_name}</h3>
+                          <Badge className={`${statusColor(lead.status)} text-[10px]`}>{lead.status}</Badge>
+                          <Badge variant="outline" className="text-[10px]">{lead.policy_type}</Badge>
                           {(relatedPolicies[lead.id] ?? []).map((p) => (
-                            <Badge key={p} variant="outline" className="border-accent/50 bg-accent/10 text-accent" title={`Same customer also has ${p} policy`}>+{p}</Badge>
+                            <Badge key={p} variant="outline" className="border-accent/50 bg-accent/10 text-accent text-[10px]" title={`Same customer also has ${p} policy`}>+{p}</Badge>
                           ))}
-                          {overdue && <Badge className="bg-primary text-primary-foreground">Overdue</Badge>}
-                          {isNext && <Badge className="bg-primary text-primary-foreground"><ArrowRight className="h-3 w-3" /> Next</Badge>}
+                          {overdue && <Badge className="bg-primary text-primary-foreground text-[10px]">Overdue</Badge>}
+                          {isNext && <Badge className="bg-primary text-primary-foreground text-[10px]"><ArrowRight className="h-3 w-3" /> Next</Badge>}
                           {expirySoon && (
-                            <Badge className="bg-destructive text-destructive-foreground animate-pulse">
+                            <Badge className="bg-destructive text-destructive-foreground animate-pulse text-[10px]">
                               <AlarmClock className="h-3 w-3" /> Expires in {expiryDays}d
                             </Badge>
                           )}
                           {expired && expiryDays !== null && expiryDays >= 0 && (
-                            <Badge className="bg-destructive text-destructive-foreground">Expires today/tomorrow</Badge>
+                            <Badge className="bg-destructive text-destructive-foreground text-[10px]">Expires today/tomorrow</Badge>
                           )}
                         </div>
-                        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5" /> {policy.display(lead.phone_number)}</span>
-                          <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {lead.areas?.name ?? "—"}</span>
-                          <span className="flex items-center gap-1"><Calendar className="h-3.5 w-3.5" /> {lead.call_date}</span>
+                        <div className="mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1"><Phone className="h-3 w-3" /> {policy.display(lead.phone_number)}</span>
+                          <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> {lead.areas?.name ?? "—"}</span>
+                          <span className="flex items-center gap-1"><Calendar className="h-3 w-3" /> {lead.call_date}</span>
                           {Number(lead.premium_amount) > 0 && (
-                            <span className="flex items-center gap-1"><IndianRupee className="h-3.5 w-3.5" />{Number(lead.premium_amount).toLocaleString("en-IN")}</span>
+                            <span className="flex items-center gap-1"><IndianRupee className="h-3 w-3" />{Number(lead.premium_amount).toLocaleString("en-IN")}</span>
                           )}
                           {lead.policy_expiry_date && (
                             <span className={`flex items-center gap-1 ${expirySoon ? "font-semibold text-destructive" : ""}`}>
-                              <AlarmClock className="h-3.5 w-3.5" /> Exp: {lead.policy_expiry_date}
+                              <AlarmClock className="h-3 w-3" /> Exp: {lead.policy_expiry_date}
                             </span>
                           )}
                           {lead.last_called_at && (
-                            <span className="text-xs">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
+                            <span className="text-[10px]">Last: {new Date(lead.last_called_at).toLocaleString()}</span>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="w-full md:max-w-md md:flex-shrink-0">
+                    <div className="w-full md:max-w-sm md:flex-shrink-0">
                       <LeadActions
                         lead={lead as any}
                         blocked={blocked}
