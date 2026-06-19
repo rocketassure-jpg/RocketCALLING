@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3, Megaphone } from "lucide-react";
+import { Plus, Trash2, MapPin, Ban, RotateCcw, UserPlus, Copy, LayoutDashboard, Phone, Inbox, Users, Upload, Shield, GraduationCap, Webhook, Lock, Settings, KeyRound, Tags, ListChecks, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, Car, HeartPulse, ShieldCheck, Building2, Wrench, Edit3, Megaphone, Briefcase } from "lucide-react";
 import { MarketingAutomationPanel } from "@/components/admin/marketing/MarketingAutomationPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
@@ -62,6 +62,7 @@ import { AdminOverviewPanel } from "@/components/admin/AdminOverviewPanel";
 import { PoliciesServicesPanel } from "@/components/admin/PoliciesServicesPanel";
 import { FinancePanel } from "@/components/admin/FinancePanel";
 import { MasterDataPanel } from "@/components/admin/master/MasterDataPanel";
+import { VendorManagementPanel } from "@/components/admin/vendor/VendorManagementPanel";
 import { useAuth } from "@/contexts/AuthContext";
 
 type Area = { id: string; name: string };
@@ -92,6 +93,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies & Services" },
   // Finance (consolidated)
   { id: "finance", label: "Finance", icon: Wallet, group: "Finance" },
+  { id: "vendors", label: "Vendor Management", icon: Briefcase, group: "Finance" },
   
   
   // Tools
@@ -363,7 +365,8 @@ const AdminDashboard = () => {
       case "overview": return <AdminOverviewPanel />;
       case "policies_services": return <PoliciesServicesPanel />;
       case "finance": return <FinancePanel />;
-      case "accounts": return <AccountsPanel />;
+     case "accounts": return <AccountsPanel />;
+     case "vendors": return <VendorManagementPanel />;
       case "brokers": return <BrokerPanel />;
       case "motor": return <MotorPanel />;
       case "health": return <HealthPanel />;
