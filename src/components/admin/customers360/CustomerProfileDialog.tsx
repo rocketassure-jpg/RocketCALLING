@@ -116,6 +116,7 @@ export const CustomerProfileDialog = ({
 
         <Tabs value={tab} onValueChange={setTab} className="space-y-3">
           <TabsList className="flex h-auto w-full flex-wrap justify-start">
+            <TabsTrigger value="products"><Package className="mr-1 h-4 w-4" /> Products</TabsTrigger>
             <TabsTrigger value="policies"><ShieldCheck className="mr-1 h-4 w-4" /> Policies</TabsTrigger>
             <TabsTrigger value="claims"><FileWarning className="mr-1 h-4 w-4" /> Claims</TabsTrigger>
             <TabsTrigger value="premium_due"><IndianRupee className="mr-1 h-4 w-4" /> Premium Due</TabsTrigger>
