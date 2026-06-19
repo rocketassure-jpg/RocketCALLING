@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { Plus, Search, Users, Phone, Mail, Trash2, Upload, FileText, UserPlus, Network } from "lucide-react";
+import { CustomerProfileDialog } from "./CustomerProfileDialog";
 
 type Customer = {
   id: string;
@@ -52,6 +53,7 @@ export const Customer360Panel = () => {
   const [form, setForm] = useState<any>(empty);
   const [tab, setTab] = useState("list");
   const [selected, setSelected] = useState<Customer | null>(null);
+  const [profileFor, setProfileFor] = useState<Customer | null>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
 
   const load = async () => {
@@ -213,7 +215,9 @@ export const Customer360Panel = () => {
                 <TableBody>
                   {filtered.map((c) => (
                     <TableRow key={c.id}>
-                      <TableCell className="font-medium">{c.full_name}</TableCell>
+                      <TableCell className="font-medium">
+                        <button className="text-primary hover:underline" onClick={() => setProfileFor(c)}>{c.full_name}</button>
+                      </TableCell>
                       <TableCell className="font-mono text-xs">{c.mobile}</TableCell>
                       <TableCell className="text-xs">{c.email ?? "—"}</TableCell>
                       <TableCell className="text-xs">{c.city ?? "—"}</TableCell>
