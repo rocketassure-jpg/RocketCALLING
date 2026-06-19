@@ -5671,6 +5671,50 @@ export type Database = {
           },
         ]
       }
+      status_mappings: {
+        Row: {
+          color: string
+          company_id: string
+          created_at: string
+          id: string
+          is_active: boolean
+          label: string
+          sort_order: number
+          status_key: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          company_id: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label: string
+          sort_order?: number
+          status_key: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          company_id?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          sort_order?: number
+          status_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "status_mappings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       super_admin_audit_log: {
         Row: {
           action_type: string
@@ -5717,6 +5761,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      system_config: {
+        Row: {
+          created_at: string
+          is_secret: boolean
+          key_name: string
+          key_value: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          is_secret?: boolean
+          key_name: string
+          key_value?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          is_secret?: boolean
+          key_name?: string
+          key_value?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
       }
       tasks: {
         Row: {
