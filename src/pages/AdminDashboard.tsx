@@ -21,9 +21,10 @@ import { BulkActionBar } from "@/components/BulkActionBar";
 import { AnnouncementsBanner } from "@/components/AnnouncementsBanner";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Lazy-load every panel — only the active section's JS is downloaded
-const named = <P = any>(loader: () => Promise<any>, name: string) =>
-  lazy(loader().then ? () => loader().then((m) => ({ default: m[name] })) : (loader as any)) as React.ComponentType<P>;
+// Lazy-load every panel — only the active section's JS is downloaded.
+// Cast to `any` so call sites can keep their existing prop types.
+const named = (loader: () => Promise<any>, name: string): any =>
+  lazy(() => loader().then((m) => ({ default: m[name] })));
 
 const MarketingAutomationPanel = named(() => import("@/components/admin/marketing/MarketingAutomationPanel"), "MarketingAutomationPanel");
 const AccountsPanel = named(() => import("@/components/admin/accounts/AccountsPanel"), "AccountsPanel");
