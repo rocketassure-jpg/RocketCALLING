@@ -266,6 +266,7 @@ const SuperAdminDashboard = () => {
             {section === "plans" && <PlanTemplatesPanel />}
             {section === "secrets" && <SecretsManager />}
             {section === "audit" && <SuperAdminAuditPanel />}
+            {section === "data-settings" && <DataSettingsPanel />}
           </div>
         </main>
       </div>
