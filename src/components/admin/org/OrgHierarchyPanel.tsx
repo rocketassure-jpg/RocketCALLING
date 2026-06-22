@@ -257,6 +257,11 @@ export default function OrgHierarchyPanel() {
           </Card>
         </TabsContent>
 
+        {/* BRANCHES */}
+        <TabsContent value="branches">
+          <BranchesPanel />
+        </TabsContent>
+
         {/* HIERARCHY */}
         <TabsContent value="hierarchy" className="space-y-3">
           <Card>
