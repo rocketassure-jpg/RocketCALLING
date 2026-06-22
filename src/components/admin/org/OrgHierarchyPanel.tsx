@@ -39,6 +39,8 @@ export default function OrgHierarchyPanel() {
   const [newDesigLabel, setNewDesigLabel] = useState("");
   const [loading, setLoading] = useState(true);
   const [editMember, setEditMember] = useState<{ profile: Profile; role: Role["role"] } | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+
 
   // Invite
   const [inviteName, setInviteName] = useState("");
