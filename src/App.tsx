@@ -21,6 +21,7 @@ const SuperAdminBlueprint = lazy(() => import("./pages/SuperAdminBlueprint.tsx")
 const SubAgentDashboard = lazy(() => import("./pages/SubAgentDashboard.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,6 +53,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/trust" element={<Trust />} />
                   <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                   <Route path="/telecaller" element={<ProtectedRoute requireRole="telecaller"><TelecallerDashboard /></ProtectedRoute>} />

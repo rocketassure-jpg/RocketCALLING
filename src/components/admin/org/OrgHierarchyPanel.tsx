@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck, KeyRound } from "lucide-react";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
+import { AddMemberDialog } from "@/components/admin/org/AddMemberDialog";
 import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Profile = {
@@ -38,6 +39,8 @@ export default function OrgHierarchyPanel() {
   const [newDesigLabel, setNewDesigLabel] = useState("");
   const [loading, setLoading] = useState(true);
   const [editMember, setEditMember] = useState<{ profile: Profile; role: Role["role"] } | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
+
 
   // Invite
   const [inviteName, setInviteName] = useState("");
@@ -122,6 +125,15 @@ export default function OrgHierarchyPanel() {
     load();
   };
 
+  const resetMemberPassword = async (userId: string, name: string) => {
+    if (!confirm(`Reset password for ${name || "this member"} to default?\n(First 4 letters of name + last 4 digits of mobile)`)) return;
+    const { data, error } = await supabase.functions.invoke("team-admin", { body: { action: "reset_to_default", user_id: userId } });
+    if (error || (data as any)?.error) return toast({ title: "Reset failed", description: (data as any)?.error || error?.message, variant: "destructive" });
+    try { await navigator.clipboard.writeText((data as any).password); } catch {}
+    toast({ title: "Password reset ✅", description: `New password: ${(data as any).password} (copied)` });
+  };
+
+
   const sendInvite = async () => {
     if (!inviteEmail.trim()) return toast({ title: "Email required", variant: "destructive" });
     const link = `${window.location.origin}/auth?invite=${encodeURIComponent(inviteEmail)}&role=${inviteRole}&name=${encodeURIComponent(inviteName)}`;
@@ -169,6 +181,9 @@ export default function OrgHierarchyPanel() {
             <CardHeader className="pb-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <CardTitle className="text-sm">All Members ({filtered.length})</CardTitle>
+                <Button size="sm" variant="hero" onClick={() => setAddOpen(true)} className="h-8 text-xs">
+                  <UserPlus className="h-3.5 w-3.5 mr-1" /> Add Member
+                </Button>
                 <div className="flex items-center gap-1.5 flex-1 sm:max-w-xs">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="h-8 text-sm" />
@@ -222,6 +237,9 @@ export default function OrgHierarchyPanel() {
                           <div className="flex gap-1">
                             <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditMember({ profile: p, role })} title="Edit">
                               <Edit3 className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => resetMemberPassword(p.id, p.full_name || "")} title="Reset password to default">
+                              <KeyRound className="h-3.5 w-3.5" />
                             </Button>
                             <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => removeMember(p.id)} title="Remove">
                               <Trash2 className="h-3.5 w-3.5" />
@@ -347,6 +365,13 @@ export default function OrgHierarchyPanel() {
         branches={branches}
         currentRole={(editMember?.role || "telecaller") as any}
         onSaved={() => { setEditMember(null); load(); }}
+      />
+      <AddMemberDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        branches={branches}
+        designations={designations as any}
+        onCreated={load}
       />
     </div>
   );
