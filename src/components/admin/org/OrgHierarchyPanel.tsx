@@ -14,6 +14,7 @@ import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel"
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { AddMemberDialog } from "@/components/admin/org/AddMemberDialog";
 import { TrainingHelp } from "@/components/TrainingHelp";
+import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 
 type Profile = {
   id: string;
