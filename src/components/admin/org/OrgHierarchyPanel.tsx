@@ -366,6 +366,13 @@ export default function OrgHierarchyPanel() {
         currentRole={(editMember?.role || "telecaller") as any}
         onSaved={() => { setEditMember(null); load(); }}
       />
+      <AddMemberDialog
+        open={addOpen}
+        onOpenChange={setAddOpen}
+        branches={branches}
+        designations={designations as any}
+        onCreated={load}
+      />
     </div>
   );
 }
