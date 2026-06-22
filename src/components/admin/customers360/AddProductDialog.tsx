@@ -204,12 +204,13 @@ export const AddProductDialog = ({
     setDetails({});
   }, [category]);
 
-  const isService = category === "rto" || category === "finance";
+  const isService = ["rto", "finance", "fastag", "rsa"].includes(category);
+  const isFinancial = ["sip", "mutual_fund", "fd", "credit_card"].includes(category);
   const list = isService ? vendors : insurers;
 
   const save = async () => {
     if (!companyId) return;
-    if (!isService && !form.premium) return toast({ title: "Premium required", variant: "destructive" });
+    if (!isService && !isFinancial && !form.premium) return toast({ title: "Premium required", variant: "destructive" });
     if (isService && !form.customer_price) return toast({ title: "Customer price required", variant: "destructive" });
 
     setSaving(true);
