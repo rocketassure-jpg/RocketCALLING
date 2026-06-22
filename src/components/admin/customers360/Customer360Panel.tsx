@@ -341,6 +341,11 @@ export const Customer360Panel = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="md:col-span-2 border-t pt-3 text-xs font-semibold text-muted-foreground uppercase">Business Details (optional)</div>
+            <div><Label>Company Name</Label><Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} /></div>
+            <div><Label>GST Number</Label><Input value={form.gst_number} maxLength={15} onChange={(e) => setForm({ ...form, gst_number: e.target.value.toUpperCase() })} /></div>
+            <div><Label>Industry</Label><Input value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} /></div>
+            <div><Label>Designation</Label><Input value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
