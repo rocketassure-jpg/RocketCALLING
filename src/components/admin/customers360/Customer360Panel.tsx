@@ -369,6 +369,7 @@ export const Customer360Panel = () => {
       </Dialog>
 
       <CustomerProfileDialog customer={profileFor} open={!!profileFor} onOpenChange={(o) => !o && setProfileFor(null)} />
+      <CustomerTimelineDialog customerId={timelineFor?.id ?? null} customerName={timelineFor?.full_name} open={!!timelineFor} onOpenChange={(o) => !o && setTimelineFor(null)} />
     </div>
   );
 };
