@@ -240,20 +240,8 @@ export const CustomerProfileDialog = ({
             />
           </TabsContent>
 
-          <TabsContent value="family">
-            <SectionList data={family} emptyLabel="No family members linked."
-              render={(r: any) => (
-                <Card key={r.id}><CardContent className="flex items-center justify-between p-3 text-sm">
-                  <div><span className="font-medium">{r.full_name}</span><span className="ml-2 text-xs text-muted-foreground">{r.relation_to_head ?? (r.id === customer.id ? "self / head" : "member")}</span></div>
-                  <span className="font-mono text-xs">{r.mobile}</span>
-                </CardContent></Card>
-              )}
-            />
-          </TabsContent>
 
-          <TabsContent value="finance">
-            <Empty label="Finance / Loan tracking coming soon. Wire to your loan products table when ready." />
-          </TabsContent>
+
 
           <TabsContent value="rto">
             <SectionList data={rto} emptyLabel="No RTO cases for this customer."
