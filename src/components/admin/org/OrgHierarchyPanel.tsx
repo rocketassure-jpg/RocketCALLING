@@ -118,11 +118,12 @@ export default function OrgHierarchyPanel() {
   };
 
   const removeMember = async (userId: string) => {
-    if (!confirm("Remove this member from the team? Their role and area assignments will be cleared.")) return;
-    await supabase.from("telecaller_areas").delete().eq("telecaller_id", userId);
-    await supabase.from("user_roles").delete().eq("user_id", userId);
-    await supabase.from("profiles").update({ is_active: false } as any).eq("id", userId);
-    toast({ title: "Member removed" });
+    if (!confirm("Permanently delete this member?\nThis removes their account, role and area assignments. Leads/renewals assigned to them will be unassigned.")) return;
+    const { data, error } = await supabase.functions.invoke("team-admin", { body: { action: "delete_member", user_id: userId } });
+    if (error || (data as any)?.error) {
+      return toast({ title: "Delete failed", description: (data as any)?.error || error?.message, variant: "destructive" });
+    }
+    toast({ title: "Member deleted ✅" });
     load();
   };
 
