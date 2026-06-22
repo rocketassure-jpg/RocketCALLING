@@ -238,6 +238,9 @@ export default function OrgHierarchyPanel() {
                             <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => setEditMember({ profile: p, role })} title="Edit">
                               <Edit3 className="h-3.5 w-3.5" />
                             </Button>
+                            <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => resetMemberPassword(p.id, p.full_name || "")} title="Reset password to default">
+                              <KeyRound className="h-3.5 w-3.5" />
+                            </Button>
                             <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => removeMember(p.id)} title="Remove">
                               <Trash2 className="h-3.5 w-3.5" />
                             </Button>
