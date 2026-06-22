@@ -34,15 +34,23 @@ type Customer = {
   agent_id: string | null;
   tags: string[] | null;
   created_at: string;
+  alt_mobile?: string | null;
+  company_name?: string | null;
+  gst_number?: string | null;
+  industry?: string | null;
+  designation?: string | null;
+  lifecycle_stage?: string | null;
+  value_score?: number | null;
 };
 
 type Doc = { id: string; doc_type: string; label: string | null; storage_path: string; created_at: string };
 
 const empty = {
-  full_name: "", mobile: "", email: "", dob: "", gender: "", occupation: "",
+  full_name: "", mobile: "", alt_mobile: "", email: "", dob: "", gender: "", occupation: "",
   address_line1: "", city: "", state: "", pincode: "",
   pan: "", aadhaar_last4: "", kyc_status: "pending",
   family_head_id: "", relation_to_head: "self", notes: "",
+  company_name: "", gst_number: "", industry: "", designation: "",
 };
 
 export const Customer360Panel = () => {
@@ -96,11 +104,13 @@ export const Customer360Panel = () => {
   const startEdit = (c: Customer) => {
     setEditing(c);
     setForm({
-      full_name: c.full_name, mobile: c.mobile, email: c.email ?? "",
+      full_name: c.full_name, mobile: c.mobile, alt_mobile: c.alt_mobile ?? "", email: c.email ?? "",
       dob: c.dob ?? "", gender: c.gender ?? "", occupation: c.occupation ?? "",
       address_line1: "", city: c.city ?? "", state: c.state ?? "", pincode: c.pincode ?? "",
       pan: c.pan ?? "", aadhaar_last4: c.aadhaar_last4 ?? "", kyc_status: c.kyc_status,
       family_head_id: c.family_head_id ?? "", relation_to_head: c.relation_to_head ?? "self", notes: "",
+      company_name: c.company_name ?? "", gst_number: c.gst_number ?? "",
+      industry: c.industry ?? "", designation: c.designation ?? "",
     });
     setOpen(true);
   };
@@ -113,6 +123,7 @@ export const Customer360Panel = () => {
     const payload: any = {
       full_name: form.full_name.trim(),
       mobile: form.mobile.trim(),
+      alt_mobile: form.alt_mobile || null,
       email: form.email || null,
       dob: form.dob || null,
       gender: form.gender || null,
@@ -126,6 +137,10 @@ export const Customer360Panel = () => {
       kyc_status: form.kyc_status,
       family_head_id: form.family_head_id || null,
       relation_to_head: form.relation_to_head || null,
+      company_name: form.company_name || null,
+      gst_number: form.gst_number ? form.gst_number.toUpperCase() : null,
+      industry: form.industry || null,
+      designation: form.designation || null,
     };
     if (editing) {
       const { error } = await (supabase as any).from("customers").update(payload).eq("id", editing.id);
