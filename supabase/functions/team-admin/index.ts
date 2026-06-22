@@ -105,6 +105,31 @@ Deno.serve(async (req) => {
       return json({ ok: true, password });
     }
 
+    if (action === "delete_member") {
+      const targetId = String(body.user_id || "");
+      if (!targetId) return json({ error: "user_id required" }, 400);
+      if (targetId === callerId) return json({ error: "Cannot delete yourself" }, 400);
+      const { data: tp } = await admin.from("profiles").select("company_id,is_super_admin").eq("id", targetId).maybeSingle();
+      if (!tp) return json({ error: "User not found" }, 404);
+      if (!prof?.is_super_admin && tp.company_id !== companyId) return json({ error: "Cross-company" }, 403);
+      if (tp.is_super_admin && !prof?.is_super_admin) return json({ error: "Cannot delete super admin" }, 403);
+
+      // Clean up dependent rows so FKs don't block deletion
+      await admin.from("telecaller_areas").delete().eq("telecaller_id", targetId);
+      await admin.from("user_roles").delete().eq("user_id", targetId);
+      // Null out manager_id on subordinates
+      await admin.from("profiles").update({ manager_id: null } as any).eq("manager_id", targetId);
+      // Unassign leads/renewals so deletion is allowed
+      await admin.from("leads").update({ assigned_telecaller: null } as any).eq("assigned_telecaller", targetId);
+      await admin.from("renewals").update({ assigned_telecaller_id: null } as any).eq("assigned_telecaller_id", targetId);
+      await admin.from("renewals").update({ original_telecaller_id: null } as any).eq("original_telecaller_id", targetId);
+      // Delete profile row (auth.users delete will also cascade if FK is set, but be explicit)
+      await admin.from("profiles").delete().eq("id", targetId);
+      const { error: dErr } = await admin.auth.admin.deleteUser(targetId);
+      if (dErr) return json({ error: dErr.message }, 400);
+      return json({ ok: true });
+    }
+
     return json({ error: "Unknown action" }, 400);
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
