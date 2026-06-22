@@ -1062,6 +1062,7 @@ export type Database = {
       call_logs: {
         Row: {
           called_at: string
+          customer_id: string | null
           id: string
           lead_id: string
           notes: string | null
@@ -1070,6 +1071,7 @@ export type Database = {
         }
         Insert: {
           called_at?: string
+          customer_id?: string | null
           id?: string
           lead_id: string
           notes?: string | null
@@ -1078,6 +1080,7 @@ export type Database = {
         }
         Update: {
           called_at?: string
+          customer_id?: string | null
           id?: string
           lead_id?: string
           notes?: string | null
@@ -1085,6 +1088,20 @@ export type Database = {
           telecaller_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "call_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "call_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
           {
             foreignKeyName: "call_logs_lead_id_fkey"
             columns: ["lead_id"]
@@ -1677,6 +1694,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "claims_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "claims_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
@@ -1684,10 +1722,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "claims_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
             foreignKeyName: "claims_insurer_id_fkey"
             columns: ["insurer_id"]
             isOneToOne: false
             referencedRelation: "insurers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "claims_policy_id_fkey"
+            columns: ["policy_id"]
+            isOneToOne: false
+            referencedRelation: "customer_products"
             referencedColumns: ["id"]
           },
         ]
@@ -2004,6 +2056,13 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "complaints_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
         ]
       }
       compliance_tracker: {
@@ -2147,6 +2206,13 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
         ]
       }
       customer_products: {
@@ -2251,11 +2317,25 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "customer_products_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "agents_profile"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "customer_products_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_products_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
           },
         ]
       }
@@ -2361,6 +2441,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customers_family_head_id_fkey"
+            columns: ["family_head_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
           },
           {
             foreignKeyName: "customers_source_lead_id_fkey"
@@ -3359,6 +3446,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "customers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
           },
         ]
       }
@@ -4987,6 +5081,8 @@ export type Database = {
           company_share: number | null
           created_at: string | null
           created_by: string | null
+          customer_id: string | null
+          customer_product_id: string | null
           expected_payout_date: string | null
           gross_premium: number | null
           gst_amount: number | null
@@ -5022,6 +5118,8 @@ export type Database = {
           company_share?: number | null
           created_at?: string | null
           created_by?: string | null
+          customer_id?: string | null
+          customer_product_id?: string | null
           expected_payout_date?: string | null
           gross_premium?: number | null
           gst_amount?: number | null
@@ -5057,6 +5155,8 @@ export type Database = {
           company_share?: number | null
           created_at?: string | null
           created_by?: string | null
+          customer_id?: string | null
+          customer_product_id?: string | null
           expected_payout_date?: string | null
           gross_premium?: number | null
           gst_amount?: number | null
@@ -5128,6 +5228,27 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_txn_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "policy_txn_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "policy_txn_customer_product_id_fkey"
+            columns: ["customer_product_id"]
+            isOneToOne: false
+            referencedRelation: "customer_products"
             referencedColumns: ["id"]
           },
         ]
@@ -5571,6 +5692,7 @@ export type Database = {
           created_at: string
           customer_id: string | null
           customer_name: string | null
+          customer_product_id: string | null
           expiry_date: string
           id: string
           last_contact_at: string | null
@@ -5590,6 +5712,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           customer_name?: string | null
+          customer_product_id?: string | null
           expiry_date: string
           id?: string
           last_contact_at?: string | null
@@ -5609,6 +5732,7 @@ export type Database = {
           created_at?: string
           customer_id?: string | null
           customer_name?: string | null
+          customer_product_id?: string | null
           expiry_date?: string
           id?: string
           last_contact_at?: string | null
@@ -5628,6 +5752,20 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renewals_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "renewals_customer_product_id_fkey"
+            columns: ["customer_product_id"]
+            isOneToOne: false
+            referencedRelation: "customer_products"
             referencedColumns: ["id"]
           },
           {
@@ -6057,11 +6195,20 @@ export type Database = {
             referencedRelation: "customers"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "service_requests_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
         ]
       }
       sms_logs: {
         Row: {
+          campaign_id: string | null
           created_at: string
+          customer_id: string | null
           error: string | null
           id: string
           lead_id: string | null
@@ -6071,7 +6218,9 @@ export type Database = {
           status: string
         }
         Insert: {
+          campaign_id?: string | null
           created_at?: string
+          customer_id?: string | null
           error?: string | null
           id?: string
           lead_id?: string | null
@@ -6081,7 +6230,9 @@ export type Database = {
           status?: string
         }
         Update: {
+          campaign_id?: string | null
           created_at?: string
+          customer_id?: string | null
           error?: string | null
           id?: string
           lead_id?: string | null
@@ -6090,7 +6241,22 @@ export type Database = {
           sent_by?: string | null
           status?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sms_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
       }
       social_post_logs: {
         Row: {
@@ -7036,7 +7202,9 @@ export type Database = {
       }
       whatsapp_logs: {
         Row: {
+          campaign_id: string | null
           created_at: string
+          customer_id: string | null
           error: string | null
           id: string
           lead_id: string | null
@@ -7047,7 +7215,9 @@ export type Database = {
           template: string
         }
         Insert: {
+          campaign_id?: string | null
           created_at?: string
+          customer_id?: string | null
           error?: string | null
           id?: string
           lead_id?: string | null
@@ -7058,7 +7228,9 @@ export type Database = {
           template: string
         }
         Update: {
+          campaign_id?: string | null
           created_at?: string
+          customer_id?: string | null
           error?: string | null
           id?: string
           lead_id?: string | null
@@ -7068,7 +7240,22 @@ export type Database = {
           status?: string
           template?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "whatsapp_logs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
       }
     }
     Views: {
@@ -7440,6 +7627,83 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      v_customer_360: {
+        Row: {
+          calls_count: number | null
+          city: string | null
+          claims_count: number | null
+          claims_settled_total: number | null
+          company_id: string | null
+          customer_id: string | null
+          full_name: string | null
+          last_call_at: string | null
+          lifetime_commission: number | null
+          lifetime_premium: number | null
+          mobile: string | null
+          next_renewal_date: string | null
+          products_count: number | null
+          renewals_count: number | null
+          sms_count: number | null
+          whatsapp_count: number | null
+        }
+        Insert: {
+          calls_count?: never
+          city?: string | null
+          claims_count?: never
+          claims_settled_total?: never
+          company_id?: string | null
+          customer_id?: string | null
+          full_name?: string | null
+          last_call_at?: never
+          lifetime_commission?: never
+          lifetime_premium?: never
+          mobile?: string | null
+          next_renewal_date?: never
+          products_count?: never
+          renewals_count?: never
+          sms_count?: never
+          whatsapp_count?: never
+        }
+        Update: {
+          calls_count?: never
+          city?: string | null
+          claims_count?: never
+          claims_settled_total?: never
+          company_id?: string | null
+          customer_id?: string | null
+          full_name?: string | null
+          last_call_at?: never
+          lifetime_commission?: never
+          lifetime_premium?: never
+          mobile?: string | null
+          next_renewal_date?: never
+          products_count?: never
+          renewals_count?: never
+          sms_count?: never
+          whatsapp_count?: never
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      v_customer_timeline: {
+        Row: {
+          at: string | null
+          company_id: string | null
+          customer_id: string | null
+          detail: string | null
+          kind: string | null
+          ref_id: string | null
+          title: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {
