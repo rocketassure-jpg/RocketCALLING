@@ -176,6 +176,9 @@ const Auth = () => {
                     <Button type="submit" variant="hero" className="w-full" disabled={loading}>
                       {loading && <Loader2 className="h-4 w-4 animate-spin" />} Sign in
                     </Button>
+                    <button type="button" onClick={handleForgot} className="block w-full text-center text-xs text-primary hover:underline">
+                      Forgot password?
+                    </button>
                   </form>
                 </TabsContent>
 
