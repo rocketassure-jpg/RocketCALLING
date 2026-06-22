@@ -2154,6 +2154,125 @@ export type Database = {
           },
         ]
       }
+      cross_sell_suggestions: {
+        Row: {
+          company_id: string
+          computed_at: string
+          customer_id: string
+          id: string
+          missing_category: string
+          reason: string | null
+          score: number
+        }
+        Insert: {
+          company_id: string
+          computed_at?: string
+          customer_id: string
+          id?: string
+          missing_category: string
+          reason?: string | null
+          score?: number
+        }
+        Update: {
+          company_id?: string
+          computed_at?: string
+          customer_id?: string
+          id?: string
+          missing_category?: string
+          reason?: string | null
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cross_sell_suggestions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_sell_suggestions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cross_sell_suggestions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      customer_contacts: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          designation: string | null
+          email: string | null
+          full_name: string
+          id: string
+          is_primary: boolean
+          mobile: string | null
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          designation?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          is_primary?: boolean
+          mobile?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          designation?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_primary?: boolean
+          mobile?: string | null
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
       customer_documents: {
         Row: {
           company_id: string
@@ -2208,6 +2327,183 @@ export type Database = {
           },
           {
             foreignKeyName: "customer_documents_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      customer_family_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          dob: string | null
+          full_name: string
+          gender: string | null
+          id: string
+          is_dependent: boolean
+          mobile: string | null
+          notes: string | null
+          relation: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          dob?: string | null
+          full_name: string
+          gender?: string | null
+          id?: string
+          is_dependent?: boolean
+          mobile?: string | null
+          notes?: string | null
+          relation: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          dob?: string | null
+          full_name?: string
+          gender?: string | null
+          id?: string
+          is_dependent?: boolean
+          mobile?: string | null
+          notes?: string | null
+          relation?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_family_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_family_members_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_family_members_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      customer_lifecycle_events: {
+        Row: {
+          company_id: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          notes: string | null
+          occurred_at: string
+          source_ref: string | null
+          stage: string
+        }
+        Insert: {
+          company_id: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          source_ref?: string | null
+          stage: string
+        }
+        Update: {
+          company_id?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          notes?: string | null
+          occurred_at?: string
+          source_ref?: string | null
+          stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_lifecycle_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_lifecycle_events_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_lifecycle_events_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+        ]
+      }
+      customer_notes: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          id: string
+          note: string
+          pinned: boolean
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          id?: string
+          note: string
+          pinned?: boolean
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          id?: string
+          note?: string
+          pinned?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_notes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_notes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_notes_customer_id_fkey"
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "v_customer_360"
@@ -2339,6 +2635,89 @@ export type Database = {
           },
         ]
       }
+      customer_tasks: {
+        Row: {
+          assigned_to: string | null
+          company_id: string
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          customer_id: string
+          description: string | null
+          due_at: string | null
+          id: string
+          priority: string
+          related_product_id: string | null
+          status: string
+          task_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          company_id: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          priority?: string
+          related_product_id?: string | null
+          status?: string
+          task_type?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          company_id?: string
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          priority?: string
+          related_product_id?: string | null
+          status?: string
+          task_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_tasks_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_tasks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_tasks_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_tasks_related_product_id_fkey"
+            columns: ["related_product_id"]
+            isOneToOne: false
+            referencedRelation: "customer_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           aadhaar_last4: string | null
@@ -2349,15 +2728,21 @@ export type Database = {
           branch_id: string | null
           city: string | null
           company_id: string
+          company_name: string | null
           created_at: string
           created_by: string | null
+          customer_since: string
+          designation: string | null
           dob: string | null
           email: string | null
           family_head_id: string | null
           full_name: string
           gender: string | null
+          gst_number: string | null
           id: string
+          industry: string | null
           kyc_status: string
+          lifecycle_stage: string
           mobile: string
           notes: string | null
           occupation: string | null
@@ -2368,6 +2753,7 @@ export type Database = {
           state: string | null
           tags: string[] | null
           updated_at: string
+          value_score: number
         }
         Insert: {
           aadhaar_last4?: string | null
@@ -2378,15 +2764,21 @@ export type Database = {
           branch_id?: string | null
           city?: string | null
           company_id: string
+          company_name?: string | null
           created_at?: string
           created_by?: string | null
+          customer_since?: string
+          designation?: string | null
           dob?: string | null
           email?: string | null
           family_head_id?: string | null
           full_name: string
           gender?: string | null
+          gst_number?: string | null
           id?: string
+          industry?: string | null
           kyc_status?: string
+          lifecycle_stage?: string
           mobile: string
           notes?: string | null
           occupation?: string | null
@@ -2397,6 +2789,7 @@ export type Database = {
           state?: string | null
           tags?: string[] | null
           updated_at?: string
+          value_score?: number
         }
         Update: {
           aadhaar_last4?: string | null
@@ -2407,15 +2800,21 @@ export type Database = {
           branch_id?: string | null
           city?: string | null
           company_id?: string
+          company_name?: string | null
           created_at?: string
           created_by?: string | null
+          customer_since?: string
+          designation?: string | null
           dob?: string | null
           email?: string | null
           family_head_id?: string | null
           full_name?: string
           gender?: string | null
+          gst_number?: string | null
           id?: string
+          industry?: string | null
           kyc_status?: string
+          lifecycle_stage?: string
           mobile?: string
           notes?: string | null
           occupation?: string | null
@@ -2426,6 +2825,7 @@ export type Database = {
           state?: string | null
           tags?: string[] | null
           updated_at?: string
+          value_score?: number
         }
         Relationships: [
           {
@@ -7630,58 +8030,22 @@ export type Database = {
       }
       v_customer_360: {
         Row: {
-          calls_count: number | null
-          city: string | null
           claims_count: number | null
-          claims_settled_total: number | null
           company_id: string | null
+          contacts_count: number | null
           customer_id: string | null
+          customer_since: string | null
+          email: string | null
+          family_count: number | null
           full_name: string | null
-          last_call_at: string | null
+          lifecycle_stage: string | null
           lifetime_commission: number | null
           lifetime_premium: number | null
+          missing_categories: string[] | null
           mobile: string | null
-          next_renewal_date: string | null
           products_count: number | null
           renewals_count: number | null
-          sms_count: number | null
-          whatsapp_count: number | null
-        }
-        Insert: {
-          calls_count?: never
-          city?: string | null
-          claims_count?: never
-          claims_settled_total?: never
-          company_id?: string | null
-          customer_id?: string | null
-          full_name?: string | null
-          last_call_at?: never
-          lifetime_commission?: never
-          lifetime_premium?: never
-          mobile?: string | null
-          next_renewal_date?: never
-          products_count?: never
-          renewals_count?: never
-          sms_count?: never
-          whatsapp_count?: never
-        }
-        Update: {
-          calls_count?: never
-          city?: string | null
-          claims_count?: never
-          claims_settled_total?: never
-          company_id?: string | null
-          customer_id?: string | null
-          full_name?: string | null
-          last_call_at?: never
-          lifetime_commission?: never
-          lifetime_premium?: never
-          mobile?: string | null
-          next_renewal_date?: never
-          products_count?: never
-          renewals_count?: never
-          sms_count?: never
-          whatsapp_count?: never
+          value_score: number | null
         }
         Relationships: [
           {
@@ -7707,6 +8071,7 @@ export type Database = {
       }
     }
     Functions: {
+      compute_cross_sell: { Args: { _customer_id: string }; Returns: undefined }
       get_active_modules: { Args: { _company_id: string }; Returns: string[] }
       get_applicable_slab: {
         Args: {
@@ -7755,6 +8120,10 @@ export type Database = {
         Returns: boolean
       }
       my_company_name: { Args: never; Returns: string }
+      recompute_customer_value: {
+        Args: { _customer_id: string }
+        Returns: undefined
+      }
       resolve_login_email: { Args: { _login: string }; Returns: string }
       seed_master_data: { Args: { _company_id: string }; Returns: undefined }
       telecaller_has_area: {

@@ -34,15 +34,23 @@ type Customer = {
   agent_id: string | null;
   tags: string[] | null;
   created_at: string;
+  alt_mobile?: string | null;
+  company_name?: string | null;
+  gst_number?: string | null;
+  industry?: string | null;
+  designation?: string | null;
+  lifecycle_stage?: string | null;
+  value_score?: number | null;
 };
 
 type Doc = { id: string; doc_type: string; label: string | null; storage_path: string; created_at: string };
 
 const empty = {
-  full_name: "", mobile: "", email: "", dob: "", gender: "", occupation: "",
+  full_name: "", mobile: "", alt_mobile: "", email: "", dob: "", gender: "", occupation: "",
   address_line1: "", city: "", state: "", pincode: "",
   pan: "", aadhaar_last4: "", kyc_status: "pending",
   family_head_id: "", relation_to_head: "self", notes: "",
+  company_name: "", gst_number: "", industry: "", designation: "",
 };
 
 export const Customer360Panel = () => {
@@ -96,11 +104,13 @@ export const Customer360Panel = () => {
   const startEdit = (c: Customer) => {
     setEditing(c);
     setForm({
-      full_name: c.full_name, mobile: c.mobile, email: c.email ?? "",
+      full_name: c.full_name, mobile: c.mobile, alt_mobile: c.alt_mobile ?? "", email: c.email ?? "",
       dob: c.dob ?? "", gender: c.gender ?? "", occupation: c.occupation ?? "",
       address_line1: "", city: c.city ?? "", state: c.state ?? "", pincode: c.pincode ?? "",
       pan: c.pan ?? "", aadhaar_last4: c.aadhaar_last4 ?? "", kyc_status: c.kyc_status,
       family_head_id: c.family_head_id ?? "", relation_to_head: c.relation_to_head ?? "self", notes: "",
+      company_name: c.company_name ?? "", gst_number: c.gst_number ?? "",
+      industry: c.industry ?? "", designation: c.designation ?? "",
     });
     setOpen(true);
   };
@@ -113,6 +123,7 @@ export const Customer360Panel = () => {
     const payload: any = {
       full_name: form.full_name.trim(),
       mobile: form.mobile.trim(),
+      alt_mobile: form.alt_mobile || null,
       email: form.email || null,
       dob: form.dob || null,
       gender: form.gender || null,
@@ -126,6 +137,10 @@ export const Customer360Panel = () => {
       kyc_status: form.kyc_status,
       family_head_id: form.family_head_id || null,
       relation_to_head: form.relation_to_head || null,
+      company_name: form.company_name || null,
+      gst_number: form.gst_number ? form.gst_number.toUpperCase() : null,
+      industry: form.industry || null,
+      designation: form.designation || null,
     };
     if (editing) {
       const { error } = await (supabase as any).from("customers").update(payload).eq("id", editing.id);
@@ -210,8 +225,8 @@ export const Customer360Panel = () => {
             <CardContent className="overflow-x-auto p-0">
               <Table>
                 <TableHeader><TableRow>
-                  <TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Email</TableHead>
-                  <TableHead>City</TableHead><TableHead>KYC</TableHead><TableHead>Family</TableHead>
+                  <TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Stage</TableHead>
+                  <TableHead>Score</TableHead><TableHead>City</TableHead><TableHead>KYC</TableHead>
                   <TableHead></TableHead>
                 </TableRow></TableHeader>
                 <TableBody>
@@ -219,17 +234,16 @@ export const Customer360Panel = () => {
                     <TableRow key={c.id}>
                       <TableCell className="font-medium">
                         <button className="text-primary hover:underline" onClick={() => setProfileFor(c)}>{c.full_name}</button>
+                        {c.company_name && <div className="text-xs text-muted-foreground">{c.company_name}</div>}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{c.mobile}</TableCell>
-                      <TableCell className="text-xs">{c.email ?? "—"}</TableCell>
+                      <TableCell><Badge variant="outline" className="capitalize text-xs">{(c.lifecycle_stage ?? "customer").replace("_"," ")}</Badge></TableCell>
+                      <TableCell className="text-xs font-mono">{c.value_score ?? 0}</TableCell>
                       <TableCell className="text-xs">{c.city ?? "—"}</TableCell>
                       <TableCell>
                         <Badge variant={c.kyc_status === "verified" ? "default" : c.kyc_status === "rejected" ? "destructive" : "secondary"}>
                           {c.kyc_status}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {c.family_head_id ? <Badge variant="outline">{c.relation_to_head ?? "member"}</Badge> : <Badge variant="outline">head</Badge>}
                       </TableCell>
                       <TableCell className="space-x-1 text-right">
                         <Button size="sm" variant="outline" title="Timeline" onClick={() => setTimelineFor(c)}><Activity className="h-3 w-3" /></Button>
@@ -280,6 +294,7 @@ export const Customer360Panel = () => {
           <div className="grid gap-3 md:grid-cols-2">
             <div className="md:col-span-2"><Label>Full Name *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
             <div><Label>Mobile *</Label><Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} /></div>
+            <div><Label>Alternate Mobile</Label><Input value={form.alt_mobile} onChange={(e) => setForm({ ...form, alt_mobile: e.target.value })} /></div>
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>DOB</Label><Input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} /></div>
             <div>
@@ -326,6 +341,11 @@ export const Customer360Panel = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div className="md:col-span-2 border-t pt-3 text-xs font-semibold text-muted-foreground uppercase">Business Details (optional)</div>
+            <div><Label>Company Name</Label><Input value={form.company_name} onChange={(e) => setForm({ ...form, company_name: e.target.value })} /></div>
+            <div><Label>GST Number</Label><Input value={form.gst_number} maxLength={15} onChange={(e) => setForm({ ...form, gst_number: e.target.value.toUpperCase() })} /></div>
+            <div><Label>Industry</Label><Input value={form.industry} onChange={(e) => setForm({ ...form, industry: e.target.value })} /></div>
+            <div><Label>Designation</Label><Input value={form.designation} onChange={(e) => setForm({ ...form, designation: e.target.value })} /></div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>

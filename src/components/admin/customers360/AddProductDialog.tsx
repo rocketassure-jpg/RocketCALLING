@@ -10,26 +10,40 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 
 type Category =
-  | "motor" | "health" | "life" | "fire" | "marine"
-  | "shopkeeper" | "engineering" | "liability" | "rto" | "finance";
+  | "motor" | "health" | "life" | "term" | "travel" | "property"
+  | "fire" | "marine" | "shopkeeper" | "engineering" | "liability"
+  | "rto" | "finance"
+  | "sip" | "mutual_fund" | "fd" | "credit_card" | "fastag" | "rsa";
 
-const CATEGORIES: { value: Category; label: string }[] = [
-  { value: "motor", label: "Motor Insurance" },
-  { value: "health", label: "Health Insurance" },
-  { value: "life", label: "Life Insurance" },
-  { value: "fire", label: "Fire Insurance" },
-  { value: "marine", label: "Marine Insurance" },
-  { value: "shopkeeper", label: "Shopkeeper Insurance" },
-  { value: "engineering", label: "Engineering Insurance" },
-  { value: "liability", label: "Liability Insurance" },
-  { value: "rto", label: "RTO Services" },
-  { value: "finance", label: "Finance / Loan" },
+const CATEGORIES: { value: Category; label: string; group: string }[] = [
+  { value: "motor", label: "Motor Insurance", group: "Insurance" },
+  { value: "health", label: "Health Insurance", group: "Insurance" },
+  { value: "life", label: "Life Insurance", group: "Insurance" },
+  { value: "term", label: "Term Insurance", group: "Insurance" },
+  { value: "travel", label: "Travel Insurance", group: "Insurance" },
+  { value: "property", label: "Property Insurance", group: "Insurance" },
+  { value: "fire", label: "Fire Insurance", group: "Insurance" },
+  { value: "marine", label: "Marine Insurance", group: "Insurance" },
+  { value: "shopkeeper", label: "Shopkeeper Insurance", group: "Insurance" },
+  { value: "engineering", label: "Engineering Insurance", group: "Insurance" },
+  { value: "liability", label: "Liability Insurance", group: "Insurance" },
+  { value: "rto", label: "RTO Services", group: "Services" },
+  { value: "finance", label: "Loan / Finance", group: "Financial" },
+  { value: "sip", label: "SIP", group: "Financial" },
+  { value: "mutual_fund", label: "Mutual Fund", group: "Financial" },
+  { value: "fd", label: "Fixed Deposit", group: "Financial" },
+  { value: "credit_card", label: "Credit Card", group: "Financial" },
+  { value: "fastag", label: "FASTag", group: "Services" },
+  { value: "rsa", label: "RSA / Extended Warranty", group: "Services" },
 ];
 
 const SUBS: Record<Category, string[]> = {
   motor: ["Private Car", "Two Wheeler", "Commercial Vehicle", "Taxi", "Bus", "Tractor", "Ambulance", "Electric Vehicle"],
   health: ["Individual", "Family Floater", "Senior Citizen", "Group Health", "Critical Illness", "Top Up"],
-  life: ["Term", "ULIP", "Endowment", "Money Back", "Child Plan", "Pension", "Whole Life"],
+  life: ["ULIP", "Endowment", "Money Back", "Child Plan", "Pension", "Whole Life"],
+  term: ["Pure Term", "Return of Premium", "Increasing Cover"],
+  travel: ["Domestic", "International", "Student", "Senior Citizen"],
+  property: ["Home Structure", "Home Contents", "Bharat Griha Raksha"],
   fire: ["Residential", "Commercial", "Industrial"],
   marine: ["Marine Cargo", "Marine Transit", "Marine Hull", "Import Export"],
   shopkeeper: ["Retail Shop", "Medical Store", "Mobile Shop", "Grocery", "Restaurant", "Showroom"],
@@ -37,6 +51,12 @@ const SUBS: Record<Category, string[]> = {
   liability: ["Professional", "Public", "Directors", "Cyber"],
   rto: ["New Registration", "RC Transfer", "Duplicate RC", "NOC", "Fitness", "Permit", "Hypothecation", "Address Change"],
   finance: ["Car Loan", "Bike Loan", "Used Car Loan", "Commercial Vehicle Loan", "Business Loan", "Personal Loan", "Home Loan", "Loan Against Property"],
+  sip: ["Equity", "Debt", "Hybrid", "ELSS"],
+  mutual_fund: ["Equity", "Debt", "Hybrid", "Index", "ELSS"],
+  fd: ["Bank FD", "Corporate FD", "Senior Citizen FD", "Tax Saver"],
+  credit_card: ["Travel", "Cashback", "Rewards", "Fuel", "Business"],
+  fastag: ["New Tag", "Recharge"],
+  rsa: ["RSA Standalone", "Extended Warranty"],
 };
 
 type DynField = { key: string; label: string; type?: string };
@@ -44,6 +64,8 @@ type DynField = { key: string; label: string; type?: string };
 const DYNAMIC: Record<Category, DynField[]> = {
   motor: [
     { key: "vehicle_no", label: "Vehicle Number" },
+    { key: "make", label: "Make" },
+    { key: "model", label: "Model" },
     { key: "engine_no", label: "Engine Number" },
     { key: "chassis_no", label: "Chassis Number" },
     { key: "idv", label: "IDV ₹", type: "number" },
@@ -51,11 +73,27 @@ const DYNAMIC: Record<Category, DynField[]> = {
   health: [
     { key: "sum_insured", label: "Sum Insured ₹", type: "number" },
     { key: "members_covered", label: "Members Covered", type: "number" },
+    { key: "ped_details", label: "PED Details" },
   ],
   life: [
     { key: "sum_assured", label: "Sum Assured ₹", type: "number" },
+    { key: "term_years", label: "Policy Term (years)", type: "number" },
+    { key: "nominee", label: "Nominee" },
+  ],
+  term: [
+    { key: "sum_assured", label: "Sum Assured ₹", type: "number" },
     { key: "term_years", label: "Term (years)", type: "number" },
     { key: "nominee", label: "Nominee" },
+  ],
+  travel: [
+    { key: "destination", label: "Destination" },
+    { key: "trip_start", label: "Trip Start", type: "date" },
+    { key: "trip_end", label: "Trip End", type: "date" },
+    { key: "sum_insured", label: "Sum Insured ₹", type: "number" },
+  ],
+  property: [
+    { key: "property_address", label: "Property Address" },
+    { key: "sum_insured", label: "Sum Insured ₹", type: "number" },
   ],
   fire: [
     { key: "sum_insured", label: "Sum Insured ₹", type: "number" },
@@ -85,7 +123,37 @@ const DYNAMIC: Record<Category, DynField[]> = {
   finance: [
     { key: "loan_amount", label: "Loan Amount ₹", type: "number" },
     { key: "tenure_months", label: "Tenure (months)", type: "number" },
+    { key: "interest_rate", label: "Interest Rate %", type: "number" },
     { key: "lender", label: "Lender / Bank" },
+  ],
+  sip: [
+    { key: "scheme_name", label: "Scheme Name" },
+    { key: "monthly_amount", label: "Monthly SIP ₹", type: "number" },
+    { key: "folio_no", label: "Folio No" },
+  ],
+  mutual_fund: [
+    { key: "scheme_name", label: "Scheme Name" },
+    { key: "invested_amount", label: "Invested Amount ₹", type: "number" },
+    { key: "folio_no", label: "Folio No" },
+  ],
+  fd: [
+    { key: "principal", label: "Principal ₹", type: "number" },
+    { key: "interest_rate", label: "Interest Rate %", type: "number" },
+    { key: "tenure_months", label: "Tenure (months)", type: "number" },
+    { key: "maturity_date", label: "Maturity Date", type: "date" },
+  ],
+  credit_card: [
+    { key: "card_last4", label: "Card Last 4" },
+    { key: "card_limit", label: "Credit Limit ₹", type: "number" },
+    { key: "issuer", label: "Issuer" },
+  ],
+  fastag: [
+    { key: "vehicle_no", label: "Vehicle Number" },
+    { key: "tag_id", label: "FASTag ID" },
+  ],
+  rsa: [
+    { key: "vehicle_no", label: "Vehicle Number" },
+    { key: "validity_months", label: "Validity (months)", type: "number" },
   ],
 };
 
@@ -136,12 +204,13 @@ export const AddProductDialog = ({
     setDetails({});
   }, [category]);
 
-  const isService = category === "rto" || category === "finance";
+  const isService = ["rto", "finance", "fastag", "rsa"].includes(category);
+  const isFinancial = ["sip", "mutual_fund", "fd", "credit_card"].includes(category);
   const list = isService ? vendors : insurers;
 
   const save = async () => {
     if (!companyId) return;
-    if (!isService && !form.premium) return toast({ title: "Premium required", variant: "destructive" });
+    if (!isService && !isFinancial && !form.premium) return toast({ title: "Premium required", variant: "destructive" });
     if (isService && !form.customer_price) return toast({ title: "Customer price required", variant: "destructive" });
 
     setSaving(true);

@@ -8,8 +8,16 @@ import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, FileWarning, IndianRupee, AlarmClock,
   MessageCircle, Phone, FileText, Users, Wallet, Building2, User, Package,
+  Sparkles, ListTodo, StickyNote, Activity, Star,
 } from "lucide-react";
 import { CustomerProductsTab } from "./CustomerProductsTab";
+import { FamilyMembersTab } from "./FamilyMembersTab";
+import { CustomerContactsTab } from "./CustomerContactsTab";
+import { CrossSellWidget } from "./CrossSellWidget";
+import { CustomerTasksTab } from "./CustomerTasksTab";
+import { CustomerNotesTab } from "./CustomerNotesTab";
+import { LifecycleTab } from "./LifecycleTab";
+
 
 
 type Customer = {
@@ -19,6 +27,8 @@ type Customer = {
   email: string | null;
   city: string | null;
   kyc_status: string;
+  lifecycle_stage?: string | null;
+  value_score?: number | null;
 };
 
 type RowList = { loading: boolean; rows: any[] };
@@ -106,32 +116,44 @@ export const CustomerProfileDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
+          <DialogTitle className="flex flex-wrap items-center gap-2">
             <User className="h-5 w-5 text-primary" />
             {customer.full_name}
             <Badge variant="outline" className="font-mono text-xs">{customer.mobile}</Badge>
             <Badge variant={customer.kyc_status === "verified" ? "default" : "secondary"}>KYC: {customer.kyc_status}</Badge>
+            {customer.lifecycle_stage && <Badge variant="default" className="capitalize"><Activity className="h-3 w-3 mr-1" /> {customer.lifecycle_stage.replace("_"," ")}</Badge>}
+            {customer.value_score != null && <Badge variant="secondary"><Star className="h-3 w-3 mr-1" /> Score {customer.value_score}</Badge>}
           </DialogTitle>
         </DialogHeader>
 
+        <div className="mb-2"><CrossSellWidget customerId={customer.id} /></div>
+
         <Tabs value={tab} onValueChange={setTab} className="space-y-3">
           <TabsList className="flex h-auto w-full flex-wrap justify-start">
-            <TabsTrigger value="products"><Package className="mr-1 h-4 w-4" /> Products</TabsTrigger>
-            <TabsTrigger value="policies"><ShieldCheck className="mr-1 h-4 w-4" /> Policies</TabsTrigger>
-            <TabsTrigger value="claims"><FileWarning className="mr-1 h-4 w-4" /> Claims</TabsTrigger>
-            <TabsTrigger value="premium_due"><IndianRupee className="mr-1 h-4 w-4" /> Premium Due</TabsTrigger>
-            <TabsTrigger value="renewals"><AlarmClock className="mr-1 h-4 w-4" /> Renewals</TabsTrigger>
-            <TabsTrigger value="whatsapp"><MessageCircle className="mr-1 h-4 w-4" /> WhatsApp</TabsTrigger>
-            <TabsTrigger value="calls"><Phone className="mr-1 h-4 w-4" /> Call History</TabsTrigger>
-            <TabsTrigger value="docs"><FileText className="mr-1 h-4 w-4" /> Docs / KYC</TabsTrigger>
+            <TabsTrigger value="products"><Package className="mr-1 h-4 w-4" /> Portfolio</TabsTrigger>
             <TabsTrigger value="family"><Users className="mr-1 h-4 w-4" /> Family</TabsTrigger>
-            <TabsTrigger value="finance"><Wallet className="mr-1 h-4 w-4" /> Finance / Loan</TabsTrigger>
-            <TabsTrigger value="rto"><Building2 className="mr-1 h-4 w-4" /> RTO Services</TabsTrigger>
+            <TabsTrigger value="contacts"><Building2 className="mr-1 h-4 w-4" /> Contacts</TabsTrigger>
+            <TabsTrigger value="claims"><FileWarning className="mr-1 h-4 w-4" /> Claims</TabsTrigger>
+            <TabsTrigger value="renewals"><AlarmClock className="mr-1 h-4 w-4" /> Renewals</TabsTrigger>
+            <TabsTrigger value="premium_due"><IndianRupee className="mr-1 h-4 w-4" /> Premium Due</TabsTrigger>
+            <TabsTrigger value="whatsapp"><MessageCircle className="mr-1 h-4 w-4" /> WhatsApp</TabsTrigger>
+            <TabsTrigger value="calls"><Phone className="mr-1 h-4 w-4" /> Calls</TabsTrigger>
+            <TabsTrigger value="docs"><FileText className="mr-1 h-4 w-4" /> Docs</TabsTrigger>
+            <TabsTrigger value="tasks"><ListTodo className="mr-1 h-4 w-4" /> Tasks</TabsTrigger>
+            <TabsTrigger value="notes"><StickyNote className="mr-1 h-4 w-4" /> Notes</TabsTrigger>
+            <TabsTrigger value="lifecycle"><Activity className="mr-1 h-4 w-4" /> Lifecycle</TabsTrigger>
+            <TabsTrigger value="rto"><Building2 className="mr-1 h-4 w-4" /> RTO</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products">
             <CustomerProductsTab customerId={customer.id} customerName={customer.full_name} />
           </TabsContent>
+
+          <TabsContent value="family"><FamilyMembersTab customerId={customer.id} /></TabsContent>
+          <TabsContent value="contacts"><CustomerContactsTab customerId={customer.id} /></TabsContent>
+          <TabsContent value="tasks"><CustomerTasksTab customerId={customer.id} /></TabsContent>
+          <TabsContent value="notes"><CustomerNotesTab customerId={customer.id} /></TabsContent>
+          <TabsContent value="lifecycle"><LifecycleTab customerId={customer.id} /></TabsContent>
 
 
 
@@ -218,20 +240,8 @@ export const CustomerProfileDialog = ({
             />
           </TabsContent>
 
-          <TabsContent value="family">
-            <SectionList data={family} emptyLabel="No family members linked."
-              render={(r: any) => (
-                <Card key={r.id}><CardContent className="flex items-center justify-between p-3 text-sm">
-                  <div><span className="font-medium">{r.full_name}</span><span className="ml-2 text-xs text-muted-foreground">{r.relation_to_head ?? (r.id === customer.id ? "self / head" : "member")}</span></div>
-                  <span className="font-mono text-xs">{r.mobile}</span>
-                </CardContent></Card>
-              )}
-            />
-          </TabsContent>
 
-          <TabsContent value="finance">
-            <Empty label="Finance / Loan tracking coming soon. Wire to your loan products table when ready." />
-          </TabsContent>
+
 
           <TabsContent value="rto">
             <SectionList data={rto} emptyLabel="No RTO cases for this customer."
