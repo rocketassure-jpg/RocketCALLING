@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Search, Users, Phone, Mail, Trash2, Upload, FileText, UserPlus, Network } from "lucide-react";
+import { Plus, Search, Users, Phone, Mail, Trash2, Upload, FileText, UserPlus, Network, Activity } from "lucide-react";
 import { CustomerProfileDialog } from "./CustomerProfileDialog";
+import { CustomerTimelineDialog } from "./CustomerTimelineDialog";
 
 type Customer = {
   id: string;
@@ -54,6 +55,7 @@ export const Customer360Panel = () => {
   const [tab, setTab] = useState("list");
   const [selected, setSelected] = useState<Customer | null>(null);
   const [profileFor, setProfileFor] = useState<Customer | null>(null);
+  const [timelineFor, setTimelineFor] = useState<Customer | null>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
 
   const load = async () => {
@@ -230,6 +232,7 @@ export const Customer360Panel = () => {
                         {c.family_head_id ? <Badge variant="outline">{c.relation_to_head ?? "member"}</Badge> : <Badge variant="outline">head</Badge>}
                       </TableCell>
                       <TableCell className="space-x-1 text-right">
+                        <Button size="sm" variant="outline" title="Timeline" onClick={() => setTimelineFor(c)}><Activity className="h-3 w-3" /></Button>
                         <Button size="sm" variant="outline" onClick={() => openDocs(c)}><FileText className="h-3 w-3" /></Button>
                         <Button size="sm" variant="outline" onClick={() => startEdit(c)}>Edit</Button>
                         <Button size="sm" variant="ghost" onClick={() => del(c.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
@@ -366,6 +369,7 @@ export const Customer360Panel = () => {
       </Dialog>
 
       <CustomerProfileDialog customer={profileFor} open={!!profileFor} onOpenChange={(o) => !o && setProfileFor(null)} />
+      <CustomerTimelineDialog customerId={timelineFor?.id ?? null} customerName={timelineFor?.full_name} open={!!timelineFor} onOpenChange={(o) => !o && setTimelineFor(null)} />
     </div>
   );
 };

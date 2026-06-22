@@ -1,121 +1,86 @@
-# Super Admin Section — System Settings & Blueprint Export
+## Audit findings (live database)
 
-Adds a new admin-only Super Admin area to Rocket CRM with two pages: a consolidated **System Settings** dashboard and a **Blueprint & Export** migration-safety page.
+Data state is clean — **zero orphans, zero duplicates** across every relationship I checked. The real problems are **structural** (missing FKs / missing link columns), not data corruption.
 
-> Note: Much of what you described already exists in this project (a `/super-admin` route with sidebar, `system_config`, `audit_logs`, `feature_flags`, `SecretsManager`, `DataSettingsPanel`, user/role management, module toggles via `company_subscriptions`, message templates, etc.). This plan **reuses** those pieces and adds only what is missing, so we don't duplicate UI or tables.
-
----
-
-## Page 1 — System Settings
-
-Single page at `/super-admin` → **System Settings** sidebar entry, organized as tabs. Each tab maps to an existing panel where possible:
-
-| Tab | Source |
+### Current row counts
+| Entity | Rows |
 |---|---|
-| App Config | New small form (app name, logo, brand color `#e85d24`, version) → stored in `system_config` |
-| User & Role Management | Existing user management panel (promote/demote, deactivate) |
-| Module Toggles | Existing module/subscription toggle UI (Lead Capture, WhatsApp, Dialer, Life/Health/Motor, Enquiries, Reports) |
-| Data Sources / API Keys | Existing `SecretsManager` (masked inputs + Test Connection already implemented) |
-| Notifications | Existing `TemplatesManager` (`message_templates` with `{placeholder}` support) |
-| Audit Log | Existing `AuditLogViewer` (read-only, from `audit_logs`) |
-| Feature Flags | New panel reading/writing `feature_flags` table |
+| customers | 12 |
+| leads | 1 |
+| claims | 2 |
+| customer_products (policies) | **0** |
+| renewals | 1 |
+| policy_transactions | 26 |
 
-New work for Page 1:
-- `AppConfigPanel.tsx` — name/logo/color/version fields, persisted via `system_config` upserts (audit-logged by existing trigger).
-- `FeatureFlagsPanel.tsx` — list + toggle switches on the existing `feature_flags` table.
-- Wire both into the System Settings tabs.
+### Orphan / duplicate checks (all PASSED)
+- leads → customers: 0 orphans
+- renewals → customers / leads: 0 orphans
+- claims → customers / policies: 0 orphans
+- call_logs → leads: 0 orphans
+- customer_products → customers: 0 orphans
+- duplicate customer mobiles per company: 0
+- duplicate lead phones per company: 0
+- active profiles missing a role: 0
 
----
+### Structural gaps (the real issues)
 
-## Page 2 — Blueprint & Export
+| # | Issue | Impact |
+|---|---|---|
+| 1 | `claims.policy_id` has **no FK** to `customer_products` | Claims can point to deleted/wrong policies |
+| 2 | `renewals` has no `customer_product_id` | Renewal isn't linked to the actual policy row, only to a free-text `policy_number` |
+| 3 | `policy_transactions` has no `customer_id` / `customer_product_id` (only `client_phone`) | 26 txns float unlinked — Customer 360 can't show them, commissions don't tie back to a policy |
+| 4 | `call_logs` has no `customer_id` | Calls placed after lead→customer conversion don't appear on Customer 360 timeline |
+| 5 | `whatsapp_logs` / `sms_logs` have no `customer_id` / `campaign_id` | Marketing can't track per-customer responses |
+| 6 | `claims.client_lead_id` has no FK | Same risk as #1 |
+| 7 | `customer_products.agent_id` has no FK to `agents_profile` | Commission ↔ agent join is implicit |
+| 8 | No `Lead → Call → Followup → Conversion` view anywhere in UI | Funnel invisible |
 
-New page `/super-admin/blueprint` (sidebar entry "Blueprint & Export"), admin-only, with a password re-auth gate before any download.
-
-Three cards:
-
-**Card 1 — Generate Build Prompt**
-- Client-side generator that introspects: enabled modules (`company_subscriptions`), CRM fields (`crm_fields`), lead statuses (`status_mappings`/`lead_statuses`), feature flags, and a static module/screen map maintained in `src/lib/blueprint/spec.ts`.
-- Produces a Markdown spec suitable for pasting into any AI builder.
-- "Last generated" timestamp + "Regenerate Now" stored in `export_history`.
-- Download as `rocket-crm-blueprint.md`.
-
-**Card 2 — Export Source Code**
-- Since the running app cannot read its own source, this card calls a new edge function `export-source` that returns a manifest + `README.md` describing folder structure, env vars, and `npm install / npm run dev` steps, plus a pointer to the GitHub repo connected via Lovable. Packaged client-side into a `.zip` using `jszip`.
-- Clearly labeled: "Latest committed source — connect GitHub in Lovable for full code mirror."
-
-**Card 3 — Export Full System**
-- Client-side `jszip` build combining:
-  - `/code` — same manifest/README as Card 2
-  - `/database` — schema SQL (fetched from a new edge function `export-schema` using `pg_dump`-style introspection via `information_schema`) + per-table CSV dumps for the core tables (leads, customers, policies, enquiries, call_logs, renewals, claims) using `supabase.from(...).select('*')` with pagination
-  - `/assets` — signed-URL list of files in the `customer-docs` bucket
-  - `/docs` — generated blueprint markdown + `MIGRATION.md` template
-- Single `.zip` download; entry recorded in `export_history`.
-
-Shared UI:
-- File-size estimate (computed before zip finalization).
-- "Last export" timestamp per card from `export_history`.
-- Yellow warning banner: API keys/secrets excluded.
-- "Schedule Auto-Export" toggle → writes to `system_config` (`auto_export_weekly = true`) + creates a `pg_cron` job invoking `export-full` weekly, storing the zip in a new private `system-exports` bucket and emailing the admin.
-- Password re-auth dialog (re-uses pattern already in `DataSettingsPanel`).
+### Code-side gaps
+- **Customer 360** (`Customer360Panel`) shows products tab but no unified timeline of calls, WhatsApp, SMS, claims, renewals against the customer.
+- **Claims panel** displays `policy_id` text but doesn't join `customer_products` to show policy details.
+- **Renewals queue** displays `policy_number` string, not the linked policy row.
+- **Reports**: no funnel widget (Lead → Call → Conversion), no Customer-LTV widget aggregating products + claims.
 
 ---
 
-## Database changes
+## Plan
 
-Only one new table is needed; the rest already exist:
+### Phase 1 — Schema migration (single migration, preserves all data)
+1. Add FKs (ON DELETE SET NULL) — backfilled where data already aligns:
+   - `claims.policy_id` → `customer_products(id)`
+   - `claims.client_lead_id` → `leads(id)`
+   - `customer_products.agent_id` → `agents_profile(id)`
+2. Add link columns + FKs:
+   - `renewals.customer_product_id uuid REFERENCES customer_products(id)`
+   - `policy_transactions.customer_id uuid REFERENCES customers(id)`
+   - `policy_transactions.customer_product_id uuid REFERENCES customer_products(id)`
+   - `call_logs.customer_id uuid REFERENCES customers(id)`
+   - `whatsapp_logs.customer_id`, `whatsapp_logs.campaign_id`
+   - `sms_logs.customer_id`, `sms_logs.campaign_id`
+3. Backfill scripts (idempotent UPDATE…FROM):
+   - `policy_transactions.customer_id` from `customers.mobile = client_phone` (same company)
+   - `call_logs.customer_id` from `leads.customer_id`
+   - `renewals.customer_product_id` from `customer_products.policy_no = renewals.policy_number`
+4. Helper view `v_customer_360` joining customer + products + renewals + claims + recent calls/messages (security_invoker, scoped by `user_company_id()`).
+5. Indexes on every new FK column.
 
-```sql
-CREATE TABLE public.export_history (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  export_type text NOT NULL,  -- 'blueprint' | 'code' | 'full'
-  file_url text,
-  file_size_bytes bigint,
-  generated_at timestamptz NOT NULL DEFAULT now(),
-  generated_by uuid REFERENCES auth.users(id)
-);
--- GRANTs + RLS: super-admin only read/insert
-```
+### Phase 2 — UI / code fixes
+- **Customer 360**: add **Unified Timeline tab** (calls, WhatsApp, SMS, claims, renewals, products) using `v_customer_360`.
+- **Claims panel**: join `customer_products` on `policy_id`, show policy_no / insurer / premium inline.
+- **Renewals queue**: when `customer_product_id` exists, link to the policy and show last claim status.
+- **Reports Hub**: new **Funnel widget** (Lead → Calls → Followups → Won) + **Customer LTV widget** (premium sum − claims).
+- **AdminSidebar**: ensure nav links exist for the funnel report (currently missing).
 
-Plus:
-- New private storage bucket `system-exports` for scheduled auto-exports.
-- One row added to `system_config` for `auto_export_weekly`.
-
-No changes to `system_config`, `audit_logs`, `feature_flags` (already present).
-
----
-
-## Edge functions
-
-- `export-schema` — returns `public` schema DDL as text (super-admin only, JWT-checked).
-- `export-source` — returns repo manifest + README (super-admin only).
-- `run-weekly-export` — invoked by `pg_cron`, writes zip to `system-exports`, emails admin.
-
----
-
-## File map
-
-New:
-- `src/pages/SuperAdminBlueprint.tsx`
-- `src/components/super-admin/AppConfigPanel.tsx`
-- `src/components/super-admin/FeatureFlagsPanel.tsx`
-- `src/components/super-admin/blueprint/BlueprintCard.tsx`
-- `src/components/super-admin/blueprint/SourceExportCard.tsx`
-- `src/components/super-admin/blueprint/FullExportCard.tsx`
-- `src/components/super-admin/blueprint/PasswordGate.tsx`
-- `src/lib/blueprint/spec.ts` (module/screen catalog)
-- `src/lib/blueprint/generate.ts` (markdown builder)
-- `supabase/functions/export-schema/index.ts`
-- `supabase/functions/export-source/index.ts`
-- `supabase/functions/run-weekly-export/index.ts`
-
-Edited:
-- `src/pages/SuperAdminDashboard.tsx` — restructure System Settings tab to include App Config + Feature Flags; add Blueprint sidebar entry.
-- `src/App.tsx` — add `/super-admin/blueprint` route, admin-guarded.
+### Phase 3 — Final report
+After applying, I'll run the same audit queries and produce a Fixed / Remaining / Recommendations report inline.
 
 ---
 
-## Out of scope / accepted limitations
+## Technical details
+- All FKs use `ON DELETE SET NULL` so no historical row is destroyed.
+- Backfills run inside the migration in a transaction; if any check fails the migration rolls back.
+- New columns are nullable so existing inserts keep working; app code is updated to populate them on new writes (leads→customer conversion trigger already handles renewal creation — I'll extend it to set the new link).
+- RLS: new columns inherit existing company-scoped policies; no policy changes required for `claims`, `customer_products`, `call_logs`. New `whatsapp_logs/sms_logs.customer_id` is read-permitted via existing company policies.
+- The `v_customer_360` view uses `WITH (security_invoker=on)` so RLS on base tables is respected.
 
-- True source-code zip requires Lovable to mirror to GitHub; Card 2 ships a manifest + setup README, not raw `.tsx` files. Called out in UI.
-- Call recordings are stored externally by the dialer provider — only references are exported, not audio files.
-- CSV exports cover the 7 core tables listed; other tables can be added later on request.
+Approve and I'll ship Phase 1 (migration) first, then Phase 2 (UI) in the same turn after the migration is approved.
