@@ -181,6 +181,9 @@ export default function OrgHierarchyPanel() {
             <CardHeader className="pb-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <CardTitle className="text-sm">All Members ({filtered.length})</CardTitle>
+                <Button size="sm" variant="hero" onClick={() => setAddOpen(true)} className="h-8 text-xs">
+                  <UserPlus className="h-3.5 w-3.5 mr-1" /> Add Member
+                </Button>
                 <div className="flex items-center gap-1.5 flex-1 sm:max-w-xs">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="h-8 text-sm" />
