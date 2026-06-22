@@ -21,6 +21,7 @@ const SuperAdminBlueprint = lazy(() => import("./pages/SuperAdminBlueprint.tsx")
 const SubAgentDashboard = lazy(() => import("./pages/SubAgentDashboard.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const Trust = lazy(() => import("./pages/Trust.tsx"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword.tsx"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
