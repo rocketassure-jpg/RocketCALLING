@@ -86,8 +86,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
   { id: "leads_hub", label: "Leads & Enquiries", icon: Users, group: "Sales" },
   { id: "customers_hub", label: "Customers", icon: Trophy, group: "Sales" },
-  // Policies & Services (consolidated)
-  { id: "policies_services", label: "Policies & Services", icon: ShieldCheck, group: "Policies & Services" },
+  // Policies & Services now lives inside Customers Hub (step 3). Renewals/Claims still standalone.
   { id: "renewals", label: "Renewals", icon: AlarmClock, group: "Policies & Services" },
   { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies & Services" },
   // Finance (consolidated)
