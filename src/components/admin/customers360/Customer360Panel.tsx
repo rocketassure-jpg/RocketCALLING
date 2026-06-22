@@ -225,8 +225,8 @@ export const Customer360Panel = () => {
             <CardContent className="overflow-x-auto p-0">
               <Table>
                 <TableHeader><TableRow>
-                  <TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Email</TableHead>
-                  <TableHead>City</TableHead><TableHead>KYC</TableHead><TableHead>Family</TableHead>
+                  <TableHead>Name</TableHead><TableHead>Mobile</TableHead><TableHead>Stage</TableHead>
+                  <TableHead>Score</TableHead><TableHead>City</TableHead><TableHead>KYC</TableHead>
                   <TableHead></TableHead>
                 </TableRow></TableHeader>
                 <TableBody>
@@ -234,17 +234,16 @@ export const Customer360Panel = () => {
                     <TableRow key={c.id}>
                       <TableCell className="font-medium">
                         <button className="text-primary hover:underline" onClick={() => setProfileFor(c)}>{c.full_name}</button>
+                        {c.company_name && <div className="text-xs text-muted-foreground">{c.company_name}</div>}
                       </TableCell>
                       <TableCell className="font-mono text-xs">{c.mobile}</TableCell>
-                      <TableCell className="text-xs">{c.email ?? "—"}</TableCell>
+                      <TableCell><Badge variant="outline" className="capitalize text-xs">{(c.lifecycle_stage ?? "customer").replace("_"," ")}</Badge></TableCell>
+                      <TableCell className="text-xs font-mono">{c.value_score ?? 0}</TableCell>
                       <TableCell className="text-xs">{c.city ?? "—"}</TableCell>
                       <TableCell>
                         <Badge variant={c.kyc_status === "verified" ? "default" : c.kyc_status === "rejected" ? "destructive" : "secondary"}>
                           {c.kyc_status}
                         </Badge>
-                      </TableCell>
-                      <TableCell className="text-xs">
-                        {c.family_head_id ? <Badge variant="outline">{c.relation_to_head ?? "member"}</Badge> : <Badge variant="outline">head</Badge>}
                       </TableCell>
                       <TableCell className="space-x-1 text-right">
                         <Button size="sm" variant="outline" title="Timeline" onClick={() => setTimelineFor(c)}><Activity className="h-3 w-3" /></Button>
@@ -295,6 +294,7 @@ export const Customer360Panel = () => {
           <div className="grid gap-3 md:grid-cols-2">
             <div className="md:col-span-2"><Label>Full Name *</Label><Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} /></div>
             <div><Label>Mobile *</Label><Input value={form.mobile} onChange={(e) => setForm({ ...form, mobile: e.target.value })} /></div>
+            <div><Label>Alternate Mobile</Label><Input value={form.alt_mobile} onChange={(e) => setForm({ ...form, alt_mobile: e.target.value })} /></div>
             <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             <div><Label>DOB</Label><Input type="date" value={form.dob} onChange={(e) => setForm({ ...form, dob: e.target.value })} /></div>
             <div>
