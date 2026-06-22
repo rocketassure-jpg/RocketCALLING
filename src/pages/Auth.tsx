@@ -67,6 +67,29 @@ const Auth = () => {
     nav("/dashboard");
   };
 
+  const handleForgot = async () => {
+    let target = email.trim();
+    if (!target) return toast({ title: "Email/Mobile daalo", description: "Pehle field bharo, fir 'Forgot password' click karo", variant: "destructive" });
+    if (!target.includes("@")) {
+      const { data } = await (supabase as any).rpc("resolve_login_email", { _login: target });
+      if (!data) return toast({ title: "Account not found", variant: "destructive" });
+      target = data as string;
+    }
+    // Synthetic staff emails can't receive mail — guide them to admin
+    if (target.endsWith(".staff.local")) {
+      return toast({
+        title: "Admin se reset karwao",
+        description: "Tumhara account email-less hai. Admin ko bolo Settings → Team se 'Reset to default password' kare.",
+        variant: "destructive",
+      });
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(target, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
+    toast({ title: "Reset link bhej diya 📧", description: `Check ${target}` });
+  };
+
   const verifyCode = async (code: string) => {
     setCompanyPreview(null);
     if (!code || code.length < 3) return;
