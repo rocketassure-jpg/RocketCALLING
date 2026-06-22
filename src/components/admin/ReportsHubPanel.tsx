@@ -4,13 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Phone, Trophy, AlarmClock, Car, Wallet } from "lucide-react";
+import { Phone, Trophy, AlarmClock, Car, Wallet, Users } from "lucide-react";
 import { Range } from "@/components/admin/reports/utils";
 import { LeadCallingReports } from "@/components/admin/reports/categories/LeadCallingReports";
 import { ProductivityReports } from "@/components/admin/reports/categories/ProductivityReports";
 import { RenewalReports } from "@/components/admin/reports/categories/RenewalReports";
 import { PolicyProductReports } from "@/components/admin/reports/categories/PolicyProductReports";
 import { FinancialReports } from "@/components/admin/reports/categories/FinancialReports";
+import { CustomerPortfolioReports } from "@/components/admin/reports/categories/CustomerPortfolioReports";
 
 export const ReportsHubPanel = () => {
   const [range, setRange] = useState<Range>("30d");
