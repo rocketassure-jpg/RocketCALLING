@@ -14,6 +14,7 @@ import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel"
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { AddMemberDialog } from "@/components/admin/org/AddMemberDialog";
 import { TrainingHelp } from "@/components/TrainingHelp";
+import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
 
 type Profile = {
   id: string;
@@ -151,6 +152,7 @@ export default function OrgHierarchyPanel() {
       <Tabs defaultValue="team" className="space-y-3">
         <TabsList className="flex w-full flex-wrap h-auto gap-1">
           <TabsTrigger value="team" className="text-xs"><Users className="h-3.5 w-3.5 mr-1" />Team</TabsTrigger>
+          <TabsTrigger value="branches" className="text-xs"><Building2 className="h-3.5 w-3.5 mr-1" />Branches</TabsTrigger>
           <TabsTrigger value="hierarchy" className="text-xs"><Network className="h-3.5 w-3.5 mr-1" />Hierarchy</TabsTrigger>
           <TabsTrigger value="approvals" className="text-xs"><UserCheck className="h-3.5 w-3.5 mr-1" />Pending Approvals</TabsTrigger>
           <TabsTrigger value="invite" className="text-xs"><Mail className="h-3.5 w-3.5 mr-1" />Invite</TabsTrigger>
@@ -253,6 +255,11 @@ export default function OrgHierarchyPanel() {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* BRANCHES */}
+        <TabsContent value="branches">
+          <BranchesPanel />
         </TabsContent>
 
         {/* HIERARCHY */}
