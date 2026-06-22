@@ -125,6 +125,15 @@ export default function OrgHierarchyPanel() {
     load();
   };
 
+  const resetMemberPassword = async (userId: string, name: string) => {
+    if (!confirm(`Reset password for ${name || "this member"} to default?\n(First 4 letters of name + last 4 digits of mobile)`)) return;
+    const { data, error } = await supabase.functions.invoke("team-admin", { body: { action: "reset_to_default", user_id: userId } });
+    if (error || (data as any)?.error) return toast({ title: "Reset failed", description: (data as any)?.error || error?.message, variant: "destructive" });
+    try { await navigator.clipboard.writeText((data as any).password); } catch {}
+    toast({ title: "Password reset ✅", description: `New password: ${(data as any).password} (copied)` });
+  };
+
+
   const sendInvite = async () => {
     if (!inviteEmail.trim()) return toast({ title: "Email required", variant: "destructive" });
     const link = `${window.location.origin}/auth?invite=${encodeURIComponent(inviteEmail)}&role=${inviteRole}&name=${encodeURIComponent(inviteName)}`;
