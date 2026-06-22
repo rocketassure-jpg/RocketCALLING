@@ -9,9 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, Users, Building2, Trash2, Edit3, Copy, UserPlus, Network, Mail, UserCheck, KeyRound } from "lucide-react";
 import { PendingApprovalsPanel } from "@/components/admin/PendingApprovalsPanel";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
+import { AddMemberDialog } from "@/components/admin/org/AddMemberDialog";
 import { TrainingHelp } from "@/components/TrainingHelp";
 
 type Profile = {
