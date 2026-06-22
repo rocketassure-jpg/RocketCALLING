@@ -51,12 +51,14 @@ export const ReportsHubPanel = () => {
           <TabsTrigger value="renewal"><AlarmClock className="h-4 w-4 mr-1" /> Renewal &amp; Pipeline</TabsTrigger>
           <TabsTrigger value="policy"><Car className="h-4 w-4 mr-1" /> Policy &amp; Product</TabsTrigger>
           <TabsTrigger value="financial"><Wallet className="h-4 w-4 mr-1" /> Financial &amp; Payouts</TabsTrigger>
+          <TabsTrigger value="portfolio"><Users className="h-4 w-4 mr-1" /> Customer Portfolio</TabsTrigger>
         </TabsList>
         <TabsContent value="lead_calling"><LeadCallingReports {...dp} /></TabsContent>
         <TabsContent value="productivity"><ProductivityReports {...dp} /></TabsContent>
         <TabsContent value="renewal"><RenewalReports {...dp} /></TabsContent>
         <TabsContent value="policy"><PolicyProductReports {...dp} /></TabsContent>
         <TabsContent value="financial"><FinancialReports {...dp} /></TabsContent>
+        <TabsContent value="portfolio"><CustomerPortfolioReports {...dp} /></TabsContent>
       </Tabs>
     </div>
   );
