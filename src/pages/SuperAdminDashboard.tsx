@@ -13,13 +13,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket, Plug } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
 import { DataSettingsPanel } from "@/components/super-admin/DataSettingsPanel";
 import { SecretsManager } from "@/components/admin/SecretsManager";
 import { AppConfigPanel } from "@/components/super-admin/AppConfigPanel";
+import { PolicyBossIntegrationPanel } from "@/components/super-admin/PolicyBossIntegrationPanel";
 
 type Company = { id: string; name: string; code: string; plan: string; is_active: boolean; created_at: string };
 type Module = { module_key: string; name: string; base_monthly_price: number; is_always_included: boolean; sort_order: number };
@@ -34,6 +35,7 @@ const SECTIONS = [
   { id: "settings", label: "System Settings", icon: SettingsIcon },
   { id: "plans", label: "Plan Templates", icon: Layers },
   { id: "secrets", label: "Platform Secrets", icon: KeyRound },
+  { id: "integrations", label: "Integrations", icon: Plug },
   { id: "audit", label: "Audit Log", icon: ShieldAlert },
   { id: "blueprint", label: "Blueprint & Export", icon: Rocket, href: "/super-admin/blueprint" },
 ];
@@ -284,6 +286,7 @@ const SuperAdminDashboard = () => {
             )}
             {section === "plans" && <PlanTemplatesPanel />}
             {section === "secrets" && <SecretsManager />}
+            {section === "integrations" && <PolicyBossIntegrationPanel />}
             {section === "audit" && <SuperAdminAuditPanel />}
           </div>
         </main>

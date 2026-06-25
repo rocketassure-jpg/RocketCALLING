@@ -2282,6 +2282,7 @@ export type Database = {
           id: string
           label: string | null
           mime_type: string | null
+          motor_quote_id: string | null
           size_bytes: number | null
           storage_path: string
           uploaded_by: string | null
@@ -2294,6 +2295,7 @@ export type Database = {
           id?: string
           label?: string | null
           mime_type?: string | null
+          motor_quote_id?: string | null
           size_bytes?: number | null
           storage_path: string
           uploaded_by?: string | null
@@ -2306,6 +2308,7 @@ export type Database = {
           id?: string
           label?: string | null
           mime_type?: string | null
+          motor_quote_id?: string | null
           size_bytes?: number | null
           storage_path?: string
           uploaded_by?: string | null
@@ -2331,6 +2334,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_customer_360"
             referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "customer_documents_motor_quote_id_fkey"
+            columns: ["motor_quote_id"]
+            isOneToOne: false
+            referencedRelation: "motor_quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -3678,7 +3688,9 @@ export type Database = {
           id: string
           insurance_company: string | null
           issue_date: string | null
+          kyc_status: string | null
           last_called_at: string | null
+          latest_quote_id: string | null
           lead_score: number | null
           lead_source: string | null
           lead_temperature: string | null
@@ -3688,6 +3700,7 @@ export type Database = {
           model_name: string | null
           net_od: number | null
           notes: string | null
+          payment_link: string | null
           payment_mode: string | null
           payment_status: string | null
           permanent_address: string | null
@@ -3736,7 +3749,9 @@ export type Database = {
           id?: string
           insurance_company?: string | null
           issue_date?: string | null
+          kyc_status?: string | null
           last_called_at?: string | null
+          latest_quote_id?: string | null
           lead_score?: number | null
           lead_source?: string | null
           lead_temperature?: string | null
@@ -3746,6 +3761,7 @@ export type Database = {
           model_name?: string | null
           net_od?: number | null
           notes?: string | null
+          payment_link?: string | null
           payment_mode?: string | null
           payment_status?: string | null
           permanent_address?: string | null
@@ -3794,7 +3810,9 @@ export type Database = {
           id?: string
           insurance_company?: string | null
           issue_date?: string | null
+          kyc_status?: string | null
           last_called_at?: string | null
+          latest_quote_id?: string | null
           lead_score?: number | null
           lead_source?: string | null
           lead_temperature?: string | null
@@ -3804,6 +3822,7 @@ export type Database = {
           model_name?: string | null
           net_od?: number | null
           notes?: string | null
+          payment_link?: string | null
           payment_mode?: string | null
           payment_status?: string | null
           permanent_address?: string | null
@@ -3853,6 +3872,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "v_customer_360"
             referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "leads_latest_quote_id_fkey"
+            columns: ["latest_quote_id"]
+            isOneToOne: false
+            referencedRelation: "motor_quotes"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -5016,6 +5042,188 @@ export type Database = {
           },
           {
             foreignKeyName: "motor_policies_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      motor_quotes: {
+        Row: {
+          addon_premium: number | null
+          company_id: string
+          converted_policy_id: string | null
+          created_at: string
+          created_by: string | null
+          current_step: number
+          customer_id: string | null
+          fuel_type: string | null
+          gross_premium: number | null
+          gst_amount: number | null
+          id: string
+          idv: number | null
+          insurer_code: string | null
+          insurer_name: string | null
+          kyc_aadhaar_last4: string | null
+          kyc_pan: string | null
+          kyc_status: string | null
+          lead_id: string | null
+          make: string | null
+          mfg_year: number | null
+          model: string | null
+          net_premium: number | null
+          od_premium: number | null
+          payment_link: string | null
+          payment_reference: string | null
+          payment_sent_at: string | null
+          plan_type: string
+          policy_type: string
+          policyboss_quote_id: string | null
+          previous_expiry_date: string | null
+          previous_insurer: string | null
+          quote_data: Json | null
+          registration_number: string
+          rto_code: string | null
+          selected_addons: Json | null
+          status: string
+          tp_premium: number | null
+          updated_at: string
+          variant: string | null
+          vehicle_id: string | null
+          whatsapp_sent_at: string | null
+        }
+        Insert: {
+          addon_premium?: number | null
+          company_id: string
+          converted_policy_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_step?: number
+          customer_id?: string | null
+          fuel_type?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          idv?: number | null
+          insurer_code?: string | null
+          insurer_name?: string | null
+          kyc_aadhaar_last4?: string | null
+          kyc_pan?: string | null
+          kyc_status?: string | null
+          lead_id?: string | null
+          make?: string | null
+          mfg_year?: number | null
+          model?: string | null
+          net_premium?: number | null
+          od_premium?: number | null
+          payment_link?: string | null
+          payment_reference?: string | null
+          payment_sent_at?: string | null
+          plan_type?: string
+          policy_type?: string
+          policyboss_quote_id?: string | null
+          previous_expiry_date?: string | null
+          previous_insurer?: string | null
+          quote_data?: Json | null
+          registration_number: string
+          rto_code?: string | null
+          selected_addons?: Json | null
+          status?: string
+          tp_premium?: number | null
+          updated_at?: string
+          variant?: string | null
+          vehicle_id?: string | null
+          whatsapp_sent_at?: string | null
+        }
+        Update: {
+          addon_premium?: number | null
+          company_id?: string
+          converted_policy_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_step?: number
+          customer_id?: string | null
+          fuel_type?: string | null
+          gross_premium?: number | null
+          gst_amount?: number | null
+          id?: string
+          idv?: number | null
+          insurer_code?: string | null
+          insurer_name?: string | null
+          kyc_aadhaar_last4?: string | null
+          kyc_pan?: string | null
+          kyc_status?: string | null
+          lead_id?: string | null
+          make?: string | null
+          mfg_year?: number | null
+          model?: string | null
+          net_premium?: number | null
+          od_premium?: number | null
+          payment_link?: string | null
+          payment_reference?: string | null
+          payment_sent_at?: string | null
+          plan_type?: string
+          policy_type?: string
+          policyboss_quote_id?: string | null
+          previous_expiry_date?: string | null
+          previous_insurer?: string | null
+          quote_data?: Json | null
+          registration_number?: string
+          rto_code?: string | null
+          selected_addons?: Json | null
+          status?: string
+          tp_premium?: number | null
+          updated_at?: string
+          variant?: string | null
+          vehicle_id?: string | null
+          whatsapp_sent_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "motor_quotes_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "motor_quotes_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
@@ -6793,6 +7001,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      super_admin_integrations: {
+        Row: {
+          created_at: string
+          credentials: Json
+          id: string
+          integration_key: string
+          last_synced_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          credentials?: Json
+          id?: string
+          integration_key: string
+          last_synced_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          credentials?: Json
+          id?: string
+          integration_key?: string
+          last_synced_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       system_config: {
         Row: {
