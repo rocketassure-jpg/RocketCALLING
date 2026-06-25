@@ -36,6 +36,7 @@ export default function OrgHierarchyPanel() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [newDesigLabel, setNewDesigLabel] = useState("");
   const [loading, setLoading] = useState(true);
