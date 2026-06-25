@@ -36,6 +36,7 @@ export default function OrgHierarchyPanel() {
   const [branches, setBranches] = useState<Branch[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [newDesigLabel, setNewDesigLabel] = useState("");
   const [loading, setLoading] = useState(true);
@@ -72,9 +73,12 @@ export default function OrgHierarchyPanel() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return profiles;
-    return profiles.filter(p => (p.full_name || "").toLowerCase().includes(q) || (p.designation || "").toLowerCase().includes(q));
-  }, [profiles, search]);
+    let list = profiles;
+    if (statusFilter === "active") list = list.filter(p => p.is_active !== false);
+    else if (statusFilter === "inactive") list = list.filter(p => p.is_active === false);
+    if (!q) return list;
+    return list.filter(p => (p.full_name || "").toLowerCase().includes(q) || (p.designation || "").toLowerCase().includes(q));
+  }, [profiles, search, statusFilter]);
 
   const roleByUser = useMemo(() => {
     const m = new Map<string, Role["role"]>();
@@ -187,6 +191,11 @@ export default function OrgHierarchyPanel() {
                 <Button size="sm" variant="hero" onClick={() => setAddOpen(true)} className="h-8 text-xs">
                   <UserPlus className="h-3.5 w-3.5 mr-1" /> Add Member
                 </Button>
+                <div className="flex items-center gap-1">
+                  <Button size="sm" variant={statusFilter === "all" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("all")}>All ({profiles.length})</Button>
+                  <Button size="sm" variant={statusFilter === "active" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("active")}>Active ({profiles.filter(p => p.is_active !== false).length})</Button>
+                  <Button size="sm" variant={statusFilter === "inactive" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("inactive")}>Inactive ({profiles.filter(p => p.is_active === false).length})</Button>
+                </div>
                 <div className="flex items-center gap-1.5 flex-1 sm:max-w-xs">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="h-8 text-sm" />
@@ -234,7 +243,14 @@ export default function OrgHierarchyPanel() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-xs">{branchName(p.branch_id)}</TableCell>
                         <TableCell>
-                          <Badge variant={p.is_active ? "default" : "outline"} className="text-[10px]">{p.is_active ? "Active" : "Inactive"}</Badge>
+                          <Badge
+                            variant={p.is_active ? "default" : "outline"}
+                            className="text-[10px] cursor-pointer"
+                            onClick={() => updateProfile(p.id, { is_active: !p.is_active } as any)}
+                            title="Click to toggle"
+                          >
+                            {p.is_active ? "Active" : "Inactive"}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
