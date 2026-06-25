@@ -191,6 +191,11 @@ export default function OrgHierarchyPanel() {
                 <Button size="sm" variant="hero" onClick={() => setAddOpen(true)} className="h-8 text-xs">
                   <UserPlus className="h-3.5 w-3.5 mr-1" /> Add Member
                 </Button>
+                <div className="flex items-center gap-1">
+                  <Button size="sm" variant={statusFilter === "all" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("all")}>All ({profiles.length})</Button>
+                  <Button size="sm" variant={statusFilter === "active" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("active")}>Active ({profiles.filter(p => p.is_active !== false).length})</Button>
+                  <Button size="sm" variant={statusFilter === "inactive" ? "default" : "outline"} className="h-8 text-xs" onClick={() => setStatusFilter("inactive")}>Inactive ({profiles.filter(p => p.is_active === false).length})</Button>
+                </div>
                 <div className="flex items-center gap-1.5 flex-1 sm:max-w-xs">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <Input placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} className="h-8 text-sm" />
