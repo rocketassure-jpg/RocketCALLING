@@ -243,7 +243,14 @@ export default function OrgHierarchyPanel() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-xs">{branchName(p.branch_id)}</TableCell>
                         <TableCell>
-                          <Badge variant={p.is_active ? "default" : "outline"} className="text-[10px]">{p.is_active ? "Active" : "Inactive"}</Badge>
+                          <Badge
+                            variant={p.is_active ? "default" : "outline"}
+                            className="text-[10px] cursor-pointer"
+                            onClick={() => updateProfile(p.id, { is_active: !p.is_active } as any)}
+                            title="Click to toggle"
+                          >
+                            {p.is_active ? "Active" : "Inactive"}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
