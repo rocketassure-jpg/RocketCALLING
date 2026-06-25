@@ -12,7 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Plus, Trash2, MapPin, UserPlus, Copy, Phone, Users, Upload, Shield, GraduationCap, Webhook, Settings, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, ShieldCheck, Building2, Edit3, Megaphone, Briefcase } from "lucide-react";
+import { Plus, Trash2, MapPin, UserPlus, Copy, Phone, Users, Upload, Shield, GraduationCap, Webhook, Settings, AlarmClock, Trophy, BarChart3, MessageCircle, Calculator, User, Wallet, ShieldCheck, Building2, Edit3, Megaphone, Briefcase, FileText } from "lucide-react";
 import { EditMemberDialog, sanitizeName } from "@/components/admin/EditMemberDialog";
 import { useModuleAccess } from "@/hooks/useModuleAccess";
 import { HamburgerMenu } from "@/components/HamburgerMenu";
@@ -57,6 +57,7 @@ const PoliciesServicesPanel = named(() => import("@/components/admin/PoliciesSer
 const FinancePanel = named(() => import("@/components/admin/FinancePanel"), "FinancePanel");
 const MasterDataPanel = named(() => import("@/components/admin/master/MasterDataPanel"), "MasterDataPanel");
 const VendorManagementPanel = named(() => import("@/components/admin/vendor/VendorManagementPanel"), "VendorManagementPanel");
+const QuotationPanel = named(() => import("@/components/admin/quotation/QuotationPanel"), "QuotationPanel");
 
 const PanelFallback = () => (
   <div className="flex items-center justify-center py-16">
@@ -86,6 +87,7 @@ const BASE_NAV: { id: string; label: string; icon: any; module?: string; group: 
   { id: "calling", label: "Calling", icon: Phone, group: "Sales" },
   { id: "leads_hub", label: "Leads & Enquiries", icon: Users, group: "Sales" },
   { id: "customers_hub", label: "Customers", icon: Trophy, group: "Sales" },
+  { id: "quotation", label: "Quotation", icon: FileText, group: "Sales" },
   // Policies & Services now lives inside Customers Hub (step 3). Renewals/Claims still standalone.
   { id: "renewals", label: "Renewals", icon: AlarmClock, group: "Policies & Services" },
   { id: "claims", label: "Claims", icon: ShieldCheck, group: "Policies & Services" },
@@ -385,6 +387,7 @@ const AdminDashboard = () => {
       case "calling": return <CallingList callerName="Owner" role="admin" />;
       case "renewals": return <RenewalsPanel />;
       case "customers_hub": return <CustomersHubPanel areas={areas} telecallers={telecallers} onDone={load} />;
+      case "quotation": return <QuotationPanel />;
       case "branches": return <BranchesPanel />;
       case "leads_hub": return <LeadsEnquiriesPanel leadsView={leadsView} />;
       case "import": return <SmartImportPanel areas={areas} telecallers={telecallers} onDone={load} />;
