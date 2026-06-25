@@ -274,7 +274,7 @@ export const LeadActions = ({
 
           {/* Row 2: SMS, WhatsApp, Quote, More — collapsible */}
           {actionsOpen && (
-            <div className="grid grid-cols-4 gap-1.5">
+            <div className="grid grid-cols-5 gap-1.5">
               <IconBtn
                 label="SMS" asChild href={smsLink(smsMsg)}
                 className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
@@ -291,12 +291,24 @@ export const LeadActions = ({
               ><FileText className="h-4 w-4" /></IconBtn>
 
               <IconBtn
+                label="Motor Quote"
+                onClick={() => setQuoteOpen(true)}
+                className="w-full bg-primary text-primary-foreground hover:opacity-90"
+              ><Car className="h-4 w-4" /></IconBtn>
+
+              <IconBtn
                 label={moreOpen ? "Hide details" : "More options"}
                 onClick={() => setMoreOpen((v) => !v)}
                 className={`w-full ${moreOpen ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
               ><MoreHorizontal className="h-4 w-4" /></IconBtn>
             </div>
           )}
+
+          <MotorQuoteWizard
+            open={quoteOpen}
+            onOpenChange={setQuoteOpen}
+            lead={{ id: lead.id, customer_name: lead.customer_name, phone_number: lead.phone_number }}
+          />
         </>
       )}
 
