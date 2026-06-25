@@ -144,9 +144,28 @@ export const BranchesPanel = () => {
 
         <TabsContent value="assign" className="mt-4">
           <Card>
-            <CardHeader><CardTitle>Assign team members to branches</CardTitle></CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between gap-3 flex-wrap">
+              <CardTitle>Assign team members to branches</CardTitle>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs">Select Branch</Label>
+                <Select value={assignFilter} onValueChange={setAssignFilter}>
+                  <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All branches</SelectItem>
+                    <SelectItem value="none">— Unassigned —</SelectItem>
+                    {branches.map((b) => <SelectItem key={b.id} value={b.id}>{b.name}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardHeader>
             <CardContent className="space-y-2">
-              {profiles.map((p) => (
+              {profiles
+                .filter((p) => {
+                  if (assignFilter === "all") return true;
+                  if (assignFilter === "none") return !p.branch_id;
+                  return p.branch_id === assignFilter;
+                })
+                .map((p) => (
                 <div key={p.id} className="flex items-center justify-between gap-2 rounded border p-2">
                   <div className="font-medium">{p.full_name || "—"}</div>
                   <Select value={p.branch_id ?? "none"} onValueChange={(v) => assignUser(p.id, v)}>
@@ -158,6 +177,9 @@ export const BranchesPanel = () => {
                   </Select>
                 </div>
               ))}
+              {profiles.filter((p) => assignFilter === "all" ? true : assignFilter === "none" ? !p.branch_id : p.branch_id === assignFilter).length === 0 && (
+                <p className="text-center text-sm text-muted-foreground py-6">No members in this branch.</p>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
