@@ -31,6 +31,7 @@ export const BranchesPanel = () => {
   const [editing, setEditing] = useState<Branch | null>(null);
   const [form, setForm] = useState<any>(empty);
   const [tab, setTab] = useState("list");
+  const [assignFilter, setAssignFilter] = useState<string>("all");
 
   const load = async () => {
     const [b, p] = await Promise.all([
