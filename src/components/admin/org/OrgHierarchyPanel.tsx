@@ -73,9 +73,12 @@ export default function OrgHierarchyPanel() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return profiles;
-    return profiles.filter(p => (p.full_name || "").toLowerCase().includes(q) || (p.designation || "").toLowerCase().includes(q));
-  }, [profiles, search]);
+    let list = profiles;
+    if (statusFilter === "active") list = list.filter(p => p.is_active !== false);
+    else if (statusFilter === "inactive") list = list.filter(p => p.is_active === false);
+    if (!q) return list;
+    return list.filter(p => (p.full_name || "").toLowerCase().includes(q) || (p.designation || "").toLowerCase().includes(q));
+  }, [profiles, search, statusFilter]);
 
   const roleByUser = useMemo(() => {
     const m = new Map<string, Role["role"]>();
