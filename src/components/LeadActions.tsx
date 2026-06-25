@@ -16,8 +16,9 @@ import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 import {
   Phone, ChevronDown, MessageCircle, MessageSquare, FileText, MoreHorizontal,
-  History, Loader2, StickyNote, Info, Ban, IndianRupee, PhoneOutgoing, Send,
+  History, Loader2, StickyNote, Info, Ban, IndianRupee, PhoneOutgoing, Send, Car,
 } from "lucide-react";
+import { MotorQuoteWizard } from "@/components/admin/quotation/MotorQuoteWizard";
 
 type Status = string;
 
