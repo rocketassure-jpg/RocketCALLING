@@ -8,11 +8,12 @@ type State = {
   expiresAt: string | null;
   status: string;
   username: string | null;
+  loginMode: "otp" | "password" | null;
 };
 
 const INITIAL: State = {
   loading: true, connected: false, token: null, expiresAt: null,
-  status: "disconnected", username: null,
+  status: "disconnected", username: null, loginMode: null,
 };
 
 export const usePolicybossSession = () => {
@@ -35,9 +36,28 @@ export const usePolicybossSession = () => {
       expiresAt,
       status: data?.status ?? "disconnected",
       username: creds.username ?? null,
+      loginMode: creds.login_mode ?? null,
     });
     if (creds.token) sessionStorage.setItem("pb_token", creds.token);
   }, []);
+
+  const sendOtp = useCallback(async (username: string) => {
+    const { data, error } = await supabase.functions.invoke("policyboss-auth", {
+      body: { action: "send_otp", username },
+    });
+    if (error) throw error;
+    await load();
+    return data;
+  }, [load]);
+
+  const verifyOtp = useCallback(async (otp: string, username?: string) => {
+    const { data, error } = await supabase.functions.invoke("policyboss-auth", {
+      body: { action: "verify_otp", otp, username },
+    });
+    if (error) throw error;
+    await load();
+    return data;
+  }, [load]);
 
   const connect = useCallback(async (username: string, password: string) => {
     const { data, error } = await supabase.functions.invoke("policyboss-auth", {
@@ -59,5 +79,5 @@ export const usePolicybossSession = () => {
 
   useEffect(() => { load(); }, [load]);
 
-  return { ...state, connect, refresh, reload: load };
+  return { ...state, sendOtp, verifyOtp, connect, refresh, reload: load };
 };
