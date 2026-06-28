@@ -74,7 +74,7 @@ export const useLeadsPaginated = ({
         .from("leads")
         .select(
           `id, customer_name, phone_number, status, policy_type,
-           call_date, premium_amount, area_id, assigned_telecaller,
+           call_date, premium_amount, area_id, assigned_telecaller, customer_id,
            last_called_at, policy_expiry_date, created_at,
            areas(name)`,
           { count: "exact" }
