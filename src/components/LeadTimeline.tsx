@@ -15,22 +15,16 @@ export const LeadTimeline = ({ leadId, customerId }: { leadId: string; customerI
 
   const load = async () => {
     setLoading(true);
-    const queries: Promise<any>[] = [
-      supabase.from("call_logs").select("id,status,called_at").eq("lead_id", leadId).order("called_at", { ascending: false }).limit(50),
-      supabase.from("lead_notes").select("id,note,created_at").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(50),
-    ];
-    let cid = customerId;
+    let cid = customerId ?? null;
     if (!cid) {
       const { data: l } = await supabase.from("leads").select("customer_id").eq("id", leadId).maybeSingle();
       cid = (l as any)?.customer_id ?? null;
     }
-    if (cid) {
-      queries.push(
-        supabase.from("customer_notes").select("id,note,created_at").eq("customer_id", cid).order("created_at", { ascending: false }).limit(50),
-      );
-    }
-    const results = await Promise.all(queries);
-    const [calls, notes, cnotes] = results;
+    const calls = await supabase.from("call_logs").select("id,status,called_at").eq("lead_id", leadId).order("called_at", { ascending: false }).limit(50);
+    const notes = await supabase.from("lead_notes").select("id,note,created_at").eq("lead_id", leadId).order("created_at", { ascending: false }).limit(50);
+    const cnotes = cid
+      ? await supabase.from("customer_notes").select("id,note,created_at").eq("customer_id", cid).order("created_at", { ascending: false }).limit(50)
+      : { data: [] as any[] };
     const merged: TimelineEntry[] = [
       ...((calls.data ?? []) as any[]).map((c: any) => ({ id: `c-${c.id}`, kind: "call" as const, text: `Call → ${c.status}`, at: c.called_at })),
       ...((notes.data ?? []) as any[]).map((n: any) => ({ id: `n-${n.id}`, kind: "note" as const, text: n.note, at: n.created_at })),
