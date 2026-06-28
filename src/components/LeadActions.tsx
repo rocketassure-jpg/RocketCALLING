@@ -104,7 +104,7 @@ export const LeadActions = ({
   lead, blocked, dialCount, statusOptions, callerName,
   onDial, onStatusChange, onUnsubscribe,
 }: Props) => {
-  const { user } = useAuth();
+  const { user, companyId } = useAuth();
   const policy = useMaskingPolicy();
   const [moreOpen, setMoreOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
@@ -184,8 +184,13 @@ export const LeadActions = ({
     const trimmed = note.trim();
     const { error } = await supabase.from("lead_notes").insert({ lead_id: lead.id, author_id: user.id, note: trimmed });
     // Bridge to customer_notes if this lead has a linked customer (BUG-2)
-    if (!error && lead.customer_id) {
-      await supabase.from("customer_notes").insert({ customer_id: lead.customer_id, author_id: user.id, note: trimmed }).then(() => {}, () => {});
+    if (!error && lead.customer_id && companyId) {
+      await supabase.from("customer_notes").insert({
+        company_id: companyId,
+        customer_id: lead.customer_id,
+        created_by: user.id,
+        note: trimmed,
+      }).then(() => {}, () => {});
     }
     setSavingNote(false);
     if (error) return toast({ title: "Note save fail", description: error.message, variant: "destructive" });
