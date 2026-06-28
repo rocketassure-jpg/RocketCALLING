@@ -16,12 +16,12 @@ import { AccountSettings } from "@/components/AccountSettings";
 import { LayoutDashboard, Users, Plus, Phone, GraduationCap, Calculator, Settings, LogOut } from "lucide-react";
 
 type Area = { id: string; name: string };
-type View = "calls" | "leads" | "add" | "training" | "calculator" | "account";
+type View = "calls" | "add" | "training" | "calculator" | "account";
 
 const TelecallerDashboard = () => {
   const { user, signOut } = useAuth();
   const [fullName, setFullName] = useState("");
-  const [tab, setTab] = useState<"home" | "leads" | "menu">("home");
+  const [tab, setTab] = useState<"home" | "menu">("home");
   const [view, setView] = useState<View>("calls");
   const [areas, setAreas] = useState<Area[]>([]);
 
@@ -43,7 +43,6 @@ const TelecallerDashboard = () => {
             <HamburgerMenu
               items={[
                 { id: "calls", label: "Dashboard", icon: LayoutDashboard },
-                { id: "leads", label: "Leads", icon: Users },
                 { id: "add", label: "Add Lead", icon: Plus },
                 { id: "calculator", label: "Premium Calculator", icon: Calculator },
                 { id: "training", label: "Training", icon: GraduationCap },
@@ -75,12 +74,7 @@ const TelecallerDashboard = () => {
             <CallingList callerName={fullName || "Rocket Services"} filterAssigned role="telecaller" />
           </>
         )}
-        {tab === "home" && view === "leads" && (
-          <>
-            <h1 className="text-xl font-bold">All My Leads</h1>
-            <CallingList callerName={fullName || "Rocket Services"} filterAssigned role="telecaller" />
-          </>
-        )}
+        {/* "leads" view removed — was a duplicate render. The bucket tabs inside CallingList cover this. */}
         {tab === "home" && view === "training" && (
           <>
             <Button variant="outline" size="sm" onClick={() => goto("calls")}>← Back to calls</Button>
@@ -112,18 +106,13 @@ const TelecallerDashboard = () => {
             <AccountSettings />
           </>
         )}
-        {tab === "leads" && (
-          <>
-            <h1 className="text-xl font-bold">All My Leads</h1>
-            <CallingList callerName={fullName || "Rocket Services"} filterAssigned role="telecaller" />
-          </>
-        )}
+        {/* removed duplicate "leads" tab render */}
         {tab === "menu" && (
           <div className="space-y-2">
             <h1 className="text-xl font-bold">Menu</h1>
             <BreakToggle />
             <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("calls")}><LayoutDashboard className="h-4 w-4" /> Dashboard</Button>
-            <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("leads")}><Users className="h-4 w-4" /> Leads</Button>
+            <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("calls")}><Users className="h-4 w-4" /> All Leads</Button>
             <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("calculator")}><Calculator className="h-4 w-4" /> Premium Calculator</Button>
             <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("training")}><GraduationCap className="h-4 w-4" /> Training</Button>
             <Button variant="outline" className="min-h-[44px] w-full justify-start" onClick={() => goto("account")}><Settings className="h-4 w-4" /> Account Settings</Button>

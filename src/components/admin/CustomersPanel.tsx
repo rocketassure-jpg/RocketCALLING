@@ -7,32 +7,42 @@ import { Button } from "@/components/ui/button";
 import { Trophy, IndianRupee, Phone, MessageCircle, Search } from "lucide-react";
 
 type Customer = {
-  id: string; customer_name: string; phone_number: string; policy_type: string;
-  premium_amount: number; updated_at: string; policy_expiry_date: string | null;
-  assigned_telecaller: string | null; areas?: { name: string } | null;
+  id: string;
+  full_name: string;
+  mobile: string;
+  city: string | null;
+  lifecycle_stage: string | null;
+  value_score: number | null;
+  customer_since: string;
+  created_at: string;
 };
+
+const POLICY_HOLDER_STAGES = ["policy_holder", "multi_product", "loyal", "renewal", "claim"];
 
 export const CustomersPanel = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, string>>({});
   const [search, setSearch] = useState("");
   const [thisMonth, setThisMonth] = useState(0);
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase
-        .from("leads").select("id,customer_name,phone_number,policy_type,premium_amount,updated_at,policy_expiry_date,assigned_telecaller, areas(name)")
-        .eq("status", "Done").order("updated_at", { ascending: false });
-      setCustomers((data ?? []) as any);
-      const p = await supabase.from("profiles").select("id,full_name");
-      setProfiles(Object.fromEntries((p.data ?? []).map((x: any) => [x.id, x.full_name])));
-      const start = new Date(); start.setDate(1); start.setHours(0,0,0,0);
-      setThisMonth((data ?? []).filter((c: any) => new Date(c.updated_at) >= start).length);
+        .from("customers")
+        .select("id,full_name,mobile,city,lifecycle_stage,value_score,customer_since,created_at")
+        .in("lifecycle_stage", POLICY_HOLDER_STAGES)
+        .order("customer_since", { ascending: false })
+        .limit(500);
+      const list = (data ?? []) as any[];
+      setCustomers(list);
+      const start = new Date(); start.setDate(1); start.setHours(0, 0, 0, 0);
+      setThisMonth(list.filter((c) => new Date(c.customer_since ?? c.created_at) >= start).length);
     })();
   }, []);
 
   const filtered = useMemo(() => customers.filter((c) =>
-    !search || c.customer_name.toLowerCase().includes(search.toLowerCase()) || c.phone_number.includes(search)
+    !search ||
+    c.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+    (c.mobile ?? "").includes(search)
   ), [customers, search]);
 
   return (
@@ -53,10 +63,10 @@ export const CustomersPanel = () => {
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <CardTitle>Customers (Policy Done)</CardTitle>
+            <CardTitle>Customers (Policy Holders)</CardTitle>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Name or phone…" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input className="pl-9" placeholder="Name or mobile…" value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
           </div>
         </CardHeader>
@@ -66,18 +76,25 @@ export const CustomersPanel = () => {
               <div key={c.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-l-4 border-l-success bg-card p-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-semibold">{c.customer_name}</span>
-                    <Badge variant="outline">{c.policy_type}</Badge>
-                    <Badge className="bg-success text-success-foreground"><IndianRupee className="h-3 w-3" />{Number(c.premium_amount || 0).toLocaleString("en-IN")}</Badge>
+                    <span className="font-semibold">{c.full_name}</span>
+                    <Badge variant="outline">{c.lifecycle_stage ?? "—"}</Badge>
+                    {c.value_score != null && (
+                      <Badge className="bg-success text-success-foreground">
+                        <IndianRupee className="h-3 w-3" />{Number(c.value_score).toLocaleString("en-IN")}
+                      </Badge>
+                    )}
                   </div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    {c.phone_number} · {c.areas?.name ?? "—"} · Sold {new Date(c.updated_at).toLocaleDateString()}
-                    {c.assigned_telecaller && ` · by ${profiles[c.assigned_telecaller] ?? "—"}`}
+                    {c.mobile} · {c.city ?? "—"} · Since {new Date(c.customer_since ?? c.created_at).toLocaleDateString()}
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button asChild size="sm" variant="outline"><a href={`tel:${c.phone_number}`}><Phone className="h-4 w-4" /> Call</a></Button>
-                  <Button asChild size="sm" variant="success"><a href={`https://wa.me/${c.phone_number.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle className="h-4 w-4" /> WA</a></Button>
+                  <Button asChild size="sm" variant="outline"><a href={`tel:${c.mobile}`}><Phone className="h-4 w-4" /> Call</a></Button>
+                  <Button asChild size="sm" variant="success">
+                    <a href={`https://wa.me/${(c.mobile ?? "").replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="h-4 w-4" /> WA
+                    </a>
+                  </Button>
                 </div>
               </div>
             ))}

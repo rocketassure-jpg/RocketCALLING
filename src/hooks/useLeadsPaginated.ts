@@ -42,6 +42,7 @@ const todayISO = () => new Date().toISOString().slice(0, 10);
 type Args = {
   role?: "admin" | "manager" | "telecaller";
   userId?: string;
+  companyId?: string | null;
   filterAssigned?: boolean;
   page?: number;
   pageSize?: number;
@@ -50,10 +51,10 @@ type Args = {
 };
 
 // Statuses that count as "completed disposition" — leads with these are hidden from active calling list
-const COMPLETED_STATUSES = ["Unsubscribed", "Done", "Not Interested", "Converted"];
+const COMPLETED_STATUSES = ["Unsubscribed", "Done", "Policy Issued", "Not Interested", "Converted"];
 
 export const useLeadsPaginated = ({
-  role, userId, filterAssigned,
+  role, userId, companyId, filterAssigned,
   page = 0, pageSize = 50,
   revivalFrom = null, revivalTo = null,
 }: Args) => {
@@ -82,6 +83,10 @@ export const useLeadsPaginated = ({
         .order("call_date", { ascending: true })
         .order("created_at", { ascending: false });
 
+      if (companyId) {
+        q = q.eq("company_id", companyId);
+      }
+
       if (filterAssigned && userId) {
         q = q.or(`assigned_telecaller.eq.${userId},assigned_telecaller.is.null`);
       }
@@ -107,7 +112,7 @@ export const useLeadsPaginated = ({
         case "converted": q = q.eq("status", "Converted"); break;
         case "transfer_to_senior": q = q.eq("status", "Transfer to Senior"); break;
         case "not_interested": q = q.eq("status", "Not Interested"); break;
-        case "done": q = q.eq("status", "Done"); break;
+        case "done": q = q.in("status", ["Done", "Policy Issued"]); break;
         case "all": break;
       }
 
@@ -122,7 +127,7 @@ export const useLeadsPaginated = ({
       }
       return q;
     },
-    [bucket, debouncedSearch, filterAssigned, userId, revivalFrom, revivalTo]
+    [bucket, debouncedSearch, filterAssigned, userId, companyId, revivalFrom, revivalTo]
   );
 
   const loadPage = useCallback(async () => {

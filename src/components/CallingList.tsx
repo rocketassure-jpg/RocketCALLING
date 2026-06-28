@@ -19,7 +19,7 @@ import { RevivalDateFilter, RevivalRange } from "@/components/RevivalDateFilter"
 import { useMaskingPolicy } from "@/hooks/useMaskingPolicy";
 
 
-type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done";
+type Status = "New" | "Interested" | "Quote Sent" | "Premium Quoted" | "Negotiation" | "Converted" | "Follow-up" | "Not Picked" | "Transfer to Senior" | "Not Interested" | "Unsubscribed" | "Done" | "Policy Issued";
 
 type Lead = {
   id: string;
@@ -35,7 +35,8 @@ type Lead = {
   areas?: { name: string } | null;
 };
 
-const STATUS_OPTIONS: Status[] = ["New", "Interested", "Quote Sent", "Premium Quoted", "Negotiation", "Converted", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Done"];
+// "Done" hidden from picker — only legacy data; UI uses "Policy Issued".
+const STATUS_OPTIONS: Status[] = ["New", "Interested", "Quote Sent", "Premium Quoted", "Negotiation", "Converted", "Follow-up", "Not Picked", "Transfer to Senior", "Not Interested", "Policy Issued"];
 
 const statusColor = (s: string) => {
   switch (s) {
@@ -46,7 +47,8 @@ const statusColor = (s: string) => {
     case "Premium Quoted":
     case "Negotiation":
     case "Follow-up": return "bg-warning text-warning-foreground";
-    case "Done": return "bg-primary text-primary-foreground";
+    case "Done":
+    case "Policy Issued": return "bg-primary text-primary-foreground";
     case "Not Picked": return "bg-muted text-muted-foreground";
     case "Not Interested":
     case "Unsubscribed": return "bg-destructive text-destructive-foreground";
@@ -63,7 +65,7 @@ const daysUntil = (d: string | null) => {
 };
 
 export const CallingList = ({ callerName = "Rocket Services", filterAssigned = false, role = "admin" }: { callerName?: string; filterAssigned?: boolean; role?: "admin" | "manager" | "telecaller" }) => {
-  const { user } = useAuth();
+  const { user, companyId } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const page = Math.max(0, parseInt(searchParams.get("page") ?? "1", 10) - 1);
@@ -109,7 +111,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     search, setSearch, bucket, setBucket, stats,
     reload, patchLead, removeLead, totalPages,
   } = useLeadsPaginated({
-    role, userId: user?.id, filterAssigned,
+    role, userId: user?.id, companyId, filterAssigned,
     page, pageSize,
     revivalFrom: revival?.from ?? null,
     revivalTo: revival?.to ?? null,
@@ -253,7 +255,7 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
     { id: "converted",          label: "Converted",       value: stats?.converted          ?? 0, accent: "border-l-success",          icon: Trophy },
     { id: "transfer_to_senior", label: "Transfer",        value: stats?.transfer_to_senior ?? 0, accent: "border-l-accent",           icon: ArrowUpRight },
     { id: "not_interested",     label: "Not Int.",        value: stats?.not_interested     ?? 0, accent: "border-l-destructive",      icon: ThumbsDown },
-    { id: "done",               label: "Done",            value: stats?.done               ?? 0, accent: "border-l-primary",          icon: CheckSquare },
+    { id: "done",               label: "Policy Issued",   value: stats?.done               ?? 0, accent: "border-l-primary",          icon: CheckSquare },
   ]), [stats]);
 
   // Clear selections when leaving a page

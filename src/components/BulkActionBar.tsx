@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Trash2, X } from "lucide-react";
 
-const SECTIONS = ["New", "Interested", "Follow-up", "Done", "Unsubscribed"];
+const SECTIONS = ["New", "Interested", "Follow-up", "Policy Issued", "Unsubscribed"];
 
 export const BulkActionBar = ({
   count,
