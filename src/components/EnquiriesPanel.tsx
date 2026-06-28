@@ -91,7 +91,6 @@ export const EnquiriesPanel = () => {
         premium_amount: 0,
         priority: "medium",
         notes: notes.trim() || null,
-        source: "enquiry",
       } as any).select("id").maybeSingle();
       if (error) throw error;
       await supabase.from("enquiries").update({ handled: true, converted_lead_id: lead?.id ?? null }).eq("id", active.id);
