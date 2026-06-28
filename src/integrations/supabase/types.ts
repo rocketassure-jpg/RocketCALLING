@@ -8387,6 +8387,7 @@ export type Database = {
         | "Premium Quoted"
         | "Negotiation"
         | "Converted"
+        | "Policy Issued"
       policy_type: "Life" | "Health" | "Motor"
     }
     CompositeTypes: {
@@ -8529,6 +8530,7 @@ export const Constants = {
         "Premium Quoted",
         "Negotiation",
         "Converted",
+        "Policy Issued",
       ],
       policy_type: ["Life", "Health", "Motor"],
     },
