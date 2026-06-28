@@ -1,6 +1,6 @@
-import { Home, Users, Menu } from "lucide-react";
+import { Home, Menu } from "lucide-react";
 
-type Tab = "home" | "leads" | "menu";
+type Tab = "home" | "menu";
 
 export const MobileBottomNav = ({
   active,
@@ -25,7 +25,6 @@ export const MobileBottomNav = ({
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t bg-background shadow-elegant md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around">
         <Btn id="home" label="Home" Icon={Home} />
-        <Btn id="leads" label="Leads" Icon={Users} />
         <Btn id="menu" label="Menu" Icon={Menu} />
       </div>
     </nav>

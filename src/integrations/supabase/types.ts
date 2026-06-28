@@ -356,6 +356,7 @@ export type Database = {
           company_id: string | null
           id: string
           invite_code: string | null
+          irdai_rates: Json | null
           masking_config: Json
           master_sheet_url: string | null
           post_interaction_actions: boolean
@@ -380,6 +381,7 @@ export type Database = {
           company_id?: string | null
           id?: string
           invite_code?: string | null
+          irdai_rates?: Json | null
           masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
@@ -404,6 +406,7 @@ export type Database = {
           company_id?: string | null
           id?: string
           invite_code?: string | null
+          irdai_rates?: Json | null
           masking_config?: Json
           master_sheet_url?: string | null
           post_interaction_actions?: boolean
@@ -2549,6 +2552,7 @@ export type Database = {
           premium: number | null
           product_name: string | null
           profit: number | null
+          renewal_lead_created: boolean
           start_date: string | null
           status: string | null
           sub_category: string | null
@@ -2582,6 +2586,7 @@ export type Database = {
           premium?: number | null
           product_name?: string | null
           profit?: number | null
+          renewal_lead_created?: boolean
           start_date?: string | null
           status?: string | null
           sub_category?: string | null
@@ -2615,6 +2620,7 @@ export type Database = {
           premium?: number | null
           product_name?: string | null
           profit?: number | null
+          renewal_lead_created?: boolean
           start_date?: string | null
           status?: string | null
           sub_category?: string | null
@@ -2978,6 +2984,7 @@ export type Database = {
       enquiries: {
         Row: {
           company_id: string | null
+          converted_lead_id: string | null
           created_at: string
           customer_name: string
           handled: boolean
@@ -2989,6 +2996,7 @@ export type Database = {
         }
         Insert: {
           company_id?: string | null
+          converted_lead_id?: string | null
           created_at?: string
           customer_name: string
           handled?: boolean
@@ -3000,6 +3008,7 @@ export type Database = {
         }
         Update: {
           company_id?: string | null
+          converted_lead_id?: string | null
           created_at?: string
           customer_name?: string
           handled?: boolean
@@ -3015,6 +3024,27 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_converted_lead_id_fkey"
+            columns: ["converted_lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_converted_lead_id_fkey"
+            columns: ["converted_lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enquiries_converted_lead_id_fkey"
+            columns: ["converted_lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
         ]
@@ -3621,6 +3651,76 @@ export type Database = {
           note?: string
         }
         Relationships: []
+      }
+      lead_quotes: {
+        Row: {
+          channel: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          idv: number | null
+          insurer: string
+          lead_id: string
+          message_sent: string | null
+          plan_type: string | null
+          policy_type: string | null
+          premium: number
+          valid_until: string | null
+        }
+        Insert: {
+          channel?: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          idv?: number | null
+          insurer: string
+          lead_id: string
+          message_sent?: string | null
+          plan_type?: string | null
+          policy_type?: string | null
+          premium?: number
+          valid_until?: string | null
+        }
+        Update: {
+          channel?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          idv?: number | null
+          insurer?: string
+          lead_id?: string
+          message_sent?: string | null
+          plan_type?: string | null
+          policy_type?: string | null
+          premium?: number
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_quotes_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lead_statuses: {
         Row: {
@@ -4910,6 +5010,7 @@ export type Database = {
           idv: number | null
           insurer_id: string | null
           issue_date: string | null
+          ncb_applied: number
           ncb_percent: number | null
           net_premium: number | null
           notes: string | null
@@ -4947,6 +5048,7 @@ export type Database = {
           idv?: number | null
           insurer_id?: string | null
           issue_date?: string | null
+          ncb_applied?: number
           ncb_percent?: number | null
           net_premium?: number | null
           notes?: string | null
@@ -4984,6 +5086,7 @@ export type Database = {
           idv?: number | null
           insurer_id?: string | null
           issue_date?: string | null
+          ncb_applied?: number
           ncb_percent?: number | null
           net_premium?: number | null
           notes?: string | null
@@ -5227,6 +5330,114 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_records: {
+        Row: {
+          amount: number
+          company_id: string
+          created_at: string
+          created_by: string | null
+          customer_id: string | null
+          gateway: string | null
+          gateway_ref: string | null
+          gst_amount: number | null
+          id: string
+          lead_id: string | null
+          motor_quote_id: string | null
+          notes: string | null
+          payment_date: string
+          payment_mode: string
+          receipt_url: string | null
+          status: string
+          total_amount: number
+          transaction_ref: string | null
+          verified: boolean | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          amount: number
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          gateway?: string | null
+          gateway_ref?: string | null
+          gst_amount?: number | null
+          id?: string
+          lead_id?: string | null
+          motor_quote_id?: string | null
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: string
+          receipt_url?: string | null
+          status?: string
+          total_amount: number
+          transaction_ref?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          amount?: number
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          customer_id?: string | null
+          gateway?: string | null
+          gateway_ref?: string | null
+          gst_amount?: number | null
+          id?: string
+          lead_id?: string | null
+          motor_quote_id?: string | null
+          notes?: string | null
+          payment_date?: string
+          payment_mode?: string
+          receipt_url?: string | null
+          status?: string
+          total_amount?: number
+          transaction_ref?: string | null
+          verified?: boolean | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_records_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_records_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "v_customer_360"
+            referencedColumns: ["customer_id"]
+          },
+          {
+            foreignKeyName: "payment_records_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_records_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "renewal_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_records_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "untouched_leads"
             referencedColumns: ["id"]
           },
         ]
@@ -5973,6 +6184,8 @@ export type Database = {
           created_at: string
           department: string | null
           designation: string | null
+          exam_date: string | null
+          exam_passed: boolean | null
           full_name: string
           id: string
           is_active: boolean
@@ -5980,6 +6193,8 @@ export type Database = {
           is_super_admin: boolean
           manager_id: string | null
           mobile: string | null
+          posp_code: string | null
+          posp_valid_until: string | null
           rejection_reason: string | null
           requested_role: string | null
           ui_theme: string
@@ -5992,6 +6207,8 @@ export type Database = {
           created_at?: string
           department?: string | null
           designation?: string | null
+          exam_date?: string | null
+          exam_passed?: boolean | null
           full_name?: string
           id: string
           is_active?: boolean
@@ -5999,6 +6216,8 @@ export type Database = {
           is_super_admin?: boolean
           manager_id?: string | null
           mobile?: string | null
+          posp_code?: string | null
+          posp_valid_until?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
           ui_theme?: string
@@ -6011,6 +6230,8 @@ export type Database = {
           created_at?: string
           department?: string | null
           designation?: string | null
+          exam_date?: string | null
+          exam_passed?: boolean | null
           full_name?: string
           id?: string
           is_active?: boolean
@@ -6018,6 +6239,8 @@ export type Database = {
           is_super_admin?: boolean
           manager_id?: string | null
           mobile?: string | null
+          posp_code?: string | null
+          posp_valid_until?: string | null
           rejection_reason?: string | null
           requested_role?: string | null
           ui_theme?: string
@@ -7216,6 +7439,7 @@ export type Database = {
       vehicles: {
         Row: {
           chassis_number: string | null
+          claim_free_years: number
           client_lead_id: string | null
           color: string | null
           company_id: string
@@ -7226,9 +7450,11 @@ export type Database = {
           fuel_type: string | null
           hypothecation: string | null
           id: string
+          last_policy_end_date: string | null
           make: string | null
           manufacturing_year: number | null
           model: string | null
+          ncb_percent: number
           notes: string | null
           owner_name: string | null
           owner_phone: string | null
@@ -7242,6 +7468,7 @@ export type Database = {
         }
         Insert: {
           chassis_number?: string | null
+          claim_free_years?: number
           client_lead_id?: string | null
           color?: string | null
           company_id: string
@@ -7252,9 +7479,11 @@ export type Database = {
           fuel_type?: string | null
           hypothecation?: string | null
           id?: string
+          last_policy_end_date?: string | null
           make?: string | null
           manufacturing_year?: number | null
           model?: string | null
+          ncb_percent?: number
           notes?: string | null
           owner_name?: string | null
           owner_phone?: string | null
@@ -7268,6 +7497,7 @@ export type Database = {
         }
         Update: {
           chassis_number?: string | null
+          claim_free_years?: number
           client_lead_id?: string | null
           color?: string | null
           company_id?: string
@@ -7278,9 +7508,11 @@ export type Database = {
           fuel_type?: string | null
           hypothecation?: string | null
           id?: string
+          last_policy_end_date?: string | null
           make?: string | null
           manufacturing_year?: number | null
           model?: string | null
+          ncb_percent?: number
           notes?: string | null
           owner_name?: string | null
           owner_phone?: string | null
@@ -8387,6 +8619,7 @@ export type Database = {
         | "Premium Quoted"
         | "Negotiation"
         | "Converted"
+        | "Policy Issued"
       policy_type: "Life" | "Health" | "Motor"
     }
     CompositeTypes: {
@@ -8529,6 +8762,7 @@ export const Constants = {
         "Premium Quoted",
         "Negotiation",
         "Converted",
+        "Policy Issued",
       ],
       policy_type: ["Life", "Health", "Motor"],
     },

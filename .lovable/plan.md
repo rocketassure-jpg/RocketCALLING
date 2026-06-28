@@ -1,57 +1,83 @@
-## Quotation Module
 
-A new top-level module in Rocket CRM that owns the full pre-sale flow: **Vehicle → Quotes → WhatsApp → KYC → Payment → Convert to Policy**. PolicyBoss POSP is the backing provider, hidden from telecallers.
+# Full Audit Execution Plan
 
-### What gets added
+Audit has **27 items** across 4 parts. I'll execute in 4 batches, each ending with a build/lint check. Approve once, I'll run all batches back-to-back and report at the end.
 
-**1. Database (one migration)**
-- `super_admin_integrations` — provider credentials/token (PolicyBoss POSP), super-admin only.
-- `motor_quotes` — every generated quote (insurer, IDV, OD/TP/addon/net, status: generated → sent → kyc_done → payment_sent → converted).
-- Extend existing `customer_documents` with `motor_quote_id` (table already exists; no recreate).
-- `leads` += `latest_quote_id`, `kyc_status`, `payment_link`.
-- RLS scoped to `company_id`; GRANTs for authenticated + service_role.
+Note: DB already has a `lead_to_customer_on_won` trigger that fires on `status='won'`. The audit refers to status `'Converted'`. I'll align the trigger + UI to a single canonical value (`'Converted'`) so BUG-1 actually works.
 
-**2. Edge functions (`supabase/functions/`)**
-- `policyboss-auth` — login/refresh, persists token.
-- `fetch-vehicle-details` — VAHAN/PolicyBoss lookup, caches into `vehicles`.
-- `policyboss-kyc-submit` — submits KYC, updates `kyc_status`.
-- `generate-payment-link` — returns a payment URL (telecaller never sees gateway).
+---
 
-**3. Super Admin — Integrations**
-- New `PolicyBossIntegrationPanel` (credentials, Connected/Disconnected badge, Test, last sync).
-- New "Integrations" entry in Super Admin sidebar.
-- `usePolicybossSession` hook for token refresh.
+## Batch A — Priority 1 (Critical Bugs)
 
-**4. Quotation Module UI (new folder `src/components/admin/quotation/`)**
-- `QuotationPanel.tsx` — module home: list of quotes (filters: status, telecaller, date), KPI strip, "New Quote" button.
-- `MotorQuoteWizard.tsx` — 5-step Sheet/Dialog:
-  1. `VehicleInputStep` (reg no → fetch)
-  2. `QuoteListStep` (multi-insurer cards, IDV slider, addon checkboxes, live recalc)
-  3. `QuoteSendStep` (WhatsApp message preview + `wa.me` send)
-  4. `KycStep` (PAN/Aadhaar/RC/DL uploads to Storage, submit to PolicyBoss)
-  5. `PaymentStep` (single "Send Payment Link on WhatsApp" button — gateway hidden)
-- Wizard persists progress to `motor_quotes` so it resumes on reopen.
+1. **BUG-1**: Update `lead_to_customer_on_won` trigger to fire on `Converted` (case-insensitive), backfill any orphaned converted leads, and add toast in `CallingList.updateStatus`. Fix `CustomersPanel` to query `customers` table by `lifecycle_stage`.
+2. **BUG-2**: Bridge `lead_notes` ↔ `customer_notes` — in `LeadActions.saveNote`, mirror to `customer_notes` when `lead.customer_id` exists. `LeadTimeline` merges both.
+3. **BUG-3**: `TelecallerDashboard` — collapse 3 duplicate `<CallingList>` renders to one; repurpose mobile "leads" tab to "My Customers".
+4. **BUG-4**: Rename `"Done"` → `"Policy Issued"` everywhere (CallingList STATUS_OPTIONS, useLeadsPaginated COMPLETED_STATUSES, LeadActions, BulkActionBar, CallReportsPanel, reports/utils). DB migration `UPDATE leads SET status='Policy Issued' WHERE status='Done'`.
+5. **BUG-5**: Replace generic "Send Quote" WA button with a Dialog (insurer, premium, IDV, plan, validity, editable message). On send, insert into new `lead_quotes` table + set status to `"Quote Sent"`.
+6. **BUG-6**: `useLeadsPaginated.buildQuery` — explicit `.eq("company_id", companyId)` defense-in-depth.
 
-**5. Wire-in points**
-- Admin sidebar: new "Quotation" entry (between Leads and Renewals).
-- `LeadActions.tsx` & `CallingList`: add "Motor Quote" button that opens the wizard pre-filled from the lead.
-- On `status = converted` → auto-insert `motor_policies` row and update lead.
+## Batch B — Duplicates / Cleanup
 
-### Out of scope (for this pass)
-- Health/Life quotation (module is built generically but only Motor flow is implemented now).
-- Real PolicyBoss API contract testing — functions are wired with the documented endpoints; you may need to share sandbox credentials before live calls succeed.
+7. **DUP-1**: Delete `CustomersPanel.tsx`; `CustomersHubPanel` "Customers Won" tab → `Customer360Panel` filtered by `lifecycle_stage in ('policy_holder','multi_product','loyal')`.
+8. **DUP-2**: Remove the add-note textarea from `LeadTimeline` (read-only timeline).
+9. **DUP-3**: Remove direct Motor/Health/Life entry points from `AdminSidebar`; keep entry only via Customers Hub → Policies & Services.
+10. **DUP-5**: New `useIRDAIRates()` hook reading from `app_settings.irdai_rates` JSONB; `PremiumCalculator` consumes it.
+11. **DUP-6**: Hardcoded WA strings (`introMsg/smsMsg/quoteMsg`) → load from `message_templates` (category: intro/sms/quote).
+12. **DUP-7**: Mark `ReportsAndPerformancePanel` + `CallReportsPanel` as deprecated; route their slots to `ReportsHubPanel` tabs.
 
-### Technical notes
-- Storage bucket `kyc-documents` (private, 5MB cap, jpg/png/pdf).
-- Reuse addon math from `PremiumCalculator.tsx`.
-- Mobile: `Sheet` (bottom); desktop: `Dialog` (large).
-- All provider branding hidden from telecaller UI per spec.
+## Batch C — Lifecycle Gaps
 
-### Delivery order
-1. Migration + storage bucket (one approval).
-2. Edge functions (4).
-3. Super Admin PolicyBoss panel + session hook.
-4. Quotation module UI + wizard.
-5. Wire into Admin sidebar, LeadActions, CallingList.
+13. **GAP-1**: `EnquiriesPanel` — "Convert to Lead" button + dialog; add `enquiries.converted_lead_id`.
+14. **GAP-3**: After `customer_products` insert (in `AddProductDialog`), update `customers.lifecycle_stage='policy_holder'` + lifecycle event. (DB trigger `log_lifecycle_on_product` already does this — just verify and add UI feedback.)
+15. **GAP-4**: `renewals.customer_id` FK already present in trigger. Add "View Customer 360" link in `RenewalCommandCenter`. On status='renewed' → lifecycle event 'loyal'/'renewal'.
+16. **GAP-5**: `AddProductDialog` — auto-call `compute_cross_sell` RPC after insert (already trigger-driven; add UI badge on Products tab when score≥70).
+17. **GAP-6**: On claim insert — lifecycle event already added via `log_lifecycle_on_claim`. Add reversal event on claim `settled`.
+18. **GAP-7**: New edge function `auto-renewal-leads` (daily cron). Add `customer_products.renewal_lead_created bool`.
+19. **GAP-8**: New `payment_records` table + "Payments" tab in `FinancePanel`. PaymentLink "Mark Paid" inserts.
 
-Approve and I'll start with the migration.
+## Batch D — Insurance Industry Features
+
+20. **INS-1**: `leads.policy_number text`. When setting "Policy Issued", dialog forces input.
+21. **INS-2**: `vehicles.ncb_percent/last_policy_end_date/claim_free_years`; `motor_policies.ncb_applied`. Calculator auto-fills from vehicle.
+22. **INS-3**: `PremiumCalculator` "Compare Insurers" tab — simulated ±5–15% spread across 6 insurers; "Select & Send Quote" hands off to BUG-5 dialog.
+23. **INS-4**: `profiles.posp_code/posp_valid_until/exam_passed/exam_date`; UI in `AccountSettings` + `EditMemberDialog`.
+24. **INS-5**: `CommissionTracker` — "Generate Invoice" via jsPDF, upload to `invoices/` bucket, update commission row.
+25. **INS-6**: WA send logger — every `wa.me` open writes `lead_notes` entry "📱 WhatsApp bheja: …"; CallingList shows "WA Sent" badge when note <24h.
+
+---
+
+## Technical Section
+
+### New tables (migrations)
+- `lead_quotes` (BUG-5)
+- `payment_records` (GAP-8)
+- `invoices` storage bucket (INS-5)
+
+### Altered tables
+- `leads`: `customer_id uuid`, `policy_number text`
+- `enquiries`: `converted_lead_id uuid`
+- `customer_products`: `renewal_lead_created bool`
+- `vehicles`: `ncb_percent int`, `last_policy_end_date date`, `claim_free_years int`
+- `motor_policies`: `ncb_applied int`
+- `profiles`: `posp_code text`, `posp_valid_until date`, `exam_passed bool`, `exam_date date`
+- `app_settings`: `irdai_rates jsonb`
+
+### Updated trigger
+- `lead_to_customer_on_won` → match `Converted` (case-insensitive) in addition to `won`.
+
+### New edge function
+- `auto-renewal-leads` — daily; reads expiring `customer_products`, inserts `leads`, marks `renewal_lead_created=true`.
+
+### Data migrations
+- `UPDATE leads SET status='Policy Issued' WHERE lower(status)='done'`
+- Backfill `customers` rows for any historical lead with `status='Converted'` lacking `customer_id`.
+
+### Risk / scope
+- ~35 files touched, 8 schema migrations, 1 new edge function, ~1500 LOC.
+- Each batch ends with a typecheck. If batch fails, I stop and report — won't push corrupted state to next batch.
+- I won't run automated end-to-end tests for every UI flow; you'll need to smoke-test BUG-5 dialog, Enquiry→Lead, and the renewal cron manually.
+
+### Out of scope (explicit)
+- No design/theme changes
+- No auth/role refactor
+- No real PolicyBoss API integration (still stubs — separate thread)
