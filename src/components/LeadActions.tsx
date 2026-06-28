@@ -19,6 +19,7 @@ import {
   History, Loader2, StickyNote, Info, Ban, IndianRupee, PhoneOutgoing, Send, Car,
 } from "lucide-react";
 import { MotorQuoteWizard } from "@/components/admin/quotation/MotorQuoteWizard";
+import { SendQuoteDialog } from "@/components/SendQuoteDialog";
 
 type Status = string;
 
@@ -31,6 +32,7 @@ type LeadLite = {
   call_date: string;
   premium_amount: number;
   policy_expiry_date?: string | null;
+  customer_id?: string | null;
   areas?: { name: string } | null;
   assigned_telecaller?: string | null;
 };
@@ -107,6 +109,7 @@ export const LeadActions = ({
   const [moreOpen, setMoreOpen] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [quoteOpen, setQuoteOpen] = useState(false);
+  const [sendQuoteOpen, setSendQuoteOpen] = useState(false);
   const [tab, setTab] = useState<Tab>("notes");
   const [revealed, setRevealed] = useState(false);
 
@@ -178,7 +181,12 @@ export const LeadActions = ({
   const saveNote = async () => {
     if (!note.trim() || !user) return;
     setSavingNote(true);
-    const { error } = await supabase.from("lead_notes").insert({ lead_id: lead.id, author_id: user.id, note: note.trim() });
+    const trimmed = note.trim();
+    const { error } = await supabase.from("lead_notes").insert({ lead_id: lead.id, author_id: user.id, note: trimmed });
+    // Bridge to customer_notes if this lead has a linked customer (BUG-2)
+    if (!error && lead.customer_id) {
+      await supabase.from("customer_notes").insert({ customer_id: lead.customer_id, author_id: user.id, note: trimmed }).then(() => {}, () => {});
+    }
     setSavingNote(false);
     if (error) return toast({ title: "Note save fail", description: error.message, variant: "destructive" });
     setNote(""); toast({ title: "Note saved" });
@@ -286,7 +294,8 @@ export const LeadActions = ({
               ><MessageCircle className="h-4 w-4" /></IconBtn>
 
               <IconBtn
-                label="Send quote" asChild href={waLink(quoteMsg)} target="_blank" rel="noopener noreferrer"
+                label="Send quote"
+                onClick={() => setSendQuoteOpen(true)}
                 className="w-full bg-warning text-warning-foreground hover:opacity-90"
               ><FileText className="h-4 w-4" /></IconBtn>
 
@@ -308,6 +317,14 @@ export const LeadActions = ({
             open={quoteOpen}
             onOpenChange={setQuoteOpen}
             lead={{ id: lead.id, customer_name: lead.customer_name, phone_number: lead.phone_number }}
+          />
+          <SendQuoteDialog
+            open={sendQuoteOpen}
+            onOpenChange={setSendQuoteOpen}
+            lead={{
+              id: lead.id, customer_name: lead.customer_name, phone_number: lead.phone_number,
+              policy_type: lead.policy_type, premium_amount: lead.premium_amount,
+            }}
           />
         </>
       )}
@@ -357,7 +374,7 @@ export const LeadActions = ({
               </div>
             )}
 
-            {tab === "timeline" && <LeadTimeline leadId={lead.id} />}
+            {tab === "timeline" && <LeadTimeline leadId={lead.id} customerId={lead.customer_id ?? null} />}
 
             {tab === "details" && (
               <dl className="divide-y text-sm">
