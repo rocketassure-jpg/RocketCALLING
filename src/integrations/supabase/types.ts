@@ -2553,6 +2553,7 @@ export type Database = {
           product_name: string | null
           profit: number | null
           renewal_lead_created: boolean
+          renewal_lead_id: string | null
           start_date: string | null
           status: string | null
           sub_category: string | null
@@ -2587,6 +2588,7 @@ export type Database = {
           product_name?: string | null
           profit?: number | null
           renewal_lead_created?: boolean
+          renewal_lead_id?: string | null
           start_date?: string | null
           status?: string | null
           sub_category?: string | null
@@ -2621,6 +2623,7 @@ export type Database = {
           product_name?: string | null
           profit?: number | null
           renewal_lead_created?: boolean
+          renewal_lead_id?: string | null
           start_date?: string | null
           status?: string | null
           sub_category?: string | null

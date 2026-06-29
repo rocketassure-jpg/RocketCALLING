@@ -29,6 +29,10 @@ export const AccountSettings = () => {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [pospCode, setPospCode] = useState("");
+  const [pospValidUntil, setPospValidUntil] = useState("");
+  const [examPassed, setExamPassed] = useState(false);
+  const [examDate, setExamDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newPwd, setNewPwd] = useState("");
@@ -40,12 +44,16 @@ export const AccountSettings = () => {
     if (!user) return;
     (async () => {
       const [{ data: prof }, { data: comp }] = await Promise.all([
-        supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+        (supabase as any).from("profiles").select("full_name, posp_code, posp_valid_until, exam_passed, exam_date").eq("id", user.id).maybeSingle(),
         companyId
           ? (supabase as any).from("companies").select("id,name,owner_name,contact_phone,contact_email,address,pincode,gst_number,tagline,logo_url").eq("id", companyId).maybeSingle()
           : Promise.resolve({ data: null }),
       ]);
       setFullName(prof?.full_name ?? "");
+      setPospCode(prof?.posp_code ?? "");
+      setPospValidUntil(prof?.posp_valid_until ?? "");
+      setExamPassed(!!prof?.exam_passed);
+      setExamDate(prof?.exam_date ?? "");
       setEmail(user.email ?? "");
       setPhone(user.phone ?? "");
       setCompany((comp as any) ?? null);
@@ -56,7 +64,13 @@ export const AccountSettings = () => {
   const saveProfile = async () => {
     if (!user) return;
     setSaving(true);
-    const { error } = await supabase.from("profiles").update({ full_name: fullName.trim() }).eq("id", user.id);
+    const { error } = await (supabase as any).from("profiles").update({
+      full_name: fullName.trim(),
+      posp_code: pospCode.trim() || null,
+      posp_valid_until: pospValidUntil || null,
+      exam_passed: examPassed,
+      exam_date: examDate || null,
+    }).eq("id", user.id);
     if (email && email !== user.email) {
       const { error: e2 } = await supabase.auth.updateUser({ email });
       if (e2) toast({ title: "Email update failed", description: e2.message, variant: "destructive" });
@@ -128,11 +142,35 @@ export const AccountSettings = () => {
               <Input className="h-9" value={phone} disabled placeholder="—" />
             </div>
           </div>
+
+          <div className="rounded-md border border-dashed bg-muted/30 p-3">
+            <div className="mb-2 text-xs font-semibold text-foreground">POSP / IRDAI Compliance</div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs">POSP Code</Label>
+                <Input className="h-9" value={pospCode} onChange={(e) => setPospCode(e.target.value)} placeholder="e.g. POSP12345" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">POSP Valid Until</Label>
+                <Input type="date" className="h-9" value={pospValidUntil} onChange={(e) => setPospValidUntil(e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs">Exam Date</Label>
+                <Input type="date" className="h-9" value={examDate} onChange={(e) => setExamDate(e.target.value)} />
+              </div>
+              <div className="flex items-end gap-2 pb-1">
+                <input id="exampassed" type="checkbox" className="h-4 w-4" checked={examPassed} onChange={(e) => setExamPassed(e.target.checked)} />
+                <Label htmlFor="exampassed" className="cursor-pointer text-xs">15-hour POSP exam passed</Label>
+              </div>
+            </div>
+          </div>
+
           <Button variant="hero" size="sm" onClick={saveProfile} disabled={saving}>
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} Save profile
           </Button>
         </CardContent>
       </Card>
+
 
       <Card>
         <CardHeader className="pb-3"><CardTitle className="text-base">Change password</CardTitle></CardHeader>
