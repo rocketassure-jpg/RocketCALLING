@@ -1,9 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Wallet, Wrench, Building2, MapPin, Plus, Trash2 } from "lucide-react";
+import { Wallet, Wrench, Building2, MapPin, Plus, Trash2, CreditCard } from "lucide-react";
 import { AccountsPanel } from "@/components/admin/accounts/AccountsPanel";
 import { BrokerPanel } from "@/components/admin/brokers/BrokerPanel";
 import { OperationsPanel } from "@/components/admin/operations/OperationsPanel";
 import { BranchesPanel } from "@/components/admin/branches/BranchesPanel";
+import { PaymentsPanel } from "@/components/admin/PaymentsPanel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export const FinancePanel = () => {
   const tabs = [
     { id: "accounts", label: "Accounts", icon: Wallet, show: has("accounts"), node: <AccountsPanel /> },
     { id: "brokers", label: "Brokers & Payouts", icon: Wallet, show: has("accounts"), node: <BrokerPanel /> },
+    { id: "payments", label: "Payments", icon: CreditCard, show: true, node: <PaymentsPanel /> },
     { id: "operations", label: "Operations", icon: Wrench, show: true, node: <OperationsPanel /> },
     { id: "branches", label: "Branches", icon: Building2, show: true, node: <BranchesPanel /> },
     { id: "areas", label: "Areas", icon: MapPin, show: true, node: <AreasPanel /> },
