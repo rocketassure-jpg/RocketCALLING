@@ -213,7 +213,17 @@ export const CallingList = ({ callerName = "Rocket Services", filterAssigned = f
 
   const updateStatus = async (lead: Lead, newStatus: Status, note?: string) => {
     const now = new Date().toISOString();
-    const { error: e1 } = await supabase.from("leads").update({ status: newStatus, last_called_at: now }).eq("id", lead.id);
+    const update: any = { status: newStatus, last_called_at: now };
+    // INS-1: Policy Issued must capture policy number
+    if (newStatus === "Policy Issued" && !(lead as any).policy_number) {
+      const pn = window.prompt("Policy Number daalo (mandatory for Policy Issued):", "");
+      if (!pn || !pn.trim()) {
+        toast({ title: "Policy number zaroori hai", variant: "destructive" });
+        return;
+      }
+      update.policy_number = pn.trim();
+    }
+    const { error: e1 } = await supabase.from("leads").update(update).eq("id", lead.id);
     if (e1) return toast({ title: "Update failed", description: e1.message, variant: "destructive" });
     if (user) await supabase.from("call_logs").insert({ lead_id: lead.id, telecaller_id: user.id, status: newStatus, notes: note || null });
     toast({ title: "Saved", description: `${lead.customer_name} → ${newStatus}` });
