@@ -1,83 +1,92 @@
+# Plan — System upgrade (4 phases)
 
-# Full Audit Execution Plan
-
-Audit has **27 items** across 4 parts. I'll execute in 4 batches, each ending with a build/lint check. Approve once, I'll run all batches back-to-back and report at the end.
-
-Note: DB already has a `lead_to_customer_on_won` trigger that fires on `status='won'`. The audit refers to status `'Converted'`. I'll align the trigger + UI to a single canonical value (`'Converted'`) so BUG-1 actually works.
+Aap ne sab 4 chuna, Partner = dono types, payout = full custom. Bohot bada scope hai isliye 4 phases me karenge — har phase ke baad aap test karke "next" bolenge.
 
 ---
 
-## Batch A — Priority 1 (Critical Bugs)
+## Phase 1 — Super Admin: Company Delete (safety-first)
 
-1. **BUG-1**: Update `lead_to_customer_on_won` trigger to fire on `Converted` (case-insensitive), backfill any orphaned converted leads, and add toast in `CallingList.updateStatus`. Fix `CustomersPanel` to query `customers` table by `lifecycle_stage`.
-2. **BUG-2**: Bridge `lead_notes` ↔ `customer_notes` — in `LeadActions.saveNote`, mirror to `customer_notes` when `lead.customer_id` exists. `LeadTimeline` merges both.
-3. **BUG-3**: `TelecallerDashboard` — collapse 3 duplicate `<CallingList>` renders to one; repurpose mobile "leads" tab to "My Customers".
-4. **BUG-4**: Rename `"Done"` → `"Policy Issued"` everywhere (CallingList STATUS_OPTIONS, useLeadsPaginated COMPLETED_STATUSES, LeadActions, BulkActionBar, CallReportsPanel, reports/utils). DB migration `UPDATE leads SET status='Policy Issued' WHERE status='Done'`.
-5. **BUG-5**: Replace generic "Send Quote" WA button with a Dialog (insurer, premium, IDV, plan, validity, editable message). On send, insert into new `lead_quotes` table + set status to `"Quote Sent"`.
-6. **BUG-6**: `useLeadsPaginated.buildQuery` — explicit `.eq("company_id", companyId)` defense-in-depth.
+**Goal:** Super admin kisi bhi company ko safely delete kar sake taki orphan kachra na bache.
 
-## Batch B — Duplicates / Cleanup
+**DB migration:**
+- New RPC `super_admin_delete_company(_company_id uuid)` — SECURITY DEFINER, sirf `is_super_admin` ko allow.
+- Function order: pehle dependent rows (leads, customers, customer_products, claims, renewals, policy_transactions, payouts, branches, profiles, user_roles, audit_logs, etc. — saare 100+ tables jinme `company_id` hai), phir companies row.
+- Audit entry `super_admin_audit_log` me likhega "DELETE_COMPANY" with old data snapshot.
+- Transaction-safe — koi error to full rollback.
 
-7. **DUP-1**: Delete `CustomersPanel.tsx`; `CustomersHubPanel` "Customers Won" tab → `Customer360Panel` filtered by `lifecycle_stage in ('policy_holder','multi_product','loyal')`.
-8. **DUP-2**: Remove the add-note textarea from `LeadTimeline` (read-only timeline).
-9. **DUP-3**: Remove direct Motor/Health/Life entry points from `AdminSidebar`; keep entry only via Customers Hub → Policies & Services.
-10. **DUP-5**: New `useIRDAIRates()` hook reading from `app_settings.irdai_rates` JSONB; `PremiumCalculator` consumes it.
-11. **DUP-6**: Hardcoded WA strings (`introMsg/smsMsg/quoteMsg`) → load from `message_templates` (category: intro/sms/quote).
-12. **DUP-7**: Mark `ReportsAndPerformancePanel` + `CallReportsPanel` as deprecated; route their slots to `ReportsHubPanel` tabs.
-
-## Batch C — Lifecycle Gaps
-
-13. **GAP-1**: `EnquiriesPanel` — "Convert to Lead" button + dialog; add `enquiries.converted_lead_id`.
-14. **GAP-3**: After `customer_products` insert (in `AddProductDialog`), update `customers.lifecycle_stage='policy_holder'` + lifecycle event. (DB trigger `log_lifecycle_on_product` already does this — just verify and add UI feedback.)
-15. **GAP-4**: `renewals.customer_id` FK already present in trigger. Add "View Customer 360" link in `RenewalCommandCenter`. On status='renewed' → lifecycle event 'loyal'/'renewal'.
-16. **GAP-5**: `AddProductDialog` — auto-call `compute_cross_sell` RPC after insert (already trigger-driven; add UI badge on Products tab when score≥70).
-17. **GAP-6**: On claim insert — lifecycle event already added via `log_lifecycle_on_claim`. Add reversal event on claim `settled`.
-18. **GAP-7**: New edge function `auto-renewal-leads` (daily cron). Add `customer_products.renewal_lead_created bool`.
-19. **GAP-8**: New `payment_records` table + "Payments" tab in `FinancePanel`. PaymentLink "Mark Paid" inserts.
-
-## Batch D — Insurance Industry Features
-
-20. **INS-1**: `leads.policy_number text`. When setting "Policy Issued", dialog forces input.
-21. **INS-2**: `vehicles.ncb_percent/last_policy_end_date/claim_free_years`; `motor_policies.ncb_applied`. Calculator auto-fills from vehicle.
-22. **INS-3**: `PremiumCalculator` "Compare Insurers" tab — simulated ±5–15% spread across 6 insurers; "Select & Send Quote" hands off to BUG-5 dialog.
-23. **INS-4**: `profiles.posp_code/posp_valid_until/exam_passed/exam_date`; UI in `AccountSettings` + `EditMemberDialog`.
-24. **INS-5**: `CommissionTracker` — "Generate Invoice" via jsPDF, upload to `invoices/` bucket, update commission row.
-25. **INS-6**: WA send logger — every `wa.me` open writes `lead_notes` entry "📱 WhatsApp bheja: …"; CallingList shows "WA Sent" badge when note <24h.
+**UI (`SuperAdminPanels.tsx` / Companies tab):**
+- Har company row me red "Delete" icon.
+- Confirm dialog 2-step: company ka exact name type karna mandatory + checkbox "I understand this is permanent".
+- Loading state + toast.
 
 ---
 
-## Technical Section
+## Phase 2 — Hierarchy: Owner → Partners → Branches → Agents
 
-### New tables (migrations)
-- `lead_quotes` (BUG-5)
-- `payment_records` (GAP-8)
-- `invoices` storage bucket (INS-5)
+**Roles add:**
+- `app_role` enum me add: `owner`, `partner`.
+- `profiles` me: `partner_type` (`equity` | `regional` | null), `partner_share_pct numeric`.
+- Branches already exist — add `partner_id uuid` (regional partner mapping, nullable).
 
-### Altered tables
-- `leads`: `customer_id uuid`, `policy_number text`
-- `enquiries`: `converted_lead_id uuid`
-- `customer_products`: `renewal_lead_created bool`
-- `vehicles`: `ncb_percent int`, `last_policy_end_date date`, `claim_free_years int`
-- `motor_policies`: `ncb_applied int`
-- `profiles`: `posp_code text`, `posp_valid_until date`, `exam_passed bool`, `exam_date date`
-- `app_settings`: `irdai_rates jsonb`
+**Org Hierarchy Panel** (`OrgHierarchyPanel.tsx` rewrite):
+```text
+[ Owner: Ramesh Kumar ]
+   ├── Partner (equity 30%): Suresh
+   ├── Partner (regional): Mahesh
+   │     ├── Branch: Indore
+   │     │     ├── Agent: Ravi (Motor 30%, Health 25%)
+   │     │     └── Agent: Priya
+   │     └── Branch: Bhopal
+   └── Branch: Ujjain (no partner — direct under owner)
+```
+- Collapsible tree, drag-drop NOT included (phase 5 if needed).
+- Add/Edit dialogs for each level.
+- Auto-elevate first admin → owner on migration.
 
-### Updated trigger
-- `lead_to_customer_on_won` → match `Converted` (case-insensitive) in addition to `won`.
+---
 
-### New edge function
-- `auto-renewal-leads` — daily; reads expiring `customer_products`, inserts `leads`, marks `renewal_lead_created=true`.
+## Phase 3 — Custom Payout Engine
 
-### Data migrations
-- `UPDATE leads SET status='Policy Issued' WHERE lower(status)='done'`
-- Backfill `customers` rows for any historical lead with `status='Converted'` lacking `customer_id`.
+**DB:**
+- `agent_payout_rules` table (per-agent override): agent_id, product_category, basis (`flat_pct` | `slab` | `fixed_amount` | `formula`), config jsonb, effective_from, effective_to.
+- `payout_slabs` table: rule_id, min_amount, max_amount, rate_pct, fixed_bonus.
+- `agent_payout_ledger`: monthly computed entries — agent_id, period_month, gross_commission, agent_share, branch_share, partner_share, owner_share, tds, net_payout, status (`pending`/`approved`/`paid`).
 
-### Risk / scope
-- ~35 files touched, 8 schema migrations, 1 new edge function, ~1500 LOC.
-- Each batch ends with a typecheck. If batch fails, I stop and report — won't push corrupted state to next batch.
-- I won't run automated end-to-end tests for every UI flow; you'll need to smoke-test BUG-5 dialog, Enquiry→Lead, and the renewal cron manually.
+**Engine (DB function `compute_agent_payout(_agent_id, _month)`):**
+- Reads `customer_products` + `policy_transactions` for the period.
+- Resolves rule cascade: agent-specific > branch-default > company-default.
+- Splits: agent → branch → partner (if regional) → owner. Configurable % per level.
+- TDS auto (5% Sec 194D).
+- Writes ledger row.
 
-### Out of scope (explicit)
-- No design/theme changes
-- No auth/role refactor
-- No real PolicyBoss API integration (still stubs — separate thread)
+**UI:**
+- `AgentPayoutRules.tsx` — per-agent rule builder with slab editor.
+- `PayoutLedger.tsx` — monthly statement, filter by agent/branch/partner, approve+mark-paid, export CSV/PDF.
+- Existing `AgentPayouts.tsx` extend ya merge.
+
+**Research-backed defaults seeded:**
+- Motor OD: 15% (IRDAI cap), Motor TP: 2.5%, Health: 15% renewal / 22.5% new, Life Term: 25% Y1 / 5% Y2-Y3, Life Endowment: 35% Y1.
+- Aap baad me edit kar sakte ho.
+
+---
+
+## Phase 4 — Mobile-friendly polish
+
+- `AdminSidebar` — desktop sidebar ke saath mobile Sheet drawer (hamburger top-left), bottom-nav already hai telecaller ke liye, admin ke liye bhi add.
+- Saare tables — wrap in horizontal scroll container, key tables ko mobile pe card-view me convert (CustomersPanel, FinancePanel, PayoutLedger).
+- Dialogs — `sm:max-w-X` ke saath `max-h-[95vh] overflow-y-auto`, mobile pe full-screen sheet.
+- Touch targets — min 44px buttons, larger tap areas in lists.
+- Sticky action bars on mobile.
+
+---
+
+## Technical notes
+
+- Migrations approval-gated (aap har migration "yes" karoge).
+- `types.ts` auto-regenerate hoga har migration ke baad.
+- Backward compatible — purane roles (admin/manager/telecaller/sub_agent) chalte rahenge; owner/partner naye additions hain.
+- No breaking changes to existing leads/customers flow.
+
+---
+
+**Start with Phase 1 (company delete)?** "haan phase 1 start karo" bolo to migration banata hu.

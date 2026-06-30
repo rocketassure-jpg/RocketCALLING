@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket, Plug } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket, Plug, Trash2, AlertTriangle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
@@ -53,6 +54,25 @@ const SuperAdminDashboard = () => {
   const [selected, setSelected] = useState<Company | null>(null);
   const [creating, setCreating] = useState(false);
   const [newCo, setNewCo] = useState({ name: "", code: "", plan: "Custom", trial_days: 14 });
+  const [deleteTarget, setDeleteTarget] = useState<Company | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
+  const [deleteAck, setDeleteAck] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const deleteCompany = async () => {
+    if (!deleteTarget) return;
+    if (deleteConfirmName.trim() !== deleteTarget.name) {
+      return toast({ title: "Name doesn't match", description: "Exact company name type karo", variant: "destructive" });
+    }
+    if (!deleteAck) return toast({ title: "Confirm karo", variant: "destructive" });
+    setDeleting(true);
+    const { data, error } = await (supabase as any).rpc("super_admin_delete_company", { _company_id: deleteTarget.id });
+    setDeleting(false);
+    if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    toast({ title: "Company deleted", description: `${deleteTarget.name} — ${Object.keys((data as any)?.deleted ?? {}).length} tables cleaned` });
+    setDeleteTarget(null); setDeleteConfirmName(""); setDeleteAck(false);
+    load();
+  };
 
   const load = async () => {
     setLoading(true);
@@ -257,6 +277,7 @@ const SuperAdminDashboard = () => {
                                 <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
                                 <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
                                 <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                                <Button size="sm" variant="destructive" onClick={() => { setDeleteTarget(co); setDeleteConfirmName(""); setDeleteAck(false); }} title="Permanently delete"><Trash2 className="h-3 w-3" /></Button>
                               </div>
                             </TableCell>
                           </TableRow>
@@ -343,6 +364,45 @@ const SuperAdminDashboard = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) { setDeleteTarget(null); setDeleteConfirmName(""); setDeleteAck(false); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" /> Delete Company — Permanent
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs">
+              <b>{deleteTarget?.name}</b> ka SAARA data — leads, customers, policies, claims, payouts, branches, profiles, audit — sab permanently delete ho jayega.
+              User login accounts (auth) safe rahenge taki dobara assign kar sakein.
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Confirm: type the company name exactly</Label>
+              <Input
+                value={deleteConfirmName}
+                onChange={(e) => setDeleteConfirmName(e.target.value)}
+                placeholder={deleteTarget?.name ?? ""}
+                autoFocus
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs">
+              <Checkbox checked={deleteAck} onCheckedChange={(v) => setDeleteAck(!!v)} />
+              <span>I understand this is permanent and cannot be undone.</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={deleteCompany}
+              disabled={deleting || !deleteAck || deleteConfirmName.trim() !== (deleteTarget?.name ?? "")}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Trash2 className="h-4 w-4 mr-1" /> Delete Permanently</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
