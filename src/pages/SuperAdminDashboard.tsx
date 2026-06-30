@@ -53,6 +53,25 @@ const SuperAdminDashboard = () => {
   const [selected, setSelected] = useState<Company | null>(null);
   const [creating, setCreating] = useState(false);
   const [newCo, setNewCo] = useState({ name: "", code: "", plan: "Custom", trial_days: 14 });
+  const [deleteTarget, setDeleteTarget] = useState<Company | null>(null);
+  const [deleteConfirmName, setDeleteConfirmName] = useState("");
+  const [deleteAck, setDeleteAck] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const deleteCompany = async () => {
+    if (!deleteTarget) return;
+    if (deleteConfirmName.trim() !== deleteTarget.name) {
+      return toast({ title: "Name doesn't match", description: "Exact company name type karo", variant: "destructive" });
+    }
+    if (!deleteAck) return toast({ title: "Confirm karo", variant: "destructive" });
+    setDeleting(true);
+    const { data, error } = await (supabase as any).rpc("super_admin_delete_company", { _company_id: deleteTarget.id });
+    setDeleting(false);
+    if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    toast({ title: "Company deleted", description: `${deleteTarget.name} — ${Object.keys((data as any)?.deleted ?? {}).length} tables cleaned` });
+    setDeleteTarget(null); setDeleteConfirmName(""); setDeleteAck(false);
+    load();
+  };
 
   const load = async () => {
     setLoading(true);
