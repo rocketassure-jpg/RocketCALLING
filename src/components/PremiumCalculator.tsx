@@ -62,10 +62,15 @@ const initial = {
 };
 
 export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) => {
+  const { rates } = useIRDAIRates();
+  const TP_RATES = rates.TP_RATES;
+  const ADDONS = rates.ADDONS;
+  const NCB_OPTIONS = rates.NCB_OPTIONS;
   const [f, setF] = useState(initial);
   const set = (k: keyof typeof initial, v: any) => setF((p) => ({ ...p, [k]: v }));
   const toggleAddon = (id: string) =>
     setF((p) => ({ ...p, addons: p.addons.includes(id) ? p.addons.filter((x) => x !== id) : [...p.addons, id] }));
+
 
   const calc = useMemo(() => {
     const age = Math.max(0, new Date().getFullYear() - Number(f.mfgYear));
