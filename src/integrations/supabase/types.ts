@@ -8599,6 +8599,10 @@ export type Database = {
       }
       resolve_login_email: { Args: { _login: string }; Returns: string }
       seed_master_data: { Args: { _company_id: string }; Returns: undefined }
+      super_admin_delete_company: {
+        Args: { _company_id: string }
+        Returns: Json
+      }
       telecaller_has_area: {
         Args: { _area_id: string; _user_id: string }
         Returns: boolean
