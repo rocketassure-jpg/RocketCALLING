@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket, Plug } from "lucide-react";
+import { Building2, Plus, Loader2, ShieldCheck, LogOut, Copy, LayoutDashboard, Megaphone, Settings as SettingsIcon, Flag, Layers, ShieldAlert, KeyRound, UserCog, TrendingUp, Users, Phone, IndianRupee, Database, Sliders, Palette, Rocket, Plug, Trash2, AlertTriangle } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Link } from "react-router-dom";
 import { GlobalSettingsPanel, FeatureFlagsPanel, AnnouncementsPanel, PlanTemplatesPanel, SuperAdminAuditPanel } from "@/components/super-admin/SuperAdminPanels";
 import { DataExplorerPanel } from "@/components/super-admin/DataExplorerPanel";
