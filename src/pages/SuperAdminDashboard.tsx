@@ -277,6 +277,7 @@ const SuperAdminDashboard = () => {
                                 <Button size="sm" variant="outline" onClick={() => setSelected(co)}>Manage</Button>
                                 <Button size="sm" variant="outline" onClick={() => impersonate(co)}><UserCog className="h-3 w-3" /> Login As</Button>
                                 <Button size="sm" variant={co.is_active ? "destructive" : "default"} onClick={() => toggleCompanyActive(co)}>{co.is_active ? "Suspend" : "Activate"}</Button>
+                                <Button size="sm" variant="destructive" onClick={() => { setDeleteTarget(co); setDeleteConfirmName(""); setDeleteAck(false); }} title="Permanently delete"><Trash2 className="h-3 w-3" /></Button>
                               </div>
                             </TableCell>
                           </TableRow>
