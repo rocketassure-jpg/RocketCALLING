@@ -10,25 +10,7 @@ import { Calculator, Download, MessageCircle, RotateCcw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-
-/* ────────── IRDAI 2026 reference rates (configurable) ────────── */
-const TP_RATES = {
-  PrivateCar: [
-    { max: 1000, amt: 2094 },
-    { max: 1500, amt: 3416 },
-    { max: 99999, amt: 7897 },
-  ],
-  TwoWheeler: [
-    { max: 75, amt: 538 },
-    { max: 150, amt: 714 },
-    { max: 350, amt: 1366 },
-    { max: 99999, amt: 2804 },
-  ],
-  GCV: [{ max: 99999, amt: 14390 }],
-  PCV: [{ max: 99999, amt: 8510 }],
-  SchoolBus: [{ max: 99999, amt: 12500 }],
-  Tractor: [{ max: 99999, amt: 1075 }],
-};
+import { useIRDAIRates, DEFAULT_IRDAI_RATES } from "@/hooks/useIRDAIRates";
 
 // IDV depreciation as per IRDAI Motor Tariff
 const depreciationByAge = (years: number) => {
@@ -52,15 +34,6 @@ const odRateByVehicle = (type: string, age: number) => {
   return base;
 };
 
-const ADDONS = [
-  { id: "zero_dep", label: "Zero Depreciation", rate: 0.15 },
-  { id: "engine", label: "Engine Protect", rate: 0.05 },
-  { id: "rti", label: "Return to Invoice", rate: 0.10 },
-  { id: "consumables", label: "Consumables", rate: 0.03 },
-  { id: "rsa", label: "Roadside Assistance", rate: 0.005 },
-];
-
-const NCB_OPTIONS = [0, 20, 25, 35, 45, 50];
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
@@ -89,10 +62,15 @@ const initial = {
 };
 
 export const PremiumCalculator = ({ embedded = false }: { embedded?: boolean }) => {
+  const { rates } = useIRDAIRates();
+  const TP_RATES = rates.TP_RATES;
+  const ADDONS = rates.ADDONS;
+  const NCB_OPTIONS = rates.NCB_OPTIONS;
   const [f, setF] = useState(initial);
   const set = (k: keyof typeof initial, v: any) => setF((p) => ({ ...p, [k]: v }));
   const toggleAddon = (id: string) =>
     setF((p) => ({ ...p, addons: p.addons.includes(id) ? p.addons.filter((x) => x !== id) : [...p.addons, id] }));
+
 
   const calc = useMemo(() => {
     const age = Math.max(0, new Date().getFullYear() - Number(f.mfgYear));
