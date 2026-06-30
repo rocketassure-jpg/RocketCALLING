@@ -364,6 +364,45 @@ const SuperAdminDashboard = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      <Dialog open={!!deleteTarget} onOpenChange={(o) => { if (!o) { setDeleteTarget(null); setDeleteConfirmName(""); setDeleteAck(false); } }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" /> Delete Company — Permanent
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-sm">
+            <div className="rounded-md border border-destructive/40 bg-destructive/5 p-3 text-xs">
+              <b>{deleteTarget?.name}</b> ka SAARA data — leads, customers, policies, claims, payouts, branches, profiles, audit — sab permanently delete ho jayega.
+              User login accounts (auth) safe rahenge taki dobara assign kar sakein.
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs">Confirm: type the company name exactly</Label>
+              <Input
+                value={deleteConfirmName}
+                onChange={(e) => setDeleteConfirmName(e.target.value)}
+                placeholder={deleteTarget?.name ?? ""}
+                autoFocus
+              />
+            </div>
+            <label className="flex items-center gap-2 text-xs">
+              <Checkbox checked={deleteAck} onCheckedChange={(v) => setDeleteAck(!!v)} />
+              <span>I understand this is permanent and cannot be undone.</span>
+            </label>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</Button>
+            <Button
+              variant="destructive"
+              onClick={deleteCompany}
+              disabled={deleting || !deleteAck || deleteConfirmName.trim() !== (deleteTarget?.name ?? "")}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Trash2 className="h-4 w-4 mr-1" /> Delete Permanently</>}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
